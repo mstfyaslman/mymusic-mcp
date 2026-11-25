@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyMusic - كل حاجة</title>
+<style>
+*{box-sizing:border-box}body{font-family:system-ui;background:#0f0f0f;color:#fff;margin:0;padding:12px;text-align:center}
+h1{color:#1DB954;margin:8px}h1 span{color:#fff}.sub{color:#aaa;font-size:14px}
+.card{background:#1e1e1e;padding:16px;border-radius:16px;margin:12px auto;max-width:600px;text-align:right;border:1px solid #333}
+input,select,textarea{width:100%;padding:13px;margin:6px 0;border-radius:10px;border:none;font-size:16px;background:#2a2a2a;color:#fff}
+button{background:#1DB954;color:#fff;border:none;padding:13px;border-radius:10px;font-size:16px;cursor:pointer;width:100%;font-weight:bold;margin-top:6px}
+button.sec{background:#333}button.red{background:#e62117}
+a{color:#1DB954;word-break:break-all}
+.box{background:#222;padding:12px;border-radius:10px;margin-top:10px;white-space:pre-wrap;line-height:1.8}
+.lyrics{white-space:pre-wrap;background:#111;padding:10px;border-radius:10px;max-height:300px;overflow:auto}
+.song{padding:10px;border-bottom:1px solid #333}
+.saved{border:1px solid #444;padding:10px;border-radius:10px;margin:8px 0;background:#222}
+iframe{width:100%;height:220px;border-radius:10px;border:none}
+.tabs{display:flex;gap:8px;max-width:600px;margin:10px auto;overflow:auto}
+.tabs button{width:auto;padding:10px 14px;white-space:nowrap}
+</style>
+</head>
+<body>
+<h1>🎵 My<span>Music</span></h1>
+<p class="sub">بحث • كلمات • مزاج • ترجمة فيديو • حفظ • تحميل فيديو و أغاني</p>
+
+<div class="tabs">
+<button onclick="scrollToId('search')">🔍 بحث</button>
+<button onclick="scrollToId('video')">🎬 ترجمة فيديو</button>
+<button onclick="scrollToId('lyrics')">🎤 كلمات</button>
+<button onclick="scrollToId('mood')">🎧 مزاج</button>
+<button onclick="scrollToId('trans')">🌐 ترجمة</button>
+<button onclick="scrollToId('dl')">⬇️ تحميل</button>
+<button onclick="scrollToId('saved')">💾 المحفوظ</button>
+</div>
+
+<!-- بحث -->
+<div class="card" id="search">
+<h3>🔍 1. بحث يوتيوب و أغاني</h3>
+<input id="song" placeholder="اكتب اسم الأغنية أو الفنان...">
+<button onclick="searchSong()">ابحث</button>
+<div id="searchOut"></div>
+</div>
+
+<!-- ترجمة فيديو -->
+<div class="card" id="video">
+<h3>🎬 2. ترجمة الفيديوهات + حفظها</h3>
+<p style="font-size:13px;color:#aaa">الصق لينك أي فيديو يوتيوب، هيشغله هنا وتقدر تترجم عنوانه ووصفه وتحفظ الترجمة</p>
+<input id="vidUrl" placeholder="الصق لينك فيديو يوتيوب...">
+<input id="vidTitle" placeholder="اكتب عنوان الفيديو أو أي نص سمعته فيه...">
+<select id="vidLang"><option value="ar">ترجم للعربي</option><option value="en">ترجم للإنجليزي</option><option value="fr">ترجم للفرنسي</option></select>
+<button onclick="loadVideo()">▶️ شغل الفيديو و ترجم</button>
+<button class="sec" onclick="saveCurrent()">💾 حفظ الترجمة دي</button>
+<div id="vidOut"></div>
+<div style="margin-top:10px">
+<button class="sec" onclick="startVoice()">🎙️ تفريغ صوت الفيديو - اتكلم جنب الموبايل</button>
+<div id="voiceOut"></div>
+</div>
+</div>
+
+<!-- كلمات -->
+<div class="card" id="lyrics">
+<h3>🎤 3. كلمات الأغنية</h3>
+<input id="artist" placeholder="الفنان - مثال: Amr Diab">
+<input id="track" placeholder="الأغنية - مثال: Tamally Maak">
+<button onclick="getLyrics()">هات الكلمات</button>
+<div id="lyricsOut"></div>
+</div>
+
+<!-- مزاج -->
+<div class="card" id="mood">
+<h3>🎧 4. قايمة حسب المزاج</h3>
+<select id="moodSel"><option value="حزين">😢 حزين</option><option value="سعيد">😀 سعيد</option><option value="رومانسي">❤️ رومانسي</option><option value="حماس">🔥 حماس</option><option value="هادي">🌙 هادي</option><option value="تمرين">💪 تمرين</option></select>
+<button onclick="makeList()">اعمل قايمة</button>
+<div id="listOut"></div>
+</div>
+
+<!-- ترجمة نص -->
+<div class="card" id="trans">
+<h3>🌐 5. ترجمة أي نص + حفظ</h3>
+<textarea id="txt" placeholder="اكتب أي نص من فيديو أو أغنية..."></textarea>
+<select id="lang"><option value="ar">للعربي</option><option value="en">للإنجليزي</option><option value="fr">للفرنسي</option></select>
+<button onclick="translateText()">ترجم</button>
+<button class="sec" onclick="saveTextTrans()">💾 حفظ الترجمة</button>
+<div id="transOut"></div>
+</div>
+
+<!-- تحميل -->
+<div class="card" id="dl">
+<h3>⬇️ 6. تحميل فيديو و أغاني</h3>
+<input id="yt" placeholder="الصق لينك يوتيوب هنا...">
+<button onclick="downloadAll()">⬇️ جهز روابط التحميل</button>
+<button class="sec" onclick="toMp3()">🎵 تحميل كـ MP3 فقط</button>
+<button class="red" onclick="toMp4()">🎬 تحميل كـ MP4 فيديو</button>
+<div id="mp3Out"></div>
+<p style="font-size:12px;color:#aaa">ملحوظة: التحميل بيتم عن طريق مواقع وسيطة آمنة، لأن يوتيوب مش بيسمح بالتحميل المباشر من الموقع.</p>
+</div>
+
+<!-- محفوظ -->
+<div class="card" id="saved">
+<h3>💾 7. الترجمات المحفوظة</h3>
+<button class="sec" onclick="showSaved()">عرض المحفوظ</button>
+<button class="sec" onclick="clearSaved()">🗑️ مسح الكل</button>
+<div id="savedOut"></div>
+</div>
+
+<div id="result" class="box" style="max-width:600px;margin:15px auto">النتيجة هتظهر هنا...</div>
+
+<script>
+function show(id,h){document.getElementById(id).innerHTML=h; document.getElementById('result').innerHTML=h;}
+function scrollToId(id){document.getElementById(id).scrollIntoView({behavior:'smooth'})}
+function getVidId(u){let m=u.match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([A-Za-z0-9_-]{11})/); return m?m[1]:null;}
+function searchSong(){let s=document.getElementById('song').value; if(!s) return alert('اكتب اسم الأغنية'); let q=encodeURIComponent(s); show('searchOut',`<div class="song">🎵 <b>${s}</b><br><a href="https://www.youtube.com/results?search_query=${q}" target="_blank">▶️ افتح في يوتيوب</a> | <a href="https://music.youtube.com/search?q=${q}" target="_blank">🎵 YouTube Music</a><br><button class="sec" onclick="downloadSong('${s}')">⬇️ تحميل الأغنية دي</button></div>`);}
+function downloadSong(s){let q=encodeURIComponent(s); show('mp3Out',`لتحميل <b>${s}</b>:<br>1. <a href="https://www.youtube.com/results?search_query=${q}" target="_blank">هات لينك الفيديو من هنا</a><br>2. انسخ اللينك والصقه تحت في قسم التحميل<br>3. اختار MP3`); scrollToId('dl');}
+async function doTranslate(text,to){let r=await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl
