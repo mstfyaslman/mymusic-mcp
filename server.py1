@@ -1,0 +1,46 @@
+from mcp.server.fastmcp import FastMCP
+import urllib.parse
+import urllib.request
+import json
+
+mcp = FastMCP("mymusic")
+
+@mcp.tool()
+def search_youtube(song: str) -> str:
+    """دور على اغنية في يوتيوب"""
+    query = urllib.parse.quote(song)
+    url = f"https://www.youtube.com/results?search_query={query}"
+    return f"لقيتلك الأغنية هنا، دوس عليها تشتغل: {url}"
+
+@mcp.tool()
+def get_lyrics(artist: str, song: str) -> str:
+    """هات كلمات اغنية"""
+    try:
+        a = urllib.parse.quote(artist)
+        s = urllib.parse.quote(song)
+        url = f"https://api.lyrics.ovh/v1/{a}/{s}"
+        with urllib.request.urlopen(url) as r:
+            data = json.loads(r.read())
+            return data.get("lyrics", "ملقيتش الكلمات")[:2000]
+    except Exception:
+        return "ملقيتش كلمات الأغنية دي، جرب اسم تاني"
+
+@mcp.tool()
+def make_playlist(mood: str) -> str:
+    """اعمل قايمة تشغيل على حسب المزاج - اكتب: حزين او سعيد او رومانسي او حماس"""
+    playlists = {
+        "حزين": ["Amr Diab - Tamally Maak", "Sherine - Mashaaer", "Tamer Hosny - Bahebak"],
+        "سعيد": ["Mohamed Ramadan - Bum Bum", "Saad Lamjarred - Lm3allem", "Amr Diab - Ya Ana Ya La"],
+        "رومانسي": ["Amr Diab - Maak Barتاح", "Elissa - Ayshalak", "Tamer Ashour - Baollak"],
+        "حماس": ["Wegz - El Bakht", "Marwan Pablo - Ghaba", "Afroto - Ana Negm"],
+    }
+    mood = mood.strip()
+    songs = playlists.get(mood, playlists["سعيد"])
+    result = f"قايمة {mood} بتاعتك:\n"
+    for song in songs:
+        q = urllib.parse.quote(song)
+        result += f"- {song} : https://www.youtube.com/results?search_query={q}\n"
+    return result
+
+if __name__ == "__main__":
+    mcp.run()
