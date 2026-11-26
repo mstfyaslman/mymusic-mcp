@@ -3,107 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyMusic AI - حول كلماتك لأغنية</title>
+<title>MyMusic AI - الملف الكامل النهائي</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#7c3aed">
+<meta name="theme-color" content="#0b001a">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:#000;color:#fff;overflow-x:hidden}
-header{padding:18px;text-align:center;background:linear-gradient(180deg,#1a0033,#000)}
-.logo{font-size:32px;font-weight:900} .logo span{color:#ff2d55}
-.sub{opacity:.7;font-size:14px;margin-top:4px}
-.search{margin:16px;background:#111;border:1px solid #222;border-radius:99px;display:flex;padding:6px}
-.search input{flex:1;background:transparent;border:0;color:#fff;padding:10px;outline:none}
-.search button{background:#ff2d55;border:0;color:#fff;padding:10px 18px;border-radius:99px;font-weight:700}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
-.card{background:#141414;border:1px solid #222;border-radius:18px;overflow:hidden;text-decoration:none;color:#fff}
-.card img{width:100%;height:110px;object-fit:cover;display:block}
-.card b{display:block;padding:10px 10px 2px} .card p{padding:0 10px 12px;font-size:12px;opacity:.6}
-.section{padding:6px 14px;font-size:18px;font-weight:800}
-.banner{margin:12px;border-radius:20px;overflow:hidden;position:relative}
-.banner img{width:100%;height:180px;object-fit:cover}
-.banner div{position:absolute;bottom:0;background:linear-gradient(transparent,#000);width:100%;padding:30px 14px 14px}
-/* الكرة العايمة */
-#ball{position:fixed;bottom:20px;left:20px;width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ff2d55);display:flex;align-items:center;justify-content:center;font-size:30px;z-index:999;box-shadow:0 10px 30px rgba(255,45,85,.5);cursor:pointer;border:3px solid #fff}
-#menu{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;display:none;padding:20px;overflow:auto}
+body{background:#000;color:#fff}
+header{background:linear-gradient(180deg,#1a0033,#0b001a 55%,#000);padding:22px 16px 10px;text-align:center}
+.logo{font-size:38px;font-weight:900}.logo span{color:#ff2d55}
+.sub{font-size:14px;opacity:.7;margin-top:6px}
+.search{margin:16px 12px;background:#131313;border:1px solid #2a2a2a;border-radius:99px;display:flex;padding:5px}
+.search input{flex:1;background:transparent;border:0;color:#fff;padding:11px 12px;outline:none;font-size:15px}
+.search button{background:#ff2d55;border:0;color:#fff;padding:11px 20px;border-radius:99px;font-weight:800}
+.banner{margin:4px 12px 12px;border-radius:22px;overflow:hidden;position:relative;box-shadow:0 0 45px rgba(124,58,237,.5)}
+.banner img{width:100%;height:185px;object-fit:cover;display:block}
+.banner .txt{position:absolute;bottom:0;left:0;right:0;padding:34px 14px 14px;background:linear-gradient(transparent,#000);text-align:center}
+.sec{padding:10px 14px;font-size:19px;font-weight:800}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 12px 12px}
+.card{background:#151515;border:1px solid #262626;border-radius:20px;overflow:hidden;text-decoration:none;color:#fff}
+.card img{width:100%;height:115px;object-fit:cover;display:block}
+.card b{display:block;text-align:center;padding:10px 6px 2px;font-size:15px}
+.card p{text-align:center;font-size:12px;opacity:.6;padding:0 6px 12px}
+.chip{display:flex;flex-wrap:wrap;gap:8px;padding:0 12px 12px}
+.chip a{background:#1c1c1c;border:1px solid #2b2b2b;color:#fff;text-decoration:none;font-size:13px;padding:8px 13px;border-radius:99px}
+#ball{position:fixed;bottom:20px;left:20px;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ff2d55);display:flex;align-items:center;justify-content:center;font-size:32px;z-index:9999;border:3px solid #fff;box-shadow:0 0 30px rgba(255,45,85,.7);cursor:pointer}
+#menu{position:fixed;inset:0;background:#070013;z-index:10000;display:none;padding:18px;overflow:auto}
 #menu.show{display:block}
-.close{float:left;font-size:26px;cursor:pointer}
-.m-item{display:flex;gap:12px;align-items:center;background:#161616;border:1px solid #222;padding:12px;border-radius:16px;margin:10px 0;text-decoration:none;color:#fff}
-.m-item img{width:48px;height:48px;border-radius:12px;object-fit:cover}
-.m-item small{display:block;opacity:.6}
-iframe{width:100%;height:220px;border:0;border-radius:16px;background:#000}
+.cat{margin:18px 0 4px;font-weight:800;color:#ff2d55;font-size:16px}
+.m-item{display:flex;gap:12px;align-items:center;background:#171717;border:1px solid #2a2a2a;padding:12px;border-radius:16px;margin:10px 0;text-decoration:none;color:#fff}
+.m-item img{width:50px;height:50px;border-radius:12px;object-fit:cover}
+.m-item small{display:block;opacity:.6;font-size:12px}
+#ytBox{position:fixed;inset:0;background:#000;z-index:10001;display:none;flex-direction:column}
+#ytBox.show{display:flex}
+#ytBox iframe{flex:1;width:100%;border:0}
+.ytBtn{padding:10px 14px;border-radius:99px;border:0;font-weight:800;cursor:pointer}
 </style>
 </head>
 <body>
+<header><div class="logo">🎵 My<span>Music</span> AI</div><div class="sub">حول كلماتك لأغنية • اسمع • ترجم • استمتع</div></header>
+<div class="search"><input id="q" placeholder="دور على أغنية... اكتب اسمها هنا"><button onclick="searchYT()">🔍 بحث</button></div>
+<div class="banner"><img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=900&q=70"><div class="txt"><b>🎧 اسمع الموسيقى بلا حدود</b><p>كل المواقع في مكان واحد - دوس على الكرة 🎵</p></div></div>
 
-<header>
-<div class="logo">My<span>Music</span> AI 🎵</div>
-<div class="sub">حول كلماتك لأغنية • اسمع • ترجم • استمتع</div>
-</header>
-
-<div class="search">
-<input id="q" placeholder="دور على أغنية... اكتب اسمها هنا">
-<button onclick="search()">بحث 🔍</button>
-</div>
-
-<div class="banner">
-<img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&q=60" alt="music">
-<div><b style="font-size:20px">🎧 اسمع الموسيقى بلا حدود</b><br><small>Free Music • Vevo • Warner Bros في مكان واحد</small></div>
-</div>
-
-<div class="section">🔥 قنوات ومواقع الموسيقى</div>
+<div class="sec">🔥 موسيقى - كل اللي طلبته</div>
 <div class="grid">
-<a class="card" href="https://www.youtube.com/@freemusic" target="_blank"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=60"><b>Free Music</b><p>موسيقى مجانية بدون حقوق</p></a>
-<a class="card" href="https://www.youtube.com/@Mazzika" target="_blank"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&q=60"><b>مزيكا - Mazzika</b><p>أغاني عربية و Vevo</p></a>
-<a class="card" href="https://www.youtube.com/@WarnerMusic" target="_blank"><img src="https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?w=600&q=60"><b>Warner Bros Music</b><p>Warner Music العالمية</p></a>
-<a class="card" href="https://www.youtube.com/@vevo" target="_blank"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=60"><b>Vevo</b><p>فيديوهات رسمية HD</p></a>
+<a class="card" href="https://www.youtube.com/@freemusic" target="_blank"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600"><b>Free Music</b><p>موسيقى مجانية</p></a>
+<a class="card" href="https://www.youtube.com/@Mazzika" target="_blank"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600"><b>مزيكا Mazzika</b><p>أغاني عربية و Vevo</p></a>
+<a class="card" href="https://www.youtube.com/@WarnerMusic" target="_blank"><img src="https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?w=600"><b>Warner Bros</b><p>وارنر العالمية</p></a>
+<a class="card" href="https://www.youtube.com/@vevo" target="_blank"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600"><b>Vevo</b><p>فيديوهات رسمية</p></a>
+<a class="card" href="https://open.spotify.com" target="_blank"><img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=600"><b>Spotify</b><p>اسمع جديد</p></a>
+<a class="card" href="https://soundcloud.com" target="_blank"><img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600"><b>SoundCloud</b><p>أغاني مستقلة</p></a>
+<a class="card" href="https://www.anghami.com" target="_blank"><img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=600"><b>أنغامي</b><p>أغاني عربية</p></a>
+<a class="card" href="https://music.youtube.com" target="_blank"><img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=600"><b>YouTube Music</b><p>موسيقى يوتيوب</p></a>
+<a class="card" href="https://www.deezer.com" target="_blank"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600"><b>Deezer</b><p>موسيقى</p></a>
+<a class="card" href="https://music.apple.com" target="_blank"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600"><b>Apple Music</b><p>أبل ميوزك</p></a>
+<a class="card" href="https://tidal.com" target="_blank"><img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600"><b>Tidal</b><p>جودة عالية</p></a>
+<a class="card" href="https://music.amazon.com" target="_blank"><img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600"><b>Amazon Music</b><p>أمازون</p></a>
+<a class="card" href="https://www.shazam.com" target="_blank"><img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600"><b>Shazam</b><p>اعرف اسم الأغنية</p></a>
+<a class="card" href="https://suno.com" target="_blank"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600"><b>Suno - اعمل أغنية</b><p>بالذكاء الاصطناعي</p></a>
 </div>
 
-<div class="section">📺 شغل فيديو وترجم وانت بتتفرج</div>
-<div style="padding:0 12px">
-<iframe id="player" src="https://www.youtube.com/embed/2Vv-BfVoq4g?cc_load_policy=1" allowfullscreen></iframe>
-<p style="font-size:12px;opacity:.6;margin:8px 0">دوس على CC في الفيديو واختار ترجمة تلقائية -> عربي، هيترجم الصوت وانت بتتفرج.</p>
+<div class="sec">📱 سوشيال - كلهم</div>
+<div class="chip">
+<a href="https://www.facebook.com" target="_blank">📘 Facebook</a><a href="https://www.instagram.com" target="_blank">📸 Instagram</a><a href="https://www.tiktok.com" target="_blank">🎵 TikTok</a><a href="https://web.whatsapp.com" target="_blank">💚 WhatsApp</a><a href="https://web.telegram.org" target="_blank">✈️ Telegram</a><a href="https://x.com" target="_blank">𝕏 X</a><a href="https://www.snapchat.com" target="_blank">👻 Snapchat</a><a href="https://www.youtube.com" target="_blank">▶️ YouTube</a><a href="https://www.linkedin.com" target="_blank">💼 LinkedIn</a><a href="https://www.pinterest.com" target="_blank">📌 Pinterest</a><a href="https://www.reddit.com" target="_blank">🟠 Reddit</a><a href="https://discord.com" target="_blank">🎮 Discord</a><a href="https://www.twitch.tv" target="_blank">🟣 Twitch</a><a href="https://www.threads.net" target="_blank">🧵 Threads</a>
 </div>
 
-<div class="section">📚 موسوعات ومواقع</div>
-<div class="grid">
-<a class="card" href="https://ar.wikipedia.org/wiki/موسيقى" target="_blank"><img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=600&q=60"><b>ويكيبيديا</b><p>تاريخ الموسيقى والفنانين</p></a>
-<a class="card" href="https://open.spotify.com" target="_blank"><img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=600&q=60"><b>Spotify</b><p>اسمع واكتشف جديد</p></a>
+<div class="sec">🎬 أفلام - كلهم</div>
+<div class="chip">
+<a href="https://www.netflix.com" target="_blank">🎬 Netflix</a><a href="https://shahid.mbc.net" target="_blank">📺 Shahid</a><a href="https://www.disneyplus.com" target="_blank">✨ Disney+</a><a href="https://www.primevideo.com" target="_blank">📦 Prime Video</a><a href="https://www.max.com" target="_blank">🎬 HBO Max</a><a href="https://tv.apple.com" target="_blank">🍎 Apple TV+</a><a href="https://www.watchit.com" target="_blank">📺 Watch It</a><a href="https://www.youtube.com/@YouTubeMovies" target="_blank">▶️ YouTube Movies</a>
 </div>
 
-<div style="height:100px"></div>
-
-<!-- الكرة العايمة -->
-<div id="ball" onclick="document.getElementById('menu').classList.add('show')">🎵</div>
-
-<div id="menu">
-<div class="close" onclick="document.getElementById('menu').classList.remove('show')">✖</div>
-<h2 style="margin:20px 0 5px">🎵 كل حاجة في مكان واحد</h2>
-<p style="opacity:.6;font-size:13px">دوس على أي حاجة هتفتح في صفحة جديدة</p>
-
-<a class="m-item" href="https://translate.google.com" target="_blank"><img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=200&q=60"><div><b>🌐 ترجمة الفيديو - Translate</b><small>ترجم الصوت والكلمات أثناء المشاهدة</small></div></a>
-
-<a class="m-item" href="https://www.youtube.com/@freemusic" target="_blank"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=60"><div><b>🎼 Free Music</b><small>موسيقى مجانية</small></div></a>
-
-<a class="m-item" href="https://www.youtube.com/@Mazzika" target="_blank"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200&q=60"><div><b>🎤 مزيكا Vevo - Mazzika</b><small>أغاني عربية</small></div></a>
-
-<a class="m-item" href="https://www.youtube.com/@WarnerMusic" target="_blank"><img src="https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?w=200&q=60"><div><b>🏢 Warner Bros Music</b><small>وارنر بروس العالمية</small></div></a>
-
-<a class="m-item" href="https://www.youtube.com/@vevo" target="_blank"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&q=60"><div><b>📺 Vevo</b><small>فيديوهات رسمية</small></div></a>
-
-<a class="m-item" href="https://ar.wikipedia.org/wiki/موسيقى" target="_blank"><img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=200&q=60"><div><b>📚 ويكيبيديا</b><small>موسوعة الموسيقى</small></div></a>
-
-<a class="m-item" href="https://www.google.com" target="_blank"><img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?w=200&q=60"><div><b>🔍 بحث جوجل</b><small>دور على أي أغنية</small></div></a>
-
-</div>
-
-<script>
-function search(){
-  let v=document.getElementById('q').value;
-  if(!v) return alert('اكتب اسم الأغنية الأول');
-  window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(v),'_blank');
-}
-if('serviceWorker' in navigator){ /* PWA جاهز */ }
-</script>
-</body>
-  </html>
+<div class="sec">🤖 ذكاء اصطناعي - كلهم</div>
+<div class="chip">
+<a href="https://chat.openai.com" target="_blank">🤖 ChatGPT</a><a href="https://manus.im" target="_blank">✨ Manus</a><a href="https://gemini.google.com" target="_blank">💎 Gemini</a><a href="https://claude.ai" target="_blank">🧠 Claude</a><a href="https://copilot.microsoft.com" target="_blank">🪟 Copilot</a><a href
