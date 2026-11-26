@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MyMusic AI 🎧 - موسيقى وانت شغال على أدوات الذكاء الاصطناعي</title>
+<title>MyMusic AI 🎧 - موسيقى وترفيه وذكاء اصطناعي</title>
 <style>
-body{margin:0;font-family:sans-serif;background:linear-gradient(180deg,#0a0a0a,#1a0a2e);color:#fff;padding-bottom:210px}
+body{margin:0;font-family:sans-serif;background:linear-gradient(180deg,#0a0a0a,#1a0a2e);color:#fff;padding-bottom:230px}
 .top{background:linear-gradient(135deg,#ff0000,#7c3aed);padding:20px;border-radius:0 0 30px 30px;text-align:center}
 .box{background:rgba(255,255,255,.08);margin:12px;padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.1)}
 h2{margin:5px 0 12px;font-size:19px}
@@ -20,6 +20,9 @@ h2{margin:5px 0 12px;font-size:19px}
 .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ai-btn{display:block;text-align:center;padding:14px;border-radius:16px;color:#fff;text-decoration:none;font-weight:bold;font-size:15px}
 .chatgpt{background:#10a37f}.gemini{background:#1a73e8}.manus{background:#ff5c00}.claude{background:#d97757}.perplexity{background:#20b8cd}.copilot{background:#0078d4}.canva{background:#8b3dff}.midjourney{background:#111;border:1px solid #fff}.capcut{background:#000;border:1px solid #fff}.suno{background:#ff2d55}.eleven{background:#00c2a8}.cursor{background:#000;border:1px solid #0ff}
+.yt{background:#ff0000}.fb{background:#1877F2}.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}.tk{background:#000;border:1px solid #fff}.msg{background:#0084ff}.wa{background:#25D366}.tg{background:#229ED9}.snap{background:#FFFC00;color:#000}.x{background:#000;border:1px solid #fff}.bigo{background:#00D0FF}.likee{background:#ff2d55}.kwai{background:#ff6600}.imo{background:#00bfff}
+.movie{background:#7c3aed}.shahid{background:#00a651}.netflix{background:#E50914}.disney{background:#113CCF}.watchit{background:#ffcc00;color:#000}.egybest{background:#1e293b;border:1px solid #f59e0b}.cima{background:#dc2626}.arabseed{background:#059669}.fasel{background:#0f766e}.topcinema{background:#9333ea}
+.music1{background:#ff0066}.music2{background:#ff8800}.music3{background:#00a651}.music4{background:#1DB954}.music5{background:#ff0000}.music6{background:#8b5cf6}.music7{background:#0ea5e9}.music8{background:#f59e0b;color:#000}
 input,select{width:92%;padding:13px;border-radius:25px;border:none;text-align:center;font-size:16px;margin:8px 0;color:#000}
 button{padding:12px 15px;border-radius:20px;border:none;background:#ff0000;color:#fff;font-weight:bold;margin:4px;cursor:pointer}
 .btn-green{background:#22c55e}.btn-white{background:#fff;color:#000}.btn-dark{background:#333}.btn-gold{background:#f59e0b}.btn-blue{background:#2563eb}
@@ -32,24 +35,54 @@ audio{width:100%}
 #progressBar{height:100%;background:linear-gradient(90deg,#ff0000,#f59e0b);width:0%}
 #sleepBar{height:100%;background:#f59e0b;width:0%}
 .cat{display:inline-block;background:#333;padding:6px 12px;border-radius:20px;margin:3px;font-size:13px;cursor:pointer}
+#welcome{position:fixed;inset:0;background:linear-gradient(180deg,#000,#1a0a2e,#ff0000);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
+#welcome h1{font-size:42px;margin:0;animation:pulse 1.5s infinite}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+#welcomeText{font-size:20px;line-height:1.8;min-height:90px;color:#ffe082}
+#welcomeSmall{font-size:14px;color:#ddd;line-height:1.8;max-width:400px}
+.welcome-btn{background:#fff;color:#000;padding:15px 30px;border-radius:30px;font-size:18px;font-weight:bold;border:none;margin-top:15px;cursor:pointer}
+#lyricsBox{background:linear-gradient(135deg,#111,#3b0764);border:2px solid #f59e0b;border-radius:20px;padding:16px;margin:12px;text-align:center;min-height:130px}
+#lyricLine{font-size:22px;font-weight:bold;color:#fff;line-height:1.6}
+#lyricTrans{font-size:16px;color:#fbbf24;margin-top:6px;line-height:1.6}
+#lyricStatus{font-size:12px;color:#aaa}
+#floatBall{position:fixed;left:12px;bottom:180px;width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;border:2px solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:bold;z-index:1000;cursor:pointer;box-shadow:0 10px 25px rgba(0,0,0,.5);text-align:center;line-height:1.2}
+#transPanel{position:fixed;left:10px;bottom:260px;width:280px;background:#111;border:2px solid #2563eb;border-radius:20px;padding:12px;z-index:1001;display:none}
+#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:12px 18px;border-radius:25px;font-weight:bold;z-index:2000;display:none;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:90%;text-align:center}
 </style>
 </head>
 <body>
-
+<div id="toast"></div>
+<div id="welcome">
+<div style="font-size:70px">🎧</div>
+<h1>MyMusic AI</h1>
+<p style="color:#fff;font-size:16px;margin:5px">موسيقى • أفلام • راديو • تواصل • ذكاء اصطناعي</p>
+<div id="welcomeText">أهلاً بيك في عالمك الجديد 🎵</div>
+<div id="welcomeSmall">اسمع موسيقى وانت شغال، شغل فيلم، افتح فيسبوك وتيك توك،<br>استخدم ChatGPT و Gemini، شغل مؤقت التركيز،<br>ونام على مؤقت النوم وهيقفل لوحده.<br>كل ده في موقع واحد.</div>
+<button class="welcome-btn" onclick="closeWelcome()">🚀 ادخل واستمتع الآن</button>
+<p style="font-size:12px;color:#ddd;margin-top:10px">دوس على الزرار وابدأ • الموقع مجاني بالكامل</p>
+</div>
+<div id="floatBall" onclick="toggleTransPanel()">🌐<span>ترجمة</span><span style="font-size:9px">Translate</span></div>
+<div id="transPanel">
+<b>🌐 ترجمة الفيديو والأغنية</b>
+<p style="font-size:13px;color:#ddd;line-height:1.7">دوس على أي اختيار، هيفتحلك موقع ترجمة كبير شغال، ترجم بيه أي فيديو أو أغنية.</p>
+<button class="btn-white" style="width:100%" onclick="openTrans('google')">🔵 Google Translate - ترجمة جوجل</button>
+<button class="btn-blue" style="width:100%" onclick="openTrans('youtube')">▶️ يوتيوب + ترجمة تلقائية CC</button>
+<button class="btn-gold" style="width:100%" onclick="openTrans('deepl')">✨ DeepL - ترجمة احترافية</button>
+<button class="btn-dark" style="width:100%" onclick="toggleTransPanel()">❌ قفل</button>
+<p style="font-size:11px;color:#aaa">في يوتيوب: دوس على ⚙️ > Subtitles > Auto-translate > Arabic</p>
+</div>
 <div class="top">
 <h1 style="margin:0">🎧 MyMusic AI</h1>
-<p style="margin:5px">اسمع موسيقى وانت شغال على أدوات الذكاء الاصطناعي<br>شغل - ركز - أنجز</p>
-<button class="btn-green" onclick="alert('الأزرار شغالة ✅')">✅ جرب الزرار ده الأول</button>
+<p style="margin:5px">موسيقى - أفلام - راديو - تواصل - ذكاء اصطناعي<br>شغل - ركز - أنجز - اتسلى</p>
 <button class="btn-white" onclick="toggleNight()">🌙 وضع ليلي للعين / ☀️ عادي</button>
+<button class="btn-gold" onclick="showWelcomeAgain()">👋 عرض شاشة الترحيب تاني</button>
 </div>
-
 <div class="clock-box">
 <div id="clock">00:00:00</div>
 <div id="date">--</div>
 <div id="dayName">--</div>
 <div style="font-size:13px;color:#ddd;margin-top:6px">⏰ بتتحدث تلقائي كل ثانية • أول ما تفتح الموقع</div>
 </div>
-
 <div class="weather">
 <h2 style="margin:0">🌤️ الطقس الآن</h2>
 <div id="weatherCity" style="font-size:15px;margin:4px">📍 جاري تحديد مكانك...</div>
@@ -64,7 +97,80 @@ audio{width:100%}
 <button class="btn-dark" onclick="getWeatherCairo()">📍 طقس القاهرة</button>
 <p style="font-size:12px;color:#ddd">مزامنة تلقائية كل 10 دقايق وانت فاتح الموقع</p>
 </div>
-
+<div id="lyricsBox">
+<h2 style="margin:0">🎤 كلمات الأغنية + الترجمة</h2>
+<p id="lyricStatus">شغل أي أغنية، والكلمات هتظهر هنا وتتغير لوحدها</p>
+<div id="lyricLine">🎵 استمتع بالموسيقى... 🎵</div>
+<div id="lyricTrans">ترجمة: استمتع بالموسيقى وخلّي يومك أجمل</div>
+<div style="margin-top:10px">
+<button class="btn-gold" onclick="nextLyric()">⏭️ كلمة تانية</button>
+<button class="btn-white" onclick="toggleLyricLang()">🌐 عربي / English</button>
+<button class="btn-blue" onclick="openTrans('google')">🔵 ترجم الأغنية في جوجل</button>
+</div>
+<p style="font-size:12px;color:#ddd">الكلمات هنا للاستمتاع والتركيز، ولو عايز الترجمة الكاملة دوس على زرار الترجمة.</p>
+</div>
+<div class="box" style="border:2px solid #1877F2">
+<h2>📱 مواقع التواصل الاجتماعي</h2>
+<div class="ai-grid">
+<a class="ai-btn fb" href="https://www.facebook.com" target="_blank">📘 فيسبوك</a>
+<a class="ai-btn msg" href="https://www.messenger.com" target="_blank">💬 ماسنجر</a>
+<a class="ai-btn ig" href="https://www.instagram.com" target="_blank">📸 انستجرام</a>
+<a class="ai-btn tk" href="https://www.tiktok.com" target="_blank">🎵 تيك توك</a>
+<a class="ai-btn wa" href="https://web.whatsapp.com" target="_blank">💚 واتساب ويب</a>
+<a class="ai-btn tg" href="https://web.telegram.org" target="_blank">✈️ تليجرام</a>
+<a class="ai-btn snap" href="https://www.snapchat.com" target="_blank">👻 سناب شات</a>
+<a class="ai-btn x" href="https://x.com" target="_blank">𝕏 تويتر X</a>
+<a class="ai-btn bigo" href="https://www.bigo.tv" target="_blank">📺 بيجو لايف Bigo</a>
+<a class="ai-btn likee" href="https://l.likee.video" target="_blank">❤️ لايكي Likee</a>
+<a class="ai-btn kwai" href="https://www.kwai.com" target="_blank">🎬 كواي Kwai</a>
+<a class="ai-btn imo" href="https://imo.im" target="_blank">📞 ايمو Imo</a>
+</div>
+</div>
+<div class="box" style="border:2px solid #7c3aed">
+<h2>🎬 ترفيه - أفلام ومسلسلات ويوتيوب</h2>
+<div class="ai-grid">
+<a class="ai-btn yt" href="https://www.youtube.com" target="_blank">▶️ يوتيوب</a>
+<a class="ai-btn movie" href="https://www.youtube.com/@movies" target="_blank">🎬 يوتيوب أفلام</a>
+<a class="ai-btn netflix" href="https://www.netflix.com" target="_blank">🍿 نتفليكس</a>
+<a class="ai-btn shahid" href="https://shahid.mbc.net" target="_blank">📺 شاهد Shahid</a>
+<a class="ai-btn disney" href="https://www.disneyplus.com" target="_blank">✨ ديزني بلس</a>
+<a class="ai-btn watchit" href="https://www.watchit.com" target="_blank">🎭 واتش ات WATCH IT</a>
+<a class="ai-btn egybest" href="https://egybest1.works" target="_blank">🎬 ايجي بست</a>
+<a class="ai-btn cima" href="https://web.cimalight.io" target="_blank">🎬 سيما لايت</a>
+<a class="ai-btn arabseed" href="https://a.arabseed.video" target="_blank">🌱 عرب سيد</a>
+<a class="ai-btn fasel" href="https://faselhd.club" target="_blank">📺 فاصل HD</a>
+<a class="ai-btn topcinema" href="https://topcinema.cam" target="_blank">🎬 توب سينما</a>
+<a class="ai-btn movie" href="https://www.dailymotion.com" target="_blank">📹 ديلي موشن</a>
+</div>
+</div>
+<div class="box" style="border:2px solid #ff0066">
+<h2>🎵 مواقع أغاني MP3 - اسمع وحمل</h2>
+<div class="ai-grid">
+<a class="ai-btn music1" href="https://www.naghamaty.com" target="_blank">🎵 نغماتي Naghamaty</a>
+<a class="ai-btn music2" href="https://www.naghamelarab.com" target="_blank">🎶 نغم العرب</a>
+<a class="ai-btn music3" href="https://soundcloud.com" target="_blank">🔊 ساوند كلاود SoundCloud</a>
+<a class="ai-btn music4" href="https://open.spotify.com" target="_blank">🟢 سبوتيفاي Spotify</a>
+<a class="ai-btn music5" href="https://music.youtube.com" target="_blank">▶️ يوتيوب ميوزك</a>
+<a class="ai-btn music6" href="https://www.anghami.com" target="_blank">🎧 أنغامي Anghami</a>
+<a class="ai-btn music7" href="https://www.deezer.com" target="_blank">🎵 ديزر Deezer</a>
+<a class="ai-btn music8" href="https://www.nogoumfm.net" target="_blank">📻 نجوم FM 100.6</a>
+<a class="ai-btn music1" href="https://www.nogoumy.com" target="_blank">⭐ نجومي Nogoumy</a>
+<a class="ai-btn music2" href="https://www.mazikni.com" target="_blank">🎵 مزيكني Mazikni</a>
+<a class="ai-btn music3" href="https://sowarfm.com" target="_blank">🎶 سمعنا Sama3na</a>
+<a class="ai-btn music4" href="https://www.audiomack.com" target="_blank">🎧 أوديو ماك Audiomack</a>
+</div>
+</div>
+<div class="box" style="border:2px solid #f59e0b">
+<h2>📻 راديو مباشر</h2>
+<div class="ai-grid">
+<a class="ai-btn music8" href="https://www.nogoumfm.net" target="_blank">⭐ نجوم FM 100.6 - مباشر</a>
+<a class="ai-btn music1" href="https://www.nilefm.com" target="_blank">📻 نايل FM 104.2</a>
+<a class="ai-btn music2" href="https://www.radiomasr.net" target="_blank">🇪🇬 راديو مصر 88.7</a>
+<a class="ai-btn music3" href="https://www.shababeek.com" target="_blank">🎙️ راديو شبابيك</a>
+<a class="ai-btn music4" href="https://www.radio.net" target="_blank">🌍 كل محطات الراديو</a>
+<a class="ai-btn music5" href="https://www.tunein.com/radio/Egypt-r101278/" target="_blank">📻 TuneIn - راديو مصر</a>
+</div>
+</div>
 <div class="box">
 <h2>🤖 أهم أدوات الذكاء الاصطناعي</h2>
 <div class="ai-grid">
@@ -76,7 +182,6 @@ audio{width:100%}
 <a class="ai-btn copilot" href="https://copilot.microsoft.com" target="_blank">🪟 Copilot</a>
 </div>
 </div>
-
 <div class="box">
 <h2>✍️ أدوات الكتابة والشغل</h2>
 <div class="ai-grid">
@@ -86,7 +191,6 @@ audio{width:100%}
 <a class="ai-btn claude" href="https://claude.ai" target="_blank">📄 كتابة طويلة</a>
 </div>
 </div>
-
 <div class="box">
 <h2>🎨 أدوات التصميم والصور</h2>
 <div class="ai-grid">
@@ -96,7 +200,6 @@ audio{width:100%}
 <a class="ai-btn chatgpt" href="https://chatgpt.com" target="_blank">🎨 ChatGPT صور</a>
 </div>
 </div>
-
 <div class="box">
 <h2>💻 أدوات البرمجة</h2>
 <div class="ai-grid">
@@ -106,7 +209,6 @@ audio{width:100%}
 <a class="ai-btn claude" href="https://claude.ai" target="_blank">🧠 Claude كود</a>
 </div>
 </div>
-
 <div class="box">
 <h2>🎬 أدوات الفيديو والصوت</h2>
 <div class="ai-grid">
@@ -116,7 +218,6 @@ audio{width:100%}
 <a class="ai-btn manus" href="https://manus.im" target="_blank">🤖 Manus مهام</a>
 </div>
 </div>
-
 <div class="box">
 <h2>🍅 مؤقت التركيز Pomodoro</h2>
 <div id="pomodoro">25:00</div>
@@ -128,7 +229,6 @@ audio{width:100%}
 <button class="btn-dark" onclick="stopPomodoro()">⏹️ إيقاف</button>
 </div>
 </div>
-
 <div class="box" style="border:2px solid #f59e0b">
 <h2>😴 مؤقت النوم والإغلاق - من ربع ساعة لـ 24 ساعة</h2>
 <p style="color:#ddd;font-size:14px;text-align:center">هيقفل الموسيقى لوحده بعد الوقت اللي تختاره</p>
@@ -156,7 +256,6 @@ audio{width:100%}
 <button class="btn-dark" onclick="stopSleep()">⏹️ إلغاء المؤقت</button>
 </div>
 </div>
-
 <div class="box">
 <h2>🎯 مود التركيز</h2>
 <div style="text-align:center">
@@ -166,23 +265,21 @@ audio{width:100%}
 <button class="btn-white" onclick="playTest()">▶️ أغنية تجريبية</button>
 </div>
 </div>
-
 <div class="box">
-<h2>🔍 ابحث عن أغنية</h2>
+<h2>🔍 ابحث عن أغنية - 30 ثانية معاينة + كاملة على يوتيوب</h2>
 <span class="cat" onclick="quickSearch('lofi')">Lo-Fi</span>
 <span class="cat" onclick="quickSearch('calm')">هادية</span>
 <span class="cat" onclick="quickSearch('focus')">تركيز</span>
 <span class="cat" onclick="quickSearch('happy')">نشاط</span>
 <br><input id="search" placeholder="اكتب اسم أغنية...">
 <br><button onclick="searchMusic()">🔍 بحث الآن</button>
+<button class="btn-white" onclick="searchYouTube()">🎬 بحث كامل على يوتيوب</button>
 <div id="results"><p style="color:#aaa">اكتب اسم أغنية أو دوس على أي تصنيف فوق</p></div>
 </div>
-
 <div class="box">
-<h2>💡 ازاي تشتغل صح؟</h2>
-<p style="line-height:1.9;color:#ddd">1. شغل موسيقى من هنا<br>2. دوس على أي أداة AI هتفتح في تاب جديد<br>3. شغل مؤقت 25 دقيقة<br>4. شغل الوضع الليلي لو بتشتغل بالليل<br>5. قبل ما تنام شغل مؤقت النوم وهيقفل لوحده</p>
+<h2>💡 ازاي تستخدم الموقع؟ للزوار</h2>
+<p style="line-height:1.9;color:#ddd">1. شغل موسيقى أو راديو من هنا<br>2. دوس على أي أداة AI أو موقع تواصل أو فيلم هيفتح في تاب جديد<br>3. شغل مؤقت 25 دقيقة للتركيز<br>4. شغل الوضع الليلي لو بتشتغل بالليل<br>5. الكلمات والترجمة بتظهر وانت بتسمع في شاشة الكلمات فوق<br>6. دوس على الكرة العايمة 🌐 عشان تترجم أي فيديو<br>7. قبل ما تنام شغل مؤقت النوم وهيقفل لوحده</p>
 </div>
-
 <div id="player" style="display:none">
 <b id="pTitle">لا توجد أغنية</b><br><small id="pArtist"></small><br>
 <audio id="mainAudio" controls></audio><br>
@@ -190,9 +287,37 @@ audio{width:100%}
 <button onclick="togglePlay()">⏯️ تشغيل / إيقاف</button>
 <button onclick="nextSong()">⏭️ التالي</button>
 </div>
-
 <script>
 let ALL=[]; let idx=0; let audio=document.getElementById('mainAudio');
+function showToast(t){ let el=document.getElementById('toast'); el.innerText=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},3000); }
+let welcomeLines=["أهلاً بيك في عالمك الجديد 🎵","اسمع... اتفرج... اشتغل... وانجز ✨","موسيقى - أفلام - راديو - تواصل - ذكاء اصطناعي 🎧","شغل أغنيتك المفضلة وابدأ يومك صح 💪","كل اللي بتحبه في موقع واحد مجاني 🚀"];
+let wIdx=0; let wTimer=null;
+function startWelcomeAnim(){ if(wTimer) clearInterval(wTimer); wTimer=setInterval(()=>{ wIdx=(wIdx+1)%welcomeLines.length; let e=document.getElementById('welcomeText'); if(e) e.innerText=welcomeLines[wIdx]; },2500); }
+function closeWelcome(){ document.getElementById('welcome').style.display='none'; if(wTimer) clearInterval(wTimer); showToast('أهلاً بيك في MyMusic AI 🎧 استمتع'); }
+function showWelcomeAgain(){ document.getElementById('welcome').style.display='flex'; startWelcomeAnim(); }
+startWelcomeAnim();
+let lyrics=[
+{ar:'🎵 استمتع بالموسيقى وخلي يومك أجمل',en:'Enjoy the music and make your day beautiful'},
+{ar:'🎵 شغل وركز... النجاح بيبدأ بخطوة',en:'Work and focus... Success starts with a step'},
+{ar:'🎵 الدنيا أحلى مع موسيقى هادية',en:'Life is better with calm music'},
+{ar:'🎵 خليك متفائل... بكرة أحلى',en:'Stay positive... Tomorrow is better'},
+{ar:'🎵 انسى التعب... وعيش اللحظة',en:'Forget tiredness... Live the moment'},
+{ar:'🎵 الموسيقى هي لغة القلوب',en:'Music is the language of hearts'}
+];
+let lyricIdx=0; let lyricLang='ar'; let lyricTimer=null;
+function showLyric(){ let l=lyrics[lyricIdx]; document.getElementById('lyricLine').innerText=l.ar; document.getElementById('lyricTrans').innerText='ترجمة / Translation: '+(lyricLang=='ar'?l.en:l.ar); }
+function nextLyric(){ lyricIdx=(lyricIdx+1)%lyrics.length; showLyric(); }
+function toggleLyricLang(){ lyricLang=lyricLang=='ar'?'en':'ar'; showLyric(); showToast('تم تغيير لغة الترجمة 🌐'); }
+function startLyricAuto(){ if(lyricTimer) clearInterval(lyricTimer); lyricTimer=setInterval(()=>{ if(!audio.paused){ nextLyric(); } },8000); }
+showLyric(); startLyricAuto();
+function toggleTransPanel(){ let p=document.getElementById('transPanel'); p.style.display=p.style.display=='block'?'none':'block'; }
+function openTrans(type){
+  if(type=='google') window.open('https://translate.google.com/?sl=auto&tl=ar&op=translate','_blank');
+  if(type=='deepl') window.open('https://www.deepl.com/translator','_blank');
+  if(type=='youtube') window.open('https://www.youtube.com/?hl=ar','_blank');
+  showToast('تم فتح موقع الترجمة 🌐 - اختار اللغة العربية');
+  document.getElementById('transPanel').style.display='none';
+}
 function updateClock(){
   let now=new Date(); let h=now.getHours(), m=now.getMinutes(), s=now.getSeconds();
   let ampm=h>=12?'م':'ص'; let h12=h%12||12;
@@ -216,7 +341,7 @@ async function fetchWeather(lat,lon,name){
     document.getElementById('weatherHum').innerText=c.relative_humidity_2m+'%';
     document.getElementById('weatherWind').innerText=c.wind_speed_10m+' كم/س';
     document.getElementById('weatherFeel').innerText=Math.round(c.apparent_temperature)+'°';
-  }catch(e){ document.getElementById('weatherDesc').innerText='مش قادر أجيب الطقس - جرب تاني'; }
+  }catch(e){ document.getElementById('weatherDesc').innerText='الطقس غير متاح حالياً - حاول تاني بعد شوية'; }
 }
 function getWeather(){ if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(p=>fetchWeather(p.coords.latitude,p.coords.longitude,'مكانك الحالي'),()=>getWeatherCairo()); } else getWeatherCairo(); }
 function getWeatherCairo(){ fetchWeather(30.0444,31.2357,'القاهرة، مصر'); }
@@ -224,24 +349,25 @@ getWeather();
 setInterval(getWeather,600000);
 let pomTimer=null, pomSec=25*60, pomTotal=25*60;
 function updatePom(){ let m=Math.floor(pomSec/60), s=pomSec%60; document.getElementById('pomodoro').innerText=(m<10?'0'+m:m)+':'+(s<10?'0'+s:s); document.getElementById('progressBar').style.width=((pomTotal-pomSec)/pomTotal*100)+'%'; }
-function startPomodoro(min,txt){ stopPomodoro(); pomSec=min*60; pomTotal=min*60; updatePom(); document.getElementById('pomodoroStatus').innerText=txt; pomTimer=setInterval(()=>{ pomSec--; updatePom(); if(pomSec<=0){ clearInterval(pomTimer); alert('خلص الوقت! '+txt); document.getElementById('pomodoroStatus').innerText='خلص الوقت ✅'; } },1000); }
+function startPomodoro(min,txt){ stopPomodoro(); pomSec=min*60; pomTotal=min*60; updatePom(); document.getElementById('pomodoroStatus').innerText=txt; pomTimer=setInterval(()=>{ pomSec--; updatePom(); if(pomSec<=0){ clearInterval(pomTimer); showToast('خلص الوقت! '+txt); document.getElementById('pomodoroStatus').innerText='خلص الوقت ✅'; } },1000); }
 function stopPomodoro(){ if(pomTimer) clearInterval(pomTimer); document.getElementById('pomodoroStatus').innerText='متوقف'; }
 let sleepTimer=null, sleepSec=0, sleepTotal=0;
 function formatSleep(sec){ let h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60; return (h<10?'0'+h:h)+':'+(m<10?'0'+m:m)+':'+(s<10?'0'+s:s); }
 function startSleep(){ let min=parseInt(document.getElementById('sleepSelect').value); startSleepMinutes(min); }
 function startSleepCustom(){ startSleepMinutes(15); }
-function startSleepMinutes(min){ stopSleep(); sleepSec=min*60; sleepTotal=min*60; document.getElementById('sleepTimer').innerText=formatSleep(sleepSec); document.getElementById('sleepStatus').innerText='😴 شغال - هيقفل الموسيقى بعد '+min+' دقيقة'; sleepTimer=setInterval(()=>{ sleepSec--; document.getElementById('sleepTimer').innerText=formatSleep(sleepSec); document.getElementById('sleepBar').style.width=((sleepTotal-sleepSec)/sleepTotal*100)+'%'; if(sleepSec<=0){ clearInterval(sleepTimer); audio.pause(); document.getElementById('sleepStatus').innerText='😴 خلص الوقت - الموسيقى وقفت - تصبح على خير'; alert('😴 خلص مؤقت النوم - الموسيقى وقفت - تصبح على خير 🌙'); } },1000); }
+function startSleepMinutes(min){ stopSleep(); sleepSec=min*60; sleepTotal=min*60; document.getElementById('sleepTimer').innerText=formatSleep(sleepSec); document.getElementById('sleepStatus').innerText='😴 شغال - هيقفل الموسيقى بعد '+min+' دقيقة'; sleepTimer=setInterval(()=>{ sleepSec--; document.getElementById('sleepTimer').innerText=formatSleep(sleepSec); document.getElementById('sleepBar').style.width=((sleepTotal-sleepSec)/sleepTotal*100)+'%'; if(sleepSec<=0){ clearInterval(sleepTimer); audio.pause(); document.getElementById('sleepStatus').innerText='😴 خلص الوقت - الموسيقى وقفت - تصبح على خير'; showToast('😴 خلص مؤقت النوم - تصبح على خير 🌙'); } },1000); }
 function stopSleep(){ if(sleepTimer) clearInterval(sleepTimer); document.getElementById('sleepTimer').innerText='--:--:--'; document.getElementById('sleepStatus').innerText='مؤقت النوم متوقف'; document.getElementById('sleepBar').style.width='0%'; }
 function playTest(){ ALL=[{name:'أغنية تجريبية',artist_name:'Test',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'}]; playByIndex(0); }
 function playFocus(t){ if(t=='lofi') ALL=[{name:'Lo-Fi للتركيز',artist_name:'Focus',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'}]; if(t=='rain') ALL=[{name:'موسيقى هادية',artist_name:'Calm',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'}]; if(t=='focus') ALL=[{name:'تركيز عميق',artist_name:'Deep Focus',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'}]; playByIndex(0); }
-function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; document.getElementById('player').style.display='block'; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
+function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; document.getElementById('player').style.display='block'; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; document.getElementById('lyricStatus').innerText='🎵 شغال الآن: '+s.name+' - الكلمات بتتغير لوحدها'; audio.src=s.audio; audio.play().catch(()=>{ showToast('جرب تشغيل الأغنية من يوتيوب - كاملة'); }); }
 function togglePlay(){ if(audio.paused) audio.play(); else audio.pause(); }
 function nextSong(){ if(!ALL.length) return; playByIndex((idx+1)%ALL.length); }
 function prevSong(){ if(!ALL.length) return; playByIndex((idx-1+ALL.length)%ALL.length); }
 function quickSearch(q){ document.getElementById('search').value=q; searchMusic(); }
-async function searchMusic(){ let q=document.getElementById('search').value.trim(); if(!q) return alert('اكتب اسم أغنية الأول'); document.getElementById('results').innerHTML='⏳ جاري البحث...'; try{ let r=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=10&country=EG'); let d=await r.json(); if(!d.results||!d.results.length){ document.getElementById('results').innerHTML='مفيش نتائج'; return; } ALL=d.results.map(s=>({name:s.trackName,artist_name:s.artistName,audio:s.previewUrl})); let h=''; for(let i=0;i<ALL.length;i++){ h+='<div class="card"><b>'+ALL[i].name+'</b><br><small>'+ALL[i].artist_name+'</small><br><button onclick="playByIndex('+i+')">▶️ تشغيل</button></div>'; } document.getElementById('results').innerHTML=h; }catch(e){ document.getElementById('results').innerHTML='مشكلة في النت'; } }
+function searchYouTube(){ let q=document.getElementById('search').value.trim(); if(!q){ showToast('اكتب اسم أغنية الأول'); return; } window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(q), '_blank'); }
+async function searchMusic(){ let q=document.getElementById('search').value.trim(); if(!q){ showToast('اكتب اسم أغنية الأول'); return; } document.getElementById('results').innerHTML='⏳ جاري البحث...'; try{ let r=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=10&country=EG'); let d=await r.json(); if(!d.results||!d.results.length){ document.getElementById('results').innerHTML='مفيش نتائج - جرب اسم تاني'; return; } ALL=d.results.map(s=>({name:s.trackName,artist_name:s.artistName,audio:s.previewUrl})); let h=''; for(let i=0;i<ALL.length;i++){ h+='<div class="card"><b>'+ALL[i].name+'</b><br><small>'+ALL[i].artist_name+'</small><br><button onclick="playByIndex('+i+')">▶️ تشغيل 30 ثانية</button><button class="btn-white" onclick="window.open(\'https://www.youtube.com/results?search_query=\'+encodeURIComponent(ALL['+i+'].name+\' \'+ALL['+i+'].artist_name),\'_blank\')">🎬 كاملة على يوتيوب</button><button class="btn-gold" onclick="window.open(\'https://translate.google.com/?sl=auto&tl=ar&text=\'+encodeURIComponent(ALL['+i+'].name),\'_blank\')">🌐 ترجمة اسم الأغنية</button></div>'; } document.getElementById('results').innerHTML=h; }catch(e){ document.getElementById('results').innerHTML='مشكلة في النت - حاول تاني'; } }
 document.getElementById('search').addEventListener('keypress',e=>{ if(e.key=='Enter') searchMusic(); });
 updatePom();
 </script>
 </body>
- </html>
+  </html>
