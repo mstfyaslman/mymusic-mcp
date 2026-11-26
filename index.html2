@@ -136,4 +136,112 @@ audio{width:100%}
 <select id="sleepSelect">
 <option value="15">⏰ 15 دقيقة - ربع ساعة</option>
 <option value="30">⏰ 30 دقيقة - نص ساعة</option>
-<option value="45">
+<option value="45">⏰ 45 دقيقة</option>
+<option value="60" selected>⏰ 1 ساعة</option>
+<option value="90">⏰ ساعة ونص</option>
+<option value="120">⏰ ساعتين</option>
+<option value="180">⏰ 3 ساعات</option>
+<option value="240">⏰ 4 ساعات</option>
+<option value="360">⏰ 6 ساعات</option>
+<option value="480">⏰ 8 ساعات - نوم كامل</option>
+<option value="720">⏰ 12 ساعة</option>
+<option value="1440">⏰ 24 ساعة - يوم كامل</option>
+</select>
+<div id="sleepTimer">--:--:--</div>
+<p style="text-align:center" id="sleepStatus">مؤقت النوم متوقف</p>
+<div class="progress"><div id="sleepBar"></div></div>
+<div style="text-align:center">
+<button class="btn-gold" onclick="startSleep()">😴 ابدأ مؤقت النوم</button>
+<button class="btn-blue" onclick="startSleepCustom()">⏱️ مؤقت سريع 15 دقيقة</button>
+<button class="btn-dark" onclick="stopSleep()">⏹️ إلغاء المؤقت</button>
+</div>
+</div>
+
+<div class="box">
+<h2>🎯 مود التركيز</h2>
+<div style="text-align:center">
+<button onclick="playFocus('lofi')">🎧 Lo-Fi</button>
+<button onclick="playFocus('rain')">🌧️ مطر</button>
+<button onclick="playFocus('focus')">🧠 تركيز عميق</button>
+<button class="btn-white" onclick="playTest()">▶️ أغنية تجريبية</button>
+</div>
+</div>
+
+<div class="box">
+<h2>🔍 ابحث عن أغنية</h2>
+<span class="cat" onclick="quickSearch('lofi')">Lo-Fi</span>
+<span class="cat" onclick="quickSearch('calm')">هادية</span>
+<span class="cat" onclick="quickSearch('focus')">تركيز</span>
+<span class="cat" onclick="quickSearch('happy')">نشاط</span>
+<br><input id="search" placeholder="اكتب اسم أغنية...">
+<br><button onclick="searchMusic()">🔍 بحث الآن</button>
+<div id="results"><p style="color:#aaa">اكتب اسم أغنية أو دوس على أي تصنيف فوق</p></div>
+</div>
+
+<div class="box">
+<h2>💡 ازاي تشتغل صح؟</h2>
+<p style="line-height:1.9;color:#ddd">1. شغل موسيقى من هنا<br>2. دوس على أي أداة AI هتفتح في تاب جديد<br>3. شغل مؤقت 25 دقيقة<br>4. شغل الوضع الليلي لو بتشتغل بالليل<br>5. قبل ما تنام شغل مؤقت النوم وهيقفل لوحده</p>
+</div>
+
+<div id="player" style="display:none">
+<b id="pTitle">لا توجد أغنية</b><br><small id="pArtist"></small><br>
+<audio id="mainAudio" controls></audio><br>
+<button onclick="prevSong()">⏮️ السابق</button>
+<button onclick="togglePlay()">⏯️ تشغيل / إيقاف</button>
+<button onclick="nextSong()">⏭️ التالي</button>
+</div>
+
+<script>
+let ALL=[]; let idx=0; let audio=document.getElementById('mainAudio');
+function updateClock(){
+  let now=new Date(); let h=now.getHours(), m=now.getMinutes(), s=now.getSeconds();
+  let ampm=h>=12?'م':'ص'; let h12=h%12||12;
+  document.getElementById('clock').innerText=(h12<10?'0'+h12:h12)+':'+(m<10?'0'+m:m)+':'+(s<10?'0'+s:s)+' '+ampm;
+  let days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  let months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  document.getElementById('date').innerText=now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+  document.getElementById('dayName').innerText='📅 '+days[now.getDay()];
+}
+setInterval(updateClock,1000); updateClock();
+function toggleNight(){ let b=document.body; if(b.style.background.includes('fef3c7')){ b.style.background='linear-gradient(180deg,#0a0a0a,#1a0a2e)'; b.style.color='#fff'; } else { b.style.background='linear-gradient(180deg,#fef3c7,#fff)'; b.style.color='#000'; } }
+async function fetchWeather(lat,lon,name){
+  try{
+    document.getElementById('weatherDesc').innerText='⏳ جاري التحميل...';
+    let r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto');
+    let d=await r.json(); let c=d.current;
+    let codes={0:'☀️ صافي',1:'🌤️ صافي غالباً',2:'⛅ غائم جزئياً',3:'☁️ غائم',45:'🌫️ ضباب',48:'🌫️ ضباب',51:'🌦️ رذاذ',61:'🌧️ مطر خفيف',63:'🌧️ مطر',65:'🌧️ مطر غزير',71:'❄️ ثلج',80:'🌧️ أمطار',95:'⛈️ عاصفة'};
+    document.getElementById('weatherCity').innerText='📍 '+name;
+    document.getElementById('weatherTemp').innerText=Math.round(c.temperature_2m)+'°';
+    document.getElementById('weatherDesc').innerText=codes[c.weather_code]||'🌤️ جميل';
+    document.getElementById('weatherHum').innerText=c.relative_humidity_2m+'%';
+    document.getElementById('weatherWind').innerText=c.wind_speed_10m+' كم/س';
+    document.getElementById('weatherFeel').innerText=Math.round(c.apparent_temperature)+'°';
+  }catch(e){ document.getElementById('weatherDesc').innerText='مش قادر أجيب الطقس - جرب تاني'; }
+}
+function getWeather(){ if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(p=>fetchWeather(p.coords.latitude,p.coords.longitude,'مكانك الحالي'),()=>getWeatherCairo()); } else getWeatherCairo(); }
+function getWeatherCairo(){ fetchWeather(30.0444,31.2357,'القاهرة، مصر'); }
+getWeather();
+setInterval(getWeather,600000);
+let pomTimer=null, pomSec=25*60, pomTotal=25*60;
+function updatePom(){ let m=Math.floor(pomSec/60), s=pomSec%60; document.getElementById('pomodoro').innerText=(m<10?'0'+m:m)+':'+(s<10?'0'+s:s); document.getElementById('progressBar').style.width=((pomTotal-pomSec)/pomTotal*100)+'%'; }
+function startPomodoro(min,txt){ stopPomodoro(); pomSec=min*60; pomTotal=min*60; updatePom(); document.getElementById('pomodoroStatus').innerText=txt; pomTimer=setInterval(()=>{ pomSec--; updatePom(); if(pomSec<=0){ clearInterval(pomTimer); alert('خلص الوقت! '+txt); document.getElementById('pomodoroStatus').innerText='خلص الوقت ✅'; } },1000); }
+function stopPomodoro(){ if(pomTimer) clearInterval(pomTimer); document.getElementById('pomodoroStatus').innerText='متوقف'; }
+let sleepTimer=null, sleepSec=0, sleepTotal=0;
+function formatSleep(sec){ let h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60; return (h<10?'0'+h:h)+':'+(m<10?'0'+m:m)+':'+(s<10?'0'+s:s); }
+function startSleep(){ let min=parseInt(document.getElementById('sleepSelect').value); startSleepMinutes(min); }
+function startSleepCustom(){ startSleepMinutes(15); }
+function startSleepMinutes(min){ stopSleep(); sleepSec=min*60; sleepTotal=min*60; document.getElementById('sleepTimer').innerText=formatSleep(sleepSec); document.getElementById('sleepStatus').innerText='😴 شغال - هيقفل الموسيقى بعد '+min+' دقيقة'; sleepTimer=setInterval(()=>{ sleepSec--; document.getElementById('sleepTimer').innerText=formatSleep(sleepSec); document.getElementById('sleepBar').style.width=((sleepTotal-sleepSec)/sleepTotal*100)+'%'; if(sleepSec<=0){ clearInterval(sleepTimer); audio.pause(); document.getElementById('sleepStatus').innerText='😴 خلص الوقت - الموسيقى وقفت - تصبح على خير'; alert('😴 خلص مؤقت النوم - الموسيقى وقفت - تصبح على خير 🌙'); } },1000); }
+function stopSleep(){ if(sleepTimer) clearInterval(sleepTimer); document.getElementById('sleepTimer').innerText='--:--:--'; document.getElementById('sleepStatus').innerText='مؤقت النوم متوقف'; document.getElementById('sleepBar').style.width='0%'; }
+function playTest(){ ALL=[{name:'أغنية تجريبية',artist_name:'Test',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'}]; playByIndex(0); }
+function playFocus(t){ if(t=='lofi') ALL=[{name:'Lo-Fi للتركيز',artist_name:'Focus',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'}]; if(t=='rain') ALL=[{name:'موسيقى هادية',artist_name:'Calm',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'}]; if(t=='focus') ALL=[{name:'تركيز عميق',artist_name:'Deep Focus',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'}]; playByIndex(0); }
+function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; document.getElementById('player').style.display='block'; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
+function togglePlay(){ if(audio.paused) audio.play(); else audio.pause(); }
+function nextSong(){ if(!ALL.length) return; playByIndex((idx+1)%ALL.length); }
+function prevSong(){ if(!ALL.length) return; playByIndex((idx-1+ALL.length)%ALL.length); }
+function quickSearch(q){ document.getElementById('search').value=q; searchMusic(); }
+async function searchMusic(){ let q=document.getElementById('search').value.trim(); if(!q) return alert('اكتب اسم أغنية الأول'); document.getElementById('results').innerHTML='⏳ جاري البحث...'; try{ let r=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=10&country=EG'); let d=await r.json(); if(!d.results||!d.results.length){ document.getElementById('results').innerHTML='مفيش نتائج'; return; } ALL=d.results.map(s=>({name:s.trackName,artist_name:s.artistName,audio:s.previewUrl})); let h=''; for(let i=0;i<ALL.length;i++){ h+='<div class="card"><b>'+ALL[i].name+'</b><br><small>'+ALL[i].artist_name+'</small><br><button onclick="playByIndex('+i+')">▶️ تشغيل</button></div>'; } document.getElementById('results').innerHTML=h; }catch(e){ document.getElementById('results').innerHTML='مشكلة في النت'; } }
+document.getElementById('search').addEventListener('keypress',e=>{ if(e.key=='Enter') searchMusic(); });
+updatePom();
+</script>
+</body>
+</html>
