@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyMusic 🎧</title>
-<meta name="description" content="MyMusic - اسمع وحمل أغاني مجاناً، كلمات ومزامنة وترجمة وقوائم تشغيل">
+<title>MyMusic</title>
 <style>
- *{box-sizing:border-box} body{margin:0;font-family:sans-serif;background:#0a0a0a;color:#fff;text-align:center;padding-bottom:200px}
+ *{box-sizing:border-box} body{margin:0;font-family:sans-serif;background:#0a0a0a;color:#fff;text-align:center;padding-bottom:180px}
  .hero{background:linear-gradient(180deg,#ff0000,#7a0000 45%,#000);padding:20px 15px 28px;border-bottom-left-radius:35px;border-bottom-right-radius:35px}
  .logo{font-size:42px;font-weight:900} .logo span{background:#000;padding:2px 10px;border-radius:12px}
- .headphones{font-size:80px} .badge{background:#22c55e;color:#000;font-size:12px;padding:5px 12px;border-radius:20px;font-weight:bold}
+ .headphones{font-size:80px}
  .tabs{display:flex;gap:8px;justify-content:center;margin:12px;flex-wrap:wrap} .tabs button{padding:10px 14px;border-radius:20px;border:none;background:#222;color:#fff;cursor:pointer} .tabs button.active{background:#ff0000}
  .box{margin:10px 15px;background:#1a1a1a;padding:14px;border-radius:20px;border:1px solid #333}
  input{width:100%;padding:12px;border-radius:25px;border:none;outline:none;text-align:center;background:#000;color:#fff;font-size:16px;margin:4px 0}
@@ -18,16 +17,12 @@
  .card{background:#1a1a1a;border:1px solid #2a2a2a;padding:12px;border-radius:18px;margin:10px 15px;text-align:right}
  .card img{width:60px;height:60px;border-radius:12px;float:left;object-fit:cover}
  .small{padding:9px 12px;border-radius:15px;border:none;margin:4px;cursor:pointer;color:#fff;font-size:14px}
- .lyrics{white-space:pre-line;background:#000;padding:12px;border-radius:12px;font-size:14px;line-height:1.8;text-align:left;direction:ltr;max-height:300px;overflow:auto;margin-top:8px}
- iframe{width:100%;height:220px;border-radius:12px;margin-top:8px;border:none}
- .ytbox{background:#000;padding:10px;border-radius:15px;margin:10px 15px}
  .filterBtn{padding:8px 14px;border-radius:20px;border:none;background:#333;color:#fff;margin:3px;cursor:pointer} .filterBtn.active{background:#ff0000}
- /* المشغل */
  #player{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:2px solid #ff0000;padding:10px 12px;z-index:99;display:none;max-height:75vh;overflow:auto}
  #player .row{display:flex;align-items:center;gap:10px;text-align:right}
  #player img{width:55px;height:55px;border-radius:10px;object-fit:cover}
  #player .info{flex:1;overflow:hidden} #player .info b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} #player .info small{color:#aaa}
- #player .controls{display:flex;justify-content:center;gap:10px;margin-top:8px;align-items:center;flex-wrap:wrap}
+ #player .controls{display:flex;justify-content:center;gap:10px;margin-top:8px;align-items:center}
  #player .controls button{width:48px;height:48px;border-radius:50%;border:none;background:#ff0000;color:#fff;font-size:20px;cursor:pointer}
  #player .controls button.mini{width:38px;height:38px;background:#333;font-size:16px}
  #player .tools{display:flex;justify-content:center;gap:8px;margin-top:8px;flex-wrap:wrap}
@@ -35,11 +30,10 @@
  #player .tools button.on{background:#ff0000}
  #progress{width:100%;accent-color:#ff0000;margin-top:6px} #time{font-size:11px;color:#aaa;display:flex;justify-content:space-between}
  #syncLyrics{margin-top:10px;background:#000;border-radius:15px;padding:12px;max-height:180px;overflow:auto;text-align:center;display:none}
- #syncLyrics .line{padding:6px 4px;font-size:15px;line-height:1.6;color:#888;transition:.3s;border-radius:8px}
- #syncLyrics .line.active{background:#ff0000;color:#fff;font-weight:bold;font-size:17px;transform:scale(1.03)}
+ #syncLyrics .line{padding:6px 4px;font-size:15px;line-height:1.6;color:#888}
+ #syncLyrics .line.active{background:#ff0000;color:#fff;font-weight:bold;font-size:17px}
  #syncLyrics .line.trans{font-size:13px;color:#ffb300;direction:rtl}
  .playlistCard{background:#222;border:1px solid #333;padding:12px;border-radius:15px;margin:10px 0;text-align:right}
- .shareBox{background:linear-gradient(90deg,#25D366,#128C7E);padding:15px;border-radius:20px;margin:10px 15px}
 </style>
 </head>
 <body>
@@ -47,8 +41,7 @@
 <div class="hero">
  <div class="headphones">🎧</div>
  <div class="logo">My<span>Music</span></div>
- <div>كلمات • ترجمة • مزامنة مع الأغنية</div><br>
- <span class="badge">✅ مشغل جديد - كلمات متزامنة</span>
+ <div>نسخة مستقرة - تم إصلاح العطل</div>
 </div>
 
 <div class="tabs">
@@ -59,7 +52,7 @@
 </div>
 
 <div id="view-search">
- <div class="box"><input id="search" placeholder="ابحث عن أغنية أو فنان..."><button class="btn" onclick="searchMusic()">🔍 بحث الآن</button></div>
+ <div class="box"><input id="search" placeholder="ابحث... مثال: happy"><button class="btn" onclick="searchMusic()">🔍 بحث الآن</button></div>
  <div id="results"><p style="color:#aaa">اكتب اسم أغنية ودوس بحث</p></div>
 </div>
 
@@ -71,36 +64,21 @@
   <button class="filterBtn" onclick="filterCat('eg',this)">🇪🇬 مصر</button>
   <button class="filterBtn" onclick="filterCat('arab',this)">🌍 عرب</button>
   <button class="filterBtn" onclick="filterCat('world',this)">🌎 أجانب</button>
-  <button class="filterBtn" onclick="filterCat('rap',this)">🎤 راب</button>
-  <button class="filterBtn" onclick="filterCat('latin',this)">💃 لاتيني</button>
  </div>
  <div id="artistList"></div><div id="artistResults"></div>
 </div>
 
 <div id="view-playlists" style="display:none">
- <div class="box"><h3>🎼 إنشاء قائمة تشغيل</h3><input id="newPlaylistName" placeholder="اسم القايمة..."><button class="btn" onclick="createPlaylist()">➕ إنشاء قايمة</button></div>
+ <div class="box"><h3>🎼 قائمة جديدة</h3><input id="newPlaylistName" placeholder="اسم القايمة..."><button class="btn" onclick="createPlaylist()">➕ إنشاء</button></div>
  <div id="playlistsList" style="padding:0 15px"></div>
 </div>
 
 <div id="view-fav" style="display:none"><div id="favList"></div></div>
 
-<div class="shareBox">
- <h3 style="margin:0">📣 شير الموقع لصحابك</h3>
- <button class="small" style="background:#fff;color:#000;font-weight:bold;width:100%" onclick="shareSite()">💬 شير على واتساب</button>
- <button class="small" style="background:#000;width:100%" onclick="navigator.clipboard.writeText(location.href);alert('اتنسخ اللينك ✅')">🔗 انسخ اللينك</button>
-</div>
-
-<div id="ytPlayer" style="display:none" class="ytbox">
- <h3 id="ytTitle">▶️ تشغيل من YouTube</h3>
- <iframe id="ytFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
- <button class="small" style="background:#333" onclick="closeYT()">✖️ إغلاق</button>
-</div>
-
-<!-- المشغل الجديد -->
 <div id="player">
  <div class="row">
   <img id="pImg" src="https://cdn-icons-png.flaticon.com/512/727/727269.png">
-  <div class="info"><b id="pTitle">لا توجد أغنية</b><small id="pArtist">اختر أغنية لتشغيلها</small></div>
+  <div class="info"><b id="pTitle">لا توجد أغنية</b><small id="pArtist">اختر أغنية</small></div>
   <button class="small" style="background:#333" onclick="closePlayer()">✖️</button>
  </div>
  <input type="range" id="progress" value="0" min="0" max="100" oninput="seek(this.value)">
@@ -111,7 +89,6 @@
   <button class="mini" onclick="nextSong()">⏭️</button>
   <button class="mini" onclick="toggleLoop()" id="loopBtn">🔁</button>
  </div>
- <!-- زراير الكلمات والترجمة والمزامنة -->
  <div class="tools">
   <button id="btnLyrics" onclick="togglePlayerLyrics()">📝 كلمات</button>
   <button id="btnTrans" onclick="togglePlayerTranslate()">🌐 ترجمة</button>
@@ -122,57 +99,259 @@
 </div>
 
 <script>
-const API='https://discoveryprovider.audius.co/v1';
-let ALL=[
- {n:"Amr Diab",ar:"عمرو دياب",e:"🇪🇬",c:"eg"},{n:"Umm Kulthum",ar:"أم كلثوم",e:"👑",c:"eg"},{n:"Tamer Hosny",ar:"تامر حسني",e:"🎙️",c:"eg"},
- {n:"Sherine",ar:"شيرين",e:"🎵",c:"eg"},{n:"Mohamed Hamaki",ar:"محمد حماقي",e:"🔥",c:"eg"},{n:"Wegz",ar:"ويجز",e:"🎧",c:"rap"},
- {n:"Ahmed Saad",ar:"أحمد سعد",e:"🎶",c:"eg"},{n:"Elissa",ar:"إليسا",e:"💎",c:"arab"},{n:"Nancy Ajram",ar:"نانسي عجرم",e:"🌹",c:"arab"},
- {n:"Wael Kfoury",ar:"وائل كفوري",e:"🎸",c:"arab"},{n:"Kadim Al Sahir",ar:"كاظم الساهر",e:"🎼",c:"arab"},{n:"Hussain Al Jassmi",ar:"حسين الجسمي",e:"🎵",c:"arab"},
- {n:"Saad Lamjarred",ar:"سعد لمجرد",e:"🔥",c:"arab"},{n:"Dua Lipa",ar:"دوا ليبا",e:"💃",c:"world"},{n:"Shakira",ar:"شاكيرا",e:"💃",c:"latin"},
- {n:"Taylor Swift",ar:"تايلور سويفت",e:"⭐",c:"world"},{n:"Ed Sheeran",ar:"إد شيران",e:"🎸",c:"world"},{n:"Adele",ar:"أديل",e:"💜",c:"world"},
- {n:"BTS",ar:"بي تي اس",e:"💜",c:"world"},{n:"Billie Eilish",ar:"بيلي إيليش",e:"🌙",c:"world"},{n:"The Weeknd",ar:"ذا ويكند",e:"🌃",c:"world"},
- {n:"Eminem",ar:"إمينيم",e:"🎤",c:"rap"},{n:"Drake",ar:"دريك",e:"🔥",c:"rap"},{n:"Bad Bunny",ar:"باد باني",e:"🐰",c:"latin"},
- {n:"Maluma",ar:"مالوما",e:"💃",c:"latin"},{n:"BLACKPINK",ar:"بلاك بينك",e:"🖤",c:"world"}
+// قايمة واحدة لكل الأغاني اللي ظاهرة - التشغيل بالرقم عشان ميكسرش
+let ALL_SONGS = [];
+let currentQueue = [];
+let currentIndex = 0;
+let currentSong = null;
+let favs = [];
+let playlists = [];
+try{ favs = JSON.parse(localStorage.getItem('mymusic_fav')||'[]'); }catch(e){ favs=[]; }
+try{ playlists = JSON.parse(localStorage.getItem('mymusic_playlists')||'[]'); }catch(e){ playlists=[]; }
+
+let ALL_ARTISTS=[
+ {n:"Amr Diab",ar:"عمرو دياب",e:"🇪🇬",c:"eg"},{n:"Sherine",ar:"شيرين",e:"🎵",c:"eg"},{n:"Tamer Hosny",ar:"تامر حسني",e:"🎙️",c:"eg"},
+ {n:"Mohamed Hamaki",ar:"محمد حماقي",e:"🔥",c:"eg"},{n:"Wegz",ar:"ويجز",e:"🎧",c:"eg"},{n:"Elissa",ar:"إليسا",e:"💎",c:"arab"},
+ {n:"Nancy Ajram",ar:"نانسي عجرم",e:"🌹",c:"arab"},{n:"Saad Lamjarred",ar:"سعد لمجرد",e:"🔥",c:"arab"},
+ {n:"Dua Lipa",ar:"دوا ليبا",e:"💃",c:"world"},{n:"Shakira",ar:"شاكيرا",e:"💃",c:"world"},{n:"Taylor Swift",ar:"تايلور سويفت",e:"⭐",c:"world"},
+ {n:"Ed Sheeran",ar:"إد شيران",e:"🎸",c:"world"},{n:"Adele",ar:"أديل",e:"💜",c:"world"},{n:"BTS",ar:"بي تي اس",e:"💜",c:"world"}
 ];
 let currentCat='all';
-let favs=JSON.parse(localStorage.getItem('mymusic_fav')||'[]');
-let playlists=JSON.parse(localStorage.getItem('mymusic_playlists')||'[]');
-let currentQueue=[]; let currentIndex=0; let currentSong=null;
-let audio=document.getElementById('mainAudio'); let isLoop=false;
-// متغيرات الكلمات والمزامنة
+let audio=document.getElementById('mainAudio');
+let isLoop=false;
 let lyricsLines=[]; let lyricsTrans=[]; let showLyrics=false; let showTrans=false; let syncOn=false; let currentLine=-1;
-function updateFavCount(){document.getElementById('favCount').innerText=favs.length?`(${favs.length})`:''}
+
+function saveFavs(){ localStorage.setItem('mymusic_fav', JSON.stringify(favs)); }
+function savePlaylists(){ localStorage.setItem('mymusic_playlists', JSON.stringify(playlists)); }
+function updateFavCount(){ document.getElementById('favCount').innerText = favs.length ? '('+favs.length+')' : ''; }
 updateFavCount();
+
 function renderArtistList(){
  let q=(document.getElementById('artistSearch').value||'').toLowerCase();
- let list=ALL.filter(a=>(currentCat=='all'||a.c==currentCat)&&(a.ar.includes(q)||a.n.toLowerCase().includes(q)||q==''));
- document.getElementById('artistList').innerHTML=`<p style="color:#aaa">عرض ${list.length} فنان</p>`+list.map(a=>`<div class="artist" onclick="loadArtist('${a.n}')"><div>${a.e}</div><span>${a.ar}</span></div>`).join('');
+ let list=ALL_ARTISTS.filter(a=>(currentCat=='all'||a.c==currentCat)&&(a.ar.includes(q)||a.n.toLowerCase().includes(q)||q==''));
+ document.getElementById('artistList').innerHTML = '<p style="color:#aaa">عرض '+list.length+' فنان</p>' + list.map(a=>'<div class="artist" onclick="loadArtist(\''+a.n+'\')"><div>'+a.e+'</div><span>'+a.ar+'</span></div>').join('');
 }
-function filterCat(cat,btn){currentCat=cat;document.querySelectorAll('.filterBtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderArtistList();}
+function filterCat(cat,btn){ currentCat=cat; document.querySelectorAll('.filterBtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderArtistList(); }
 renderArtistList();
+
 function showTab(t){
  ['search','artists','playlists','fav'].forEach(x=>{
-  document.getElementById('view-'+x).style.display=x==t?'block':'none';
-  document.getElementById('tab-'+x).classList.toggle('active',x==t);
+  document.getElementById('view-'+x).style.display = x==t ? 'block' : 'none';
+  document.getElementById('tab-'+x).classList.toggle('active', x==t);
  });
- if(t=='fav') renderFav(); if(t=='playlists') renderPlaylists();
+ if(t=='fav') renderFav();
+ if(t=='playlists') renderPlaylists();
 }
-function shareSite(){let txt='اسمع وحمل أغاني مجاناً 🎧🔥 MyMusic 👇 '+location.href; window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');}
-// ===== المشغل =====
-function playSong(song,queue){
- if(queue){currentQueue=queue;currentIndex=queue.findIndex(s=>s.audio==song.audio);} else {currentQueue=[song];currentIndex=0;}
- currentSong=song;
- audio.pause(); audio.currentTime=0; audio.src=song.audio;
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// التشغيل بالرقم - دي اللي صلحت العطل
+function playByIndex(i, queue){
+ if(!queue) queue = ALL_SONGS;
+ currentQueue = queue;
+ currentIndex = i;
+ let song = queue[i];
+ if(!song) return;
+ currentSong = song;
+ audio.pause(); audio.currentTime = 0; audio.src = song.audio;
  document.getElementById('player').style.display='block';
- document.getElementById('pImg').src=song.image||'https://cdn-icons-png.flaticon.com/512/727/727269.png';
- document.getElementById('pTitle').innerText=song.name; document.getElementById('pArtist').innerText=song.artist_name;
- audio.play(); document.getElementById('playBtn').innerText='⏸️';
- // صفر الكلمات القديمة وجهز الجديدة
+ document.getElementById('pImg').src = song.image || 'https://cdn-icons-png.flaticon.com/512/727/727269.png';
+ document.getElementById('pTitle').innerText = song.name;
+ document.getElementById('pArtist').innerText = song.artist_name;
+ audio.play().catch(()=>{});
+ document.getElementById('playBtn').innerText='⏸️';
  lyricsLines=[]; lyricsTrans=[]; currentLine=-1; showLyrics=false; showTrans=false;
- document.getElementById('btnLyrics').classList.remove('on'); document.getElementById('btnTrans').classList.remove('on');
- document.getElementById('syncLyrics').style.display='none'; document.getElementById('syncLyrics').innerHTML='';
- // لو المزامنة شغالة، هات الكلمات تلقائي
+ document.getElementById('btnLyrics').classList.remove('on');
+ document.getElementById('btnTrans').classList.remove('on');
+ document.getElementById('syncLyrics').style.display='none';
+ document.getElementById('syncLyrics').innerHTML='';
  if(syncOn) loadLyricsForCurrent();
 }
-function togglePlay(){if(!audio.src) return alert('اختر أغنية الأول'); if(audio.paused){audio.play();document.getElementById('playBtn').innerText='⏸️';}else{audio.pause();document.getElementById('playBtn').innerText='▶️';}}
-function nextSong(){if
+function togglePlay(){
+ if(!audio.src) return alert('اختر أغنية الأول');
+ if(audio.paused){ audio.play(); document.getElementById('playBtn').innerText='⏸️'; }
+ else { audio.pause(); document.getElementById('playBtn').innerText='▶️'; }
+}
+function nextSong(){ if(!currentQueue.length) return; let n = (currentIndex+1) % currentQueue.length; playByIndex(n, currentQueue); }
+function prevSong(){ if(!currentQueue.length) return; let p = (currentIndex-1+currentQueue.length) % currentQueue.length; playByIndex(p, currentQueue); }
+function toggleLoop(){ isLoop=!isLoop; audio.loop=isLoop; document.getElementById('loopBtn').style.background = isLoop ? '#ff0000' : '#333'; }
+function closePlayer(){ audio.pause(); audio.src=''; document.getElementById('player').style.display='none'; }
+function seek(v){ if(audio.duration) audio.currentTime = (v/100)*audio.duration; }
+function fmt(s){ if(!s||isNaN(s)) return '0:00'; let m=Math.floor(s/60); let sec=Math.floor(s%60); return m+':'+String(sec).padStart(2,'0'); }
+
+async function loadLyricsForCurrent(){
+ if(!currentSong) return;
+ let box=document.getElementById('syncLyrics');
+ box.innerHTML='⏳ جاري جلب الكلمات...'; box.style.display='block';
+ try{
+  let r=await fetch('https://api.lyrics.ovh/v1/'+encodeURIComponent(currentSong.artist_name)+'/'+encodeURIComponent(currentSong.name));
+  let d=await r.json();
+  if(!d.lyrics){ box.innerHTML='الكلمات مش متاحة للأغنية دي'; lyricsLines=[]; return; }
+  lyricsLines = d.lyrics.split('\n').filter(l=>l.trim()!='').slice(0,100);
+  renderSyncLyrics();
+ }catch(e){ box.innerHTML='مش قادر أجيب الكلمات دلوقتي'; }
+}
+function renderSyncLyrics(){
+ let box=document.getElementById('syncLyrics');
+ if(!lyricsLines.length) return;
+ let h='';
+ for(let i=0;i<lyricsLines.length;i++){
+  h += '<div class="line" id="line-'+i+'">'+esc(lyricsLines[i])+'</div>';
+  if(showTrans && lyricsTrans[i]) h += '<div class="line trans">'+esc(lyricsTrans[i])+'</div>';
+ }
+ box.innerHTML=h;
+ updateSyncHighlight();
+}
+function togglePlayerLyrics(){
+ if(!currentSong) return alert('شغل أغنية الأول');
+ showLyrics=!showLyrics;
+ document.getElementById('btnLyrics').classList.toggle('on',showLyrics);
+ if(showLyrics){
+  if(!lyricsLines.length) loadLyricsForCurrent();
+  else { document.getElementById('syncLyrics').style.display='block'; renderSyncLyrics(); }
+ } else {
+  document.getElementById('syncLyrics').style.display='none';
+ }
+}
+async function togglePlayerTranslate(){
+ if(!currentSong) return alert('شغل أغنية الأول');
+ if(!lyricsLines.length) return alert('دوس على 📝 كلمات الأول');
+ showTrans=!showTrans;
+ document.getElementById('btnTrans').classList.toggle('on',showTrans);
+ if(showTrans && !lyricsTrans.length){
+  document.getElementById('syncLyrics').innerHTML='⏳ جاري الترجمة...';
+  for(let i=0;i<Math.min(lyricsLines.length,15);i++){
+   try{
+    let r=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(lyricsLines[i])+'&langpair=en|ar');
+    let d=await r.json(); lyricsTrans[i]=d.responseData.translatedText;
+   }catch(e){ lyricsTrans[i]=''; }
+  }
+ }
+ renderSyncLyrics();
+}
+function toggleSync(){
+ syncOn=!syncOn;
+ document.getElementById('btnSync').innerText = syncOn ? '🎯 مزامنة: شغالة' : '🎯 مزامنة: إيقاف';
+ document.getElementById('btnSync').classList.toggle('on',syncOn);
+ if(syncOn){
+  if(!currentSong) return alert('شغل أغنية الأول');
+  if(!lyricsLines.length) loadLyricsForCurrent();
+  else { document.getElementById('syncLyrics').style.display='block'; showLyrics=true; document.getElementById('btnLyrics').classList.add('on'); }
+ }
+}
+function updateSyncHighlight(){
+ if(!syncOn || !lyricsLines.length || !audio.duration) return;
+ let idx = Math.floor((audio.currentTime / audio.duration) * lyricsLines.length);
+ if(idx>=lyricsLines.length) idx=lyricsLines.length-1;
+ if(idx!==currentLine){
+  currentLine=idx;
+  let all=document.querySelectorAll('#syncLyrics .line');
+  all.forEach(el=>el.classList.remove('active'));
+  let el=document.getElementById('line-'+idx);
+  if(el){ el.classList.add('active'); el.scrollIntoView({block:'center',behavior:'smooth'}); }
+ }
+}
+audio.addEventListener('timeupdate',()=>{
+ if(audio.duration){
+  document.getElementById('progress').value=(audio.currentTime/audio.duration)*100;
+  document.getElementById('curTime').innerText=fmt(audio.currentTime);
+  document.getElementById('durTime').innerText=fmt(audio.duration);
+ }
+ updateSyncHighlight();
+});
+audio.addEventListener('ended',()=>{ if(!isLoop) nextSong(); });
+
+function createPlaylist(){
+ let name=document.getElementById('newPlaylistName').value.trim();
+ if(!name) return alert('اكتب اسم القايمة');
+ playlists.push({name:name, songs:[]}); savePlaylists();
+ document.getElementById('newPlaylistName').value=''; renderPlaylists(); alert('اتعملت القايمة ✅');
+}
+function renderPlaylists(){
+ let box=document.getElementById('playlistsList');
+ if(!playlists.length){ box.innerHTML='<p style="color:#aaa">لسه مفيش قوائم</p>'; return; }
+ let h='';
+ for(let i=0;i<playlists.length;i++){
+  let p=playlists[i];
+  h += '<div class="playlistCard"><b>🎼 '+esc(p.name)+'</b> <small>('+p.songs.length+' أغنية)</small><br>';
+  h += '<button class="small" style="background:#ff0000" onclick="playPlaylist('+i+')">▶️ تشغيل القايمة</button> ';
+  h += '<button class="small" style="background:#333" onclick="deletePlaylist('+i+')">🗑️ حذف</button><div>';
+  if(p.songs.length==0) h += '<small>القايمة فاضية</small>';
+  for(let j=0;j<p.songs.length;j++){
+   h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #333"><span>🎵 '+esc(p.songs[j].name)+'</span><button class="small" style="background:#333" onclick="removeFromPlaylist('+i+','+j+')">✖️</button></div>';
+  }
+  h += '</div></div>';
+ }
+ box.innerHTML=h;
+}
+function deletePlaylist(i){ if(confirm('تحذف القايمة؟')){ playlists.splice(i,1); savePlaylists(); renderPlaylists(); } }
+function removeFromPlaylist(pi,si){ playlists[pi].songs.splice(si,1); savePlaylists(); renderPlaylists(); }
+function addToPlaylistByIndex(i){
+ if(!playlists.length) return alert('اعمل قايمة الأول من تبويب 🎼 قوائمي');
+ let song = ALL_SONGS[i]; if(!song) return;
+ let names='';
+ for(let k=0;k<playlists.length;k++) names += (k+1)+'. '+playlists[k].name+'\n';
+ let choice = prompt('اختار رقم القايمة:\n'+names);
+ let idx = parseInt(choice)-1;
+ if(playlists[idx]){ playlists[idx].songs.push(song); savePlaylists(); alert('اتضافت لقايمة '+playlists[idx].name+' ✅'); }
+}
+function playPlaylist(i){
+ if(!playlists[i].songs.length) return alert('القايمة فاضية');
+ playByIndex(0, playlists[i].songs);
+}
+function toggleFavByIndex(i){
+ let song = ALL_SONGS[i]; if(!song) return;
+ let idx = favs.findIndex(f=>f.audio==song.audio);
+ if(idx>-1){ favs.splice(idx,1); alert('اتشالت من المفضلة'); }
+ else { favs.push(song); alert('اتضافت للمفضلة ❤️'); }
+ saveFavs(); updateFavCount();
+}
+function renderFav(){
+ if(!favs.length){ document.getElementById('favList').innerHTML='<p style="color:#aaa">لسه مفيش مفضلة</p>'; return; }
+ let h='';
+ for(let i=0;i<favs.length;i++){
+  let t=favs[i];
+  h += '<div class="card"><img src="'+esc(t.image)+'"><b>'+esc(t.name)+'</b><br><small>'+esc(t.artist_name)+'</small><div style="clear:both"></div><button class="small" style="background:#ff0000;width:100%" onclick="playByIndex('+i+', favs)">▶️ تشغيل</button></div>';
+ }
+ document.getElementById('favList').innerHTML=h;
+}
+
+function makeCard(song, i){
+ return '<div class="card"><img src="'+esc(song.image)+'"><b>'+esc(song.name)+'</b><br><small>'+esc(song.artist_name)+'</small><div style="clear:both"></div>'
+ + '<button class="small" style="background:#ff0000;width:100%" onclick="playByIndex('+i+', ALL_SONGS)">▶️ تشغيل</button><br>'
+ + '<button class="small" style="background:#ff0055" onclick="toggleFavByIndex('+i+')">❤️ مفضلة</button> '
+ + '<button class="small" style="background:#ff9800" onclick="addToPlaylistByIndex('+i+')">➕ قايمة</button> '
+ + '<a href="'+song.audio+'" download target="_blank"><button class="small" style="background:#22c55e">⬇️ MP3</button></a></div>';
+}
+
+async function searchMusic(){
+ let q=document.getElementById('search').value.trim();
+ if(!q) return alert('اكتب اسم أغنية الأول');
+ document.getElementById('results').innerHTML='⏳ جاري البحث...';
+ try{
+  let res=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=20&country=EG');
+  let d=await res.json();
+  if(!d.results || !d.results.length){ document.getElementById('results').innerHTML='مفيش نتائج، جرب كلمة تانية'; return; }
+  ALL_SONGS = d.results.map(s=>({ name:s.trackName, artist_name:s.artistName, audio:s.previewUrl, image:s.artworkUrl100 }));
+  let h='';
+  for(let i=0;i<ALL_SONGS.length;i++) h += makeCard(ALL_SONGS[i], i);
+  document.getElementById('results').innerHTML=h;
+ }catch(e){
+  document.getElementById('results').innerHTML='في مشكلة في النت، جرب تاني. افتح الموقع من واي فاي مش داتا لو لسه مش شغال.';
+ }
+}
+async function loadArtist(name){
+ document.getElementById('artistResults').innerHTML='⏳ جاري تحميل أغاني '+esc(name)+'...';
+ try{
+  let res=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(name)+'&media=music&limit=20&country=EG');
+  let d=await res.json();
+  ALL_SONGS = d.results.map(s=>({ name:s.trackName, artist_name:s.artistName, audio:s.previewUrl, image:s.artworkUrl100 }));
+  let h='<h3>أغاني '+esc(name)+'</h3>';
+  for(let i=0;i<ALL_SONGS.length;i++) h += makeCard(ALL_SONGS[i], i);
+  document.getElementById('artistResults').innerHTML=h;
+ }catch(e){ document.getElementById('artistResults').innerHTML='مش قادر أجيب الأغاني دلوقتي، جرب تاني'; }
+}
+document.getElementById('search').addEventListener('keypress', function(e){ if(e.key=='Enter') searchMusic(); });
+</script>
+</body>
+ </html>
