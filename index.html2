@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MyMusic AI 🎧 - موسيقى وانت شغال على أدوات الذكاء الاصطناعي</title>
+<style>
+body{margin:0;font-family:sans-serif;background:linear-gradient(180deg,#0a0a0a,#1a0a2e);color:#fff;padding-bottom:210px}
+.top{background:linear-gradient(135deg,#ff0000,#7c3aed);padding:20px;border-radius:0 0 30px 30px;text-align:center}
+.box{background:rgba(255,255,255,.08);margin:12px;padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.1)}
+h2{margin:5px 0 12px;font-size:19px}
+.clock-box{background:linear-gradient(135deg,#0f172a,#7c3aed);text-align:center;padding:18px;border-radius:20px;margin:12px;box-shadow:0 10px 30px rgba(124,58,237,.4)}
+#clock{font-size:52px;font-weight:bold;letter-spacing:2px;margin:0}
+#date{font-size:18px;color:#ddd;margin:5px 0}
+#dayName{font-size:16px;color:#fbbf24}
+.weather{background:linear-gradient(135deg,#0ea5e9,#0f766e);padding:16px;border-radius:20px;margin:12px;text-align:center}
+.weather-temp{font-size:52px;font-weight:bold}
+.weather-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.w-item{background:rgba(255,255,255,.15);padding:10px;border-radius:14px}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ai-btn{display:block;text-align:center;padding:14px;border-radius:16px;color:#fff;text-decoration:none;font-weight:bold;font-size:15px}
+.chatgpt{background:#10a37f}.gemini{background:#1a73e8}.manus{background:#ff5c00}.claude{background:#d97757}.perplexity{background:#20b8cd}.copilot{background:#0078d4}.canva{background:#8b3dff}.midjourney{background:#111;border:1px solid #fff}.capcut{background:#000;border:1px solid #fff}.suno{background:#ff2d55}.eleven{background:#00c2a8}.cursor{background:#000;border:1px solid #0ff}
+input,select{width:92%;padding:13px;border-radius:25px;border:none;text-align:center;font-size:16px;margin:8px 0;color:#000}
+button{padding:12px 15px;border-radius:20px;border:none;background:#ff0000;color:#fff;font-weight:bold;margin:4px;cursor:pointer}
+.btn-green{background:#22c55e}.btn-white{background:#fff;color:#000}.btn-dark{background:#333}.btn-gold{background:#f59e0b}.btn-blue{background:#2563eb}
+.card{background:#222;margin:10px;padding:12px;border-radius:14px;text-align:right}
+#pomodoro{font-size:48px;font-weight:bold;text-align:center}
+#sleepTimer{font-size:36px;font-weight:bold;text-align:center;color:#fbbf24}
+#player{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:2px solid red;padding:12px;text-align:center;z-index:99}
+audio{width:100%}
+.progress{height:8px;background:#333;border-radius:10px;overflow:hidden;margin:10px 0}
+#progressBar{height:100%;background:linear-gradient(90deg,#ff0000,#f59e0b);width:0%}
+#sleepBar{height:100%;background:#f59e0b;width:0%}
+.cat{display:inline-block;background:#333;padding:6px 12px;border-radius:20px;margin:3px;font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="top">
+<h1 style="margin:0">🎧 MyMusic AI</h1>
+<p style="margin:5px">اسمع موسيقى وانت شغال على أدوات الذكاء الاصطناعي<br>شغل - ركز - أنجز</p>
+<button class="btn-green" onclick="alert('الأزرار شغالة ✅')">✅ جرب الزرار ده الأول</button>
+<button class="btn-white" onclick="toggleNight()">🌙 وضع ليلي للعين / ☀️ عادي</button>
+</div>
+
+<div class="clock-box">
+<div id="clock">00:00:00</div>
+<div id="date">--</div>
+<div id="dayName">--</div>
+<div style="font-size:13px;color:#ddd;margin-top:6px">⏰ بتتحدث تلقائي كل ثانية • أول ما تفتح الموقع</div>
+</div>
+
+<div class="weather">
+<h2 style="margin:0">🌤️ الطقس الآن</h2>
+<div id="weatherCity" style="font-size:15px;margin:4px">📍 جاري تحديد مكانك...</div>
+<div class="weather-temp" id="weatherTemp">--°</div>
+<div id="weatherDesc" style="font-size:18px">جاري تحميل الطقس...</div>
+<div class="weather-grid">
+<div class="w-item">💧 رطوبة<br><b id="weatherHum">--%</b></div>
+<div class="w-item">💨 رياح<br><b id="weatherWind">--</b></div>
+<div class="w-item">👁️ الإحساس<br><b id="weatherFeel">--°</b></div>
+</div>
+<button class="btn-white" onclick="getWeather()">🔄 تحديث الطقس</button>
+<button class="btn-dark" onclick="getWeatherCairo()">📍 طقس القاهرة</button>
+<p style="font-size:12px;color:#ddd">مزامنة تلقائية كل 10 دقايق وانت فاتح الموقع</p>
+</div>
+
+<div class="box">
+<h2>🤖 أهم أدوات الذكاء الاصطناعي</h2>
+<div class="ai-grid">
+<a class="ai-btn chatgpt" href="https://chatgpt.com" target="_blank">💬 ChatGPT</a>
+<a class="ai-btn gemini" href="https://gemini.google.com" target="_blank">✨ Gemini</a>
+<a class="ai-btn manus" href="https://manus.im" target="_blank">🚀 Manus</a>
+<a class="ai-btn claude" href="https://claude.ai" target="_blank">🧠 Claude</a>
+<a class="ai-btn perplexity" href="https://www.perplexity.ai" target="_blank">🔍 Perplexity</a>
+<a class="ai-btn copilot" href="https://copilot.microsoft.com" target="_blank">🪟 Copilot</a>
+</div>
+</div>
+
+<div class="box">
+<h2>✍️ أدوات الكتابة والشغل</h2>
+<div class="ai-grid">
+<a class="ai-btn chatgpt" href="https://chatgpt.com" target="_blank">✍️ كتابة مقالات</a>
+<a class="ai-btn gemini" href="https://gemini.google.com" target="_blank">📝 تلخيص وترجمة</a>
+<a class="ai-btn perplexity" href="https://www.perplexity.ai" target="_blank">📚 بحث ذكي</a>
+<a class="ai-btn claude" href="https://claude.ai" target="_blank">📄 كتابة طويلة</a>
+</div>
+</div>
+
+<div class="box">
+<h2>🎨 أدوات التصميم والصور</h2>
+<div class="ai-grid">
+<a class="ai-btn canva" href="https://www.canva.com" target="_blank">🎨 Canva تصميم</a>
+<a class="ai-btn midjourney" href="https://www.midjourney.com" target="_blank">🖼️ Midjourney صور</a>
+<a class="ai-btn gemini" href="https://gemini.google.com/app" target="_blank">✨ Gemini صور</a>
+<a class="ai-btn chatgpt" href="https://chatgpt.com" target="_blank">🎨 ChatGPT صور</a>
+</div>
+</div>
+
+<div class="box">
+<h2>💻 أدوات البرمجة</h2>
+<div class="ai-grid">
+<a class="ai-btn cursor" href="https://cursor.com" target="_blank">💻 Cursor</a>
+<a class="ai-btn copilot" href="https://github.com/features/copilot" target="_blank">🐙 GitHub Copilot</a>
+<a class="ai-btn chatgpt" href="https://chatgpt.com" target="_blank">💬 ChatGPT كود</a>
+<a class="ai-btn claude" href="https://claude.ai" target="_blank">🧠 Claude كود</a>
+</div>
+</div>
+
+<div class="box">
+<h2>🎬 أدوات الفيديو والصوت</h2>
+<div class="ai-grid">
+<a class="ai-btn capcut" href="https://www.capcut.com" target="_blank">🎬 CapCut فيديو</a>
+<a class="ai-btn suno" href="https://suno.com" target="_blank">🎵 Suno موسيقى AI</a>
+<a class="ai-btn eleven" href="https://elevenlabs.io" target="_blank">🎙️ ElevenLabs صوت</a>
+<a class="ai-btn manus" href="https://manus.im" target="_blank">🤖 Manus مهام</a>
+</div>
+</div>
+
+<div class="box">
+<h2>🍅 مؤقت التركيز Pomodoro</h2>
+<div id="pomodoro">25:00</div>
+<p style="text-align:center" id="pomodoroStatus">جاهز؟</p>
+<div class="progress"><div id="progressBar"></div></div>
+<div style="text-align:center">
+<button class="btn-green" onclick="startPomodoro(25,'شغل وركز 💪')">▶️ ابدأ شغل 25 دقيقة</button>
+<button class="btn-gold" onclick="startPomodoro(5,'راحة ☕')">☕ راحة 5 دقايق</button>
+<button class="btn-dark" onclick="stopPomodoro()">⏹️ إيقاف</button>
+</div>
+</div>
+
+<div class="box" style="border:2px solid #f59e0b">
+<h2>😴 مؤقت النوم والإغلاق - من ربع ساعة لـ 24 ساعة</h2>
+<p style="color:#ddd;font-size:14px;text-align:center">هيقفل الموسيقى لوحده بعد الوقت اللي تختاره</p>
+<label>اختر المدة:</label>
+<select id="sleepSelect">
+<option value="15">⏰ 15 دقيقة - ربع ساعة</option>
+<option value="30">⏰ 30 دقيقة - نص ساعة</option>
+<option value="45">
