@@ -3,21 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyMusic</title>
+<title>MyMusic - كل الفنانين</title>
 <style>
  *{box-sizing:border-box} body{margin:0;font-family:sans-serif;background:#0a0a0a;color:#fff;text-align:center}
- .hero{background:linear-gradient(180deg,#ff0000,#7a0000 45%,#000);padding:20px 15px 30px;border-bottom-left-radius:35px;border-bottom-right-radius:35px}
+ .hero{background:linear-gradient(180deg,#ff0000,#7a0000 45%,#000);padding:20px 15px 28px;border-bottom-left-radius:35px;border-bottom-right-radius:35px}
  .logo{font-size:42px;font-weight:900} .logo span{background:#000;padding:2px 10px;border-radius:12px}
  .headphones{font-size:85px}
- .tabs{display:flex;gap:8px;justify-content:center;margin:12px} .tabs button{padding:10px 16px;border-radius:20px;border:none;background:#222;color:#fff;cursor:pointer} .tabs button.active{background:#ff0000}
+ .tabs{display:flex;gap:8px;justify-content:center;margin:12px;flex-wrap:wrap} .tabs button{padding:10px 14px;border-radius:20px;border:none;background:#222;color:#fff;cursor:pointer} .tabs button.active{background:#ff0000}
  .box{margin:10px 15px;background:#1a1a1a;padding:14px;border-radius:20px;border:1px solid #333}
- input{width:100%;padding:12px;border-radius:25px;border:none;outline:none;text-align:center;background:#000;color:#fff;font-size:16px}
- .btn{width:100%;padding:12px;border:none;border-radius:25px;background:#ff0000;color:#fff;font-weight:bold;margin-top:10px;cursor:pointer}
- .artist{display:inline-block;width:80px;margin:6px;cursor:pointer} .artist div{width:70px;height:70px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:32px;margin:auto} .artist span{font-size:12px}
+ input{width:100%;padding:13px;border-radius:25px;border:none;outline:none;text-align:center;background:#000;color:#fff;font-size:16px}
+ .btn{width:100%;padding:12px;border:none;border-radius:25px;background:#ff0000;color:#fff;font-weight:bold;margin-top:10px;cursor:pointer;font-size:16px}
+ .cat{margin:18px 0 6px;font-size:19px;font-weight:bold;background:#222;padding:10px;border-radius:12px}
+ .artist{display:inline-block;width:84px;margin:6px;cursor:pointer;vertical-align:top} .artist div{width:66px;height:66px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:28px;margin:auto} .artist span{font-size:12px;display:block;margin-top:4px;line-height:1.3}
  .card{background:#1a1a1a;border:1px solid #2a2a2a;padding:12px;border-radius:18px;margin:10px 15px;text-align:right}
  .card img{width:60px;height:60px;border-radius:12px;float:left;object-fit:cover}
- audio{width:100%;margin-top:8px} .small{padding:8px 12px;border-radius:15px;border:none;margin:4px;cursor:pointer;color:#fff}
+ audio{width:100%;margin-top:8px} .small{padding:9px 12px;border-radius:15px;border:none;margin:4px;cursor:pointer;color:#fff;font-size:14px}
  .lyrics{white-space:pre-line;background:#000;padding:12px;border-radius:12px;font-size:14px;line-height:1.8;text-align:left;direction:ltr;max-height:300px;overflow:auto;margin-top:8px}
+ iframe{width:100%;height:220px;border-radius:12px;margin-top:8px;border:none}
+ .ytbox{background:#000;padding:10px;border-radius:15px;margin:10px 15px}
+ .filterBtn{padding:8px 14px;border-radius:20px;border:none;background:#333;color:#fff;margin:3px;cursor:pointer} .filterBtn.active{background:#ff0000}
 </style>
 </head>
 <body>
@@ -25,112 +29,201 @@
 <div class="hero">
  <div class="headphones">🎧</div>
  <div class="logo">My<span>Music</span></div>
- <div>كلمات • ترجمة • فنانين العالم • مفضلة • تحميل MP3</div>
+ <div>🔥 أكبر ليستة فنانين في مصر والعالم - +100 فنان</div>
 </div>
 
 <div class="tabs">
  <button id="tab-search" class="active" onclick="showTab('search')">🔍 بحث</button>
- <button id="tab-artists" onclick="showTab('artists')">🌍 الفنانين</button>
+ <button id="tab-artists" onclick="showTab('artists')">🌍 كل الفنانين</button>
+ <button id="tab-trend" onclick="showTab('trend')">🔥 ترند</button>
  <button id="tab-fav" onclick="showTab('fav')">❤️ المفضلة <span id="favCount"></span></button>
 </div>
 
 <div id="view-search">
  <div class="box">
-  <input id="search" placeholder="اكتب اسم أغنية... مثال: happy">
-  <button class="btn" onclick="searchMusic()">🔍 بحث</button>
+  <input id="search" placeholder="ابحث عن أغنية أو فنان...">
+  <button class="btn" onclick="searchMusic()">🔍 بحث الآن</button>
  </div>
- <div id="results"><p style="color:#aaa">اكتب اسم أغنية ودوس بحث</p></div>
+ <div id="results"><p style="color:#aaa">اكتب اسم أي أغنية ودوس بحث</p></div>
 </div>
 
 <div id="view-artists" style="display:none">
- <div class="box"><h3>🌍 فنانين من كل العالم - دوس على أي فنان</h3><div id="artistList"></div></div>
+ <div class="box">
+  <input id="artistSearch" placeholder="🔍 دور على فنان من الليستا... اكتب عمرو، شاكيرا، دوا..." oninput="filterArtists()">
+  <br><br>
+  <button class="filterBtn active" onclick="filterCat('all',this)">الكل</button>
+  <button class="filterBtn" onclick="filterCat('eg',this)">🇪🇬 مصر</button>
+  <button class="filterBtn" onclick="filterCat('arab',this)">🌍 عرب</button>
+  <button class="filterBtn" onclick="filterCat('gulf',this)">🏜️ خليج</button>
+  <button class="filterBtn" onclick="filterCat('maghreb',this)">🌊 مغرب</button>
+  <button class="filterBtn" onclick="filterCat('world',this)">🌎 أجانب</button>
+  <button class="filterBtn" onclick="filterCat('rap',this)">🎤 راب</button>
+  <button class="filterBtn" onclick="filterCat('latin',this)">💃 لاتيني</button>
+ </div>
+ <div id="artistList"></div>
  <div id="artistResults"></div>
 </div>
 
-<div id="view-fav" style="display:none"><div id="favList"><p style="color:#aaa">لسه مفيش مفضلة، دوس ❤️ على أي أغنية</p></div></div>
+<div id="view-trend" style="display:none"><div id="trendList">⏳ جاري تحميل الترند...</div></div>
+<div id="view-fav" style="display:none"><div id="favList"></div></div>
+
+<div id="ytPlayer" style="display:none" class="ytbox">
+ <h3 id="ytTitle">▶️ تشغيل من YouTube</h3>
+ <iframe id="ytFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+ <button class="small" style="background:#333" onclick="closeYT()">✖️ إغلاق</button>
+</div>
 
 <script>
-let artists=[
- {n:"عمرو دياب",e:"🎤"},{n:"أم كلثوم",e:"👑"},{n:"تامر حسني",e:"🎙️"},{n:"شيرين",e:"🎵"},
- {n:"Taylor Swift",e:"⭐"},{n:"Ed Sheeran",e:"🎸"},{n:"Adele",e:"💜"},{n:"BTS",e:"💜"},
- {n:"Drake",e:"🔥"},{n:"Billie Eilish",e:"🌙"},{n:"The Weeknd",e:"🌃"},{n:"Coldplay",e:"🌈"},
- {n:"Amr Diab",e:"🇪🇬"},{n:"Elissa",e:"💎"},{n:"Nancy Ajram",e:"🌹"},{n:"Saad Lamjarred",e:"🎶"}
+const API='https://discoveryprovider.audius.co/v1';
+// كل الفنانين
+let ALL=[
+ // مصر
+ {n:"Amr Diab",ar:"عمرو دياب",e:"🇪🇬",c:"eg"},{n:"Umm Kulthum",ar:"أم كلثوم",e:"👑",c:"eg"},{n:"Abdel Halim Hafez",ar:"عبد الحليم حافظ",e:"🎤",c:"eg"},
+ {n:"Tamer Hosny",ar:"تامر حسني",e:"🎙️",c:"eg"},{n:"Sherine",ar:"شيرين",e:"🎵",c:"eg"},{n:"Mohamed Hamaki",ar:"محمد حماقي",e:"🔥",c:"eg"},
+ {n:"Mohamed Ramadan",ar:"محمد رمضان",e:"💪",c:"eg"},{n:"Wegz",ar:"ويجز",e:"🎧",c:"eg"},{n:"Ahmed Saad",ar:"أحمد سعد",e:"🎶",c:"eg"},
+ {n:"Ramy Sabry",ar:"رامي صبري",e:"⭐",c:"eg"},{n:"Amr Diab",ar:"عمرو دياب",e:"🇪🇬",c:"eg"},{n:"Tamer Ashour",ar:"تامر عاشور",e:"🎼",c:"eg"},
+ {n:"Bahaa Sultan",ar:"بهاء سلطان",e:"🎤",c:"eg"},{n:"Hakim",ar:"حكيم",e:"🎵",c:"eg"},{n:"Hany Shaker",ar:"هاني شاكر",e:"👑",c:"eg"},
+ {n:"Angham",ar:"أنغام",e:"🌙",c:"eg"},{n:"Mohamed Mounir",ar:"محمد منير",e:"🎸",c:"eg"},{n:"Marwan Pablo",ar:"مروان بابلو",e:"🎤",c:"rap"},
+ {n:"Afroto",ar:"أفروتو",e:"🔥",c:"rap"},{n:"Mousa Sam",ar:"موسى سام",e:"🎧",c:"rap"},{n:"Cairokee",ar:"كايروكي",e:"🎸",c:"eg"},
+ {n:"Massar Egbari",ar:"مسار إجباري",e:"🎸",c:"eg"},{n:"Sharmoofers",ar:"شارموفرز",e:"🎶",c:"eg"},
+ // عرب شام و عراق
+ {n:"Elissa",ar:"إليسا",e:"💎",c:"arab"},{n:"Nancy Ajram",ar:"نانسي عجرم",e:"🌹",c:"arab"},{n:"Wael Kfoury",ar:"وائل كفوري",e:"🎸",c:"arab"},
+ {n:"Ragheb Alama",ar:"راغب علامة",e:"🎤",c:"arab"},{n:"Kadim Al Sahir",ar:"كاظم الساهر",e:"🎼",c:"arab"},{n:"Majid Al Mohandis",ar:"ماجد المهندس",e:"👑",c:"arab"},
+ {n:"Assala",ar:"أصالة",e:"💜",c:"arab"},{n:"Fadl Shaker",e:"فضل شاكر",e:"🎵",c:"arab"},{n:"Najwa Karam",ar:"نجوى كرم",e:"🌹",c:"arab"},
+ {n:"Myriam Fares",ar:"ميريام فارس",e:"💃",c:"arab"},{n:"Haifa Wehbe",ar:"هيفاء وهبي",e:"✨",c:"arab"},{n:"Carole Samaha",ar:"كارول سماحة",e:"🌟",c:"arab"},
+ // خليج
+ {n:"Hussain Al Jassmi",ar:"حسين الجسمي",e:"🎵",c:"gulf"},{n:"Ahlam",ar:"أحلام",e:"👑",c:"gulf"},{n:"Rashed Al Majed",ar:"راشد الماجد",e:"🎤",c:"gulf"},
+ {n:"Abdul Majeed Abdullah",ar:"عبد المجيد عبدالله",e:"🎼",c:"gulf"},{n:"Mohammed Abdu",ar:"محمد عبده",e:"👑",c:"gulf"},{n:"Nawal Al Kuwaitia",ar:"نوال الكويتية",e:"🌹",c:"gulf"},
+ {n:"Balqees",ar:"بلقيس",e:"✨",c:"gulf"},{n:"Dalia Mubarak",ar:"داليا مبارك",e:"🎵",c:"gulf"},{n:"Aseel Hameem",ar:"أصيل هميم",e:"💜",c:"gulf"},
+ // مغرب و جزائر
+ {n:"Saad Lamjarred",ar:"سعد لمجرد",e:"🔥",c:"maghreb"},{n:"Dounia Batma",ar:"دنيا بطمة",e:"🎵",c:"maghreb"},{n:"Salma Rachid",ar:"سلمى رشيد",e:"🌹",c:"maghreb"},
+ {n:"Hatfi",ar:"حاتم عمور",e:"🎤",c:"maghreb"},{n:"Cheb Khaled",ar:"الشاب خالد",e:"💃",c:"maghreb"},{n:"Cheb Mami",ar:"الشاب مامي",e:"🎶",c:"maghreb"},
+ // أجانب بوب
+ {n:"Dua Lipa",ar:"دوا ليبا",e:"💃",c:"world"},{n:"Shakira",ar:"شاكيرا",e:"💃",c:"latin"},{n:"Taylor Swift",ar:"تايلور سويفت",e:"⭐",c:"world"},
+ {n:"Ed Sheeran",ar:"إد شيران",e:"🎸",c:"world"},{n:"Adele",ar:"أديل",e:"💜",c:"world"},{n:"BTS",ar:"بي تي اس",e:"💜",c:"world"},
+ {n:"Billie Eilish",ar:"بيلي إيليش",e:"🌙",c:"world"},{n:"The Weeknd",ar:"ذا ويكند",e:"🌃",c:"world"},{n:"Coldplay",ar:"كولدبلاي",e:"🌈",c:"world"},
+ {n:"Ariana Grande",ar:"أريانا جراندي",e:"✨",c:"world"},{n:"Selena Gomez",ar:"سيلينا جوميز",e:"🌹",c:"world"},{n:"Rihanna",ar:"ريهانا",e:"👑",c:"world"},
+ {n:"Justin Bieber",ar:"جاستن بيبر",e:"🎤",c:"world"},{n:"Jennifer Lopez",ar:"جينيفر لوبيز",e:"💃",c:"latin"},{n:"Enrique Iglesias",ar:"إنريكي إيجليسياس",e:"🎸",c:"latin"},
+ {n:"Celine Dion",ar:"سيلين ديون",e:"🎼",c:"world"},{n:"Imagine Dragons",ar:"إماجين دراجونز",e:"🐉",c:"world"},{n:"Maroon 5",ar:"مارون 5",e:"🎶",c:"world"},
+ {n:"Bruno Mars",ar:"برونو مارس",e:"🎤",c:"world"},{n:"Lady Gaga",ar:"ليدي جاجا",e:"⭐",c:"world"},{n:"Katy Perry",ar:"كاتي بيري",e:"🌈",c:"world"},
+ {n:"Miley Cyrus",ar:"مايلي سايرس",e:"🔥",c:"world"},{n:"Olivia Rodrigo",ar:"أوليفيا رودريجو",e:"💜",c:"world"},{n:"Sabrina Carpenter",ar:"سابرينا كاربنتر",e:"✨",c:"world"},
+ // راب أجنبي
+ {n:"Eminem",ar:"إمينيم",e:"🎤",c:"rap"},{n:"Drake",ar:"دريك",e:"🔥",c:"rap"},{n:"Travis Scott",ar:"ترافيس سكوت",e:"🌵",c:"rap"},
+ {n:"Kendrick Lamar",ar:"كيندريك لامار",e:"👑",c:"rap"},{n:"Kanye West",ar:"كاني ويست",e:"🎤",c:"rap"},{n:"Nicki Minaj",ar:"نيكي ميناج",e:"👑",c:"rap"},
+ {n:"Cardi B",ar:"كاردي بي",e:"🔥",c:"rap"},{n:"Post Malone",ar:"بوست مالون",e:"🎸",c:"rap"},
+ // لاتيني
+ {n:"Bad Bunny",ar:"باد باني",e:"🐰",c:"latin"},{n:"Maluma",ar:"مالوما",e:"💃",c:"latin"},{n:"J Balvin",ar:"جي بالفين",e:"🌈",c:"latin"},
+ {n:"Karol G",ar:"كارول جي",e:"💖",c:"latin"},{n:"Luis Fonsi",ar:"لويس فونسي",e:"🎵",c:"latin"},{n:"Daddy Yankee",ar:"دادي يانكي",e:"🔥",c:"latin"},
+ // كيبوب و هندي و تركي
+ {n:"BLACKPINK",ar:"بلاك بينك",e:"🖤",c:"world"},{n:"Jung Kook",ar:"جونج كوك",e:"⭐",c:"world"},{n:"Arijit Singh",ar:"أريجيت سينغ",e:"🎵",c:"world"},
+ {n:"Tarkan",ar:"تاركان",e:"🔥",c:"world"},{n:"Sezen Aksu",ar:"سيزين أكسو",e:"👑",c:"world"}
 ];
-let favs = JSON.parse(localStorage.getItem('mymusic_fav')||'[]');
-function updateFavCount(){document.getElementById('favCount').innerText = favs.length?`(${favs.length})`:''}
+let currentCat='all';
+let favs=JSON.parse(localStorage.getItem('mymusic_fav')||'[]');
+function updateFavCount(){document.getElementById('favCount').innerText=favs.length?`(${favs.length})`:''}
 updateFavCount();
-document.getElementById('artistList').innerHTML = artists.map((a,i)=>`<div class="artist" onclick="loadArtist('${a.n}')"><div>${a.e}</div><span>${a.n}</span></div>`).join('');
-
+function renderArtistList(){
+ let q=(document.getElementById('artistSearch').value||'').toLowerCase();
+ let list=ALL.filter(a=>(currentCat=='all'||a.c==currentCat) && (a.ar.includes(q)||a.n.toLowerCase().includes(q)||q==''));
+ document.getElementById('artistList').innerHTML=`<p style="color:#aaa">عرض ${list.length} فنان - دوس على أي فنان</p>`+list.map(a=>`<div class="artist" onclick="loadArtist('${a.n}')"><div>${a.e}</div><span>${a.ar}</span></div>`).join('');
+}
+function filterCat(cat,btn){
+ currentCat=cat;
+ document.querySelectorAll('.filterBtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+ renderArtistList();
+}
+function filterArtists(){renderArtistList()}
+renderArtistList();
 function showTab(t){
- ['search','artists','fav'].forEach(x=>{
-   document.getElementById('view-'+x).style.display = x==t?'block':'none';
-   document.getElementById('tab-'+x).classList.toggle('active', x==t);
+ ['search','artists','trend','fav'].forEach(x=>{
+  document.getElementById('view-'+x).style.display=x==t?'block':'none';
+  document.getElementById('tab-'+x).classList.toggle('active',x==t);
  });
  if(t=='fav') renderFav();
+ if(t=='trend') loadTrend();
 }
-function cardHTML(t){
- let isFav = favs.some(f=>f.audio==t.audio);
- return `<div class="card">
-  <img src="${t.image||'https://cdn-icons-png.flaticon.com/512/727/727269.png'}">
-  <b>${t.name}</b><br><small>${t.artist_name}</small>
-  <div style="clear:both"></div>
-  <audio controls preload="none" src="${t.audio}"></audio><br>
-  <button class="small" style="background:#a855f7" onclick="showLyrics('${t.artist_name.replace(/'/g,'')}','${t.name.replace(/'/g,'')}',this)">📝 كلمات + ترجمة</button>
-  <button class="small" style="background:#ff0055" onclick='toggleFav(${JSON.stringify(t).replace(/'/g,"\\'")},this)'>${isFav?'💔 إزالة':'❤️ مفضلة'}</button>
-  <a href="${t.audio}" download target="_blank"><button class="small" style="background:#22c55e">⬇️ تحميل MP3</button></a>
-  <div class="lyricsBox"></div>
- </div>`;
+function cardHTML(tr){
+ let img=tr.artwork?tr.artwork['480x480']||tr.artwork['150x150']:'https://cdn-icons-png.flaticon.com/512/727/727269.png';
+ let stream=`https://discoveryprovider.audius.co/v1/tracks/${tr.id}/stream?app_name=MyMusic`;
+ let t={name:tr.title,artist_name:tr.user?tr.user.handle:'',audio:stream,image:img};
+ let isFav=favs.some(f=>f.audio==t.audio);
+ return `<div class="card"><img src="${img}"><b>${t.name}</b><br><small>${tr.user?tr.user.name:''}</small><div style="clear:both"></div>
+ <audio controls preload="none" src="${stream}"></audio>
+ <p style="font-size:11px;color:#22c55e">✅ أغنية كاملة - Audius</p>
+ <button class="small" style="background:#ff0000" onclick="playYT('${t.artist_name.replace(/'/g,'')}','${t.name.replace(/'/g,'')}')">▶️ فيديو YouTube</button>
+ <button class="small" style="background:#a855f7" onclick="showLyrics('${t.artist_name.replace(/'/g,'')}','${t.name.replace(/'/g,'')}',this)">📝 كلمات + ترجمة</button>
+ <button class="small" style="background:#ff0055" onclick='toggleFav(${JSON.stringify(t).replace(/'/g,"\\'")},this)'>${isFav?'💔 إزالة':'❤️ مفضلة'}</button>
+ <a href="${stream}" download target="_blank"><button class="small" style="background:#22c55e">⬇️ تحميل MP3</button></a>
+ <div class="lyricsBox"></div></div>`;
+}
+function cardItunes(s){
+ let t={name:s.trackName,artist_name:s.artistName,audio:s.previewUrl,image:s.artworkUrl100};
+ let isFav=favs.some(f=>f.audio==t.audio);
+ return `<div class="card"><img src="${t.image}"><b>${t.name}</b><br><small>${t.artist_name}</small><div style="clear:both"></div>
+ <audio controls preload="none" src="${t.audio}"></audio>
+ <p style="font-size:11px;color:#aaa">معاينة 30 ثانية - الأغنية الكاملة من YouTube</p>
+ <button class="small" style="background:#ff0000" onclick="playYT('${t.artist_name.replace(/'/g,'')}','${t.name.replace(/'/g,'')}')">▶️ تشغيل كامل YouTube</button>
+ <button class="small" style="background:#a855f7" onclick="showLyrics('${t.artist_name.replace(/'/g,'')}','${t.name.replace(/'/g,'')}',this)">📝 كلمات + ترجمة</button>
+ <button class="small" style="background:#ff0055" onclick='toggleFav(${JSON.stringify(t).replace(/'/g,"\\'")},this)'>${isFav?'💔 إزالة':'❤️ مفضلة'}</button>
+ <div class="lyricsBox"></div></div>`;
 }
 async function searchMusic(){
  let q=document.getElementById('search').value.trim(); if(!q) return alert('اكتب اسم أغنية');
  document.getElementById('results').innerHTML='⏳ جاري البحث...';
- let res=await fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=9f2d5c3a&format=json&limit=20&search=${encodeURIComponent(q)}`);
- let d=await res.json();
- document.getElementById('results').innerHTML = d.results.length? d.results.map(cardHTML).join('') : 'مفيش نتائج، جرب كلمة انجليزية';
+ // جرب Audius الأول، لو مفيش روح لـ iTunes + YouTube
+ let r1=await fetch(`${API}/tracks/search?query=${encodeURIComponent(q)}&app_name=MyMusic`);
+ let d1=await r1.json();
+ if(d1.data && d1.data.length){ document.getElementById('results').innerHTML=d1.data.map(cardHTML).join(''); return; }
+ let r2=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=music&limit=20&country=EG`);
+ let d2=await r2.json();
+ document.getElementById('results').innerHTML=d2.results.length?d2.results.map(cardItunes).join(''):`مفيش نتائج، جرب YouTube <button class="small" style="background:#ff0000" onclick="playYT('','${q}')">▶️ شغل من YouTube</button>`;
 }
 async function loadArtist(name){
  document.getElementById('artistResults').innerHTML='⏳ جاري تحميل أغاني '+name+'...';
- let res=await fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=9f2d5c3a&format=json&limit=20&search=${encodeURIComponent(name)}`);
- let d=await res.json();
- // لو مفيش في المجاني، نجيب من iTunes كمعاينة
- if(!d.results.length){
-   let r2=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&media=music&limit=10`);
-   let d2=await r2.json();
-   document.getElementById('artistResults').innerHTML = d2.results.map(s=>cardHTML({name:s.trackName,artist_name:s.artistName,audio:s.previewUrl,image:s.artworkUrl100})).join('');
- } else {
-   document.getElementById('artistResults').innerHTML = d.results.map(cardHTML).join('');
- }
+ document.getElementById('artistResults').scrollIntoView({behavior:'smooth'});
+ let r1=await fetch(`${API}/tracks/search?query=${encodeURIComponent(name)}&app_name=MyMusic`);
+ let d1=await r1.json();
+ if(d1.data && d1.data.length){ document.getElementById('artistResults').innerHTML=`<h3>أغاني ${name}</h3>`+d1.data.map(cardHTML).join(''); return; }
+ let r2=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&media=music&limit=20&country=EG`);
+ let d2=await r2.json();
+ document.getElementById('artistResults').innerHTML=`<h3>أغاني ${name}</h3>`+d2.results.map(cardItunes).join('')+`<br><button class="small" style="background:#ff0000" onclick="playYT('','${name}')">▶️ شغل كل أغاني ${name} من YouTube</button>`;
 }
+async function loadTrend(){
+ let res=await fetch(`${API}/tracks/trending?genre=all&time=week&app_name=MyMusic`);
+ let d=await res.json(); document.getElementById('trendList').innerHTML=d.data.map(cardHTML).join('');
+}
+function playYT(artist,title){
+ document.getElementById('ytPlayer').style.display='block';
+ document.getElementById('ytTitle').innerText='▶️ '+artist+' - '+title;
+ document.getElementById('ytFrame').src=`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(artist+' '+title)}&autoplay=1`;
+ document.getElementById('ytPlayer').scrollIntoView({behavior:'smooth'});
+}
+function closeYT(){document.getElementById('ytPlayer').style.display='none';document.getElementById('ytFrame').src='';}
 function toggleFav(t,btn){
  let idx=favs.findIndex(f=>f.audio==t.audio);
- if(idx>-1){ favs.splice(idx,1); btn.innerText='❤️ مفضلة'; } else { favs.push(t); btn.innerText='💔 إزالة'; alert('اتضافت للمفضلة ❤️'); }
+ if(idx>-1){favs.splice(idx,1);btn.innerText='❤️ مفضلة'}else{favs.push(t);btn.innerText='💔 إزالة';alert('اتضافت للمفضلة ❤️')}
  localStorage.setItem('mymusic_fav',JSON.stringify(favs)); updateFavCount();
 }
-function renderFav(){
- document.getElementById('favList').innerHTML = favs.length? favs.map(cardHTML).join('') : '<p style="color:#aaa">لسه مفيش مفضلة</p>';
-}
+function renderFav(){document.getElementById('favList').innerHTML=favs.length?favs.map(cardHTML).join(''):'<p style="color:#aaa">لسه مفيش مفضلة</p>'}
 async function showLyrics(artist,title,btn){
- let box=btn.parentElement.querySelector('.lyricsBox');
- box.innerHTML='⏳ جاري جلب الكلمات...';
+ let box=btn.parentElement.querySelector('.lyricsBox'); box.innerHTML='⏳ جاري جلب الكلمات...';
  try{
   let r=await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`);
   let d=await r.json();
-  if(!d.lyrics){ box.innerHTML='<div class="lyrics">كلمات الأغنية مش متاحة للأغنية دي، جرب أغنية تانية.</div>'; return; }
+  if(!d.lyrics){box.innerHTML='<div class="lyrics">الكلمات مش متاحة للأغنية دي.</div>';return;}
   let lyrics=d.lyrics.slice(0,2000);
   box.innerHTML=`<div class="lyrics">${lyrics}</div><button class="small" style="background:#ff9800" onclick="translateLyrics(this)">🌐 ترجم للعربي</button><div class="transBox"></div>`;
   box.dataset.lyrics=lyrics;
- }catch(e){ box.innerHTML='مش قادر أجيب الكلمات دلوقتي'; }
+ }catch(e){box.innerHTML='مش قادر أجيب الكلمات دلوقتي'}
 }
 async function translateLyrics(btn){
- let box=btn.parentElement; let text=box.parentElement.dataset.lyrics||'';
- let transBox=box.querySelector('.transBox'); transBox.innerHTML='⏳ جاري الترجمة...';
+ let box=btn.parentElement; let text=box.parentElement.dataset.lyrics||''; let tb=box.querySelector('.transBox'); tb.innerHTML='⏳ جاري الترجمة...';
  try{
   let r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0,500))}&langpair=en|ar`);
-  let d=await r.json();
-  transBox.innerHTML=`<div class="lyrics" style="direction:rtl;text-align:right">${d.responseData.translatedText}</div><small>ترجمة تقريبية بالذكاء الاصطناعي</small>`;
- }catch(e){ transBox.innerHTML='الترجمة مش شغالة دلوقتي'; }
+  let d=await r.json(); tb.innerHTML=`<div class="lyrics" style="direction:rtl;text-align:right">${d.responseData.translatedText}</div>`;
+ }catch(e){tb.innerHTML='الترجمة مش شغالة دلوقتي'}
 }
 document.getElementById('search').addEventListener('keypress',e=>{if(e.key=='Enter')searchMusic()});
 </script>
 </body>
- </html>
+                           </html>
