@@ -1,84 +1,372 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyMusic - شغال بجد</title>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#0f0f1a;color:#fff;padding:16px}
-h1{text-align:center}h1 span{color:#a855f7}
-.tabs{display:flex;gap:8px;justify-content:center;margin:16px 0;flex-wrap:wrap}
-.tabs button{padding:10px 16px;border:0;border-radius:20px;background:#222; color:#fff;cursor:pointer}
-.tabs button.active{background:#a855f7}
-.search{display:flex;gap:8px;max-width:600px;margin:auto}
-input{flex:1;padding:12px;border-radius:12px;border:0;background:#1e1e2e;color:#fff;outline:none}
-.btn{padding:12px 18px;border:0;border-radius:12px;background:#a855f7;color:#fff;cursor:pointer;font-weight:bold}
-.card{background:#1e1e2e;border-radius:16px;padding:12px;margin:12px auto;max-width:600px;display:flex;gap:12px;align-items:center}
-.card img{width:70px;height:70px;border-radius:12px}
-.card h3{margin:0;font-size:16px}.card p{margin:4px 0;color:#aaa;font-size:13px}
-.card .actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.card .actions button{padding:6px 10px;border:0;border-radius:8px;cursor:pointer;background:#333;color:#fff}
-.card .actions .play{background:#22c55e}.card .actions .save{background:#eab308;color:#000}
-.box{max-width:600px;margin:16px auto;background:#1e1e2e;padding:16px;border-radius:16px}
-audio{width:100%;margin-top:10px}
-#result{white-space:pre-wrap;background:#111;padding:12px;border-radius:12px;margin-top:10px}
-.hidden{display:none}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f0f1a">
+  <title>MyMusic | بحث ومعاينة الأغاني</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0f0f1a;--surface:#1e1e2e;--surface-2:#28283a;--text:#f7f7fb;--muted:#b5b5c5;--accent:#a855f7;--green:#22c55e;--gold:#facc15;--danger:#f87171}
+    *{box-sizing:border-box}
+    body{margin:0;padding:20px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+    main{max-width:760px;margin:auto}
+    h1{text-align:center;margin:8px 0 4px;font-size:clamp(1.8rem,5vw,2.5rem)}
+    h1 span{color:var(--accent)}
+    .intro{text-align:center;color:var(--muted);margin:0 0 18px}
+    .notice{max-width:640px;margin:0 auto 16px;padding:12px 14px;border:1px solid #49305f;background:#20182c;border-radius:12px;color:#e9d5ff;line-height:1.6;font-size:.92rem}
+    .tabs{display:flex;gap:8px;justify-content:center;margin:18px 0;flex-wrap:wrap}
+    button,input,textarea{font:inherit}
+    button{border:0;cursor:pointer;color:var(--text)}
+    button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid #d8b4fe;outline-offset:2px}
+    .tabs button{padding:10px 16px;border-radius:20px;background:var(--surface-2)}
+    .tabs button.active{background:var(--accent)}
+    .search{display:flex;gap:8px;max-width:640px;margin:auto}
+    input,textarea{width:100%;padding:12px;border:1px solid transparent;border-radius:12px;background:var(--surface);color:var(--text)}
+    input::placeholder,textarea::placeholder{color:#9595a7}
+    .search input{flex:1;min-width:0}
+    .btn{padding:11px 18px;border-radius:12px;background:var(--accent);font-weight:700}
+    .btn:disabled{opacity:.55;cursor:wait}
+    .status{min-height:1.5em;text-align:center;color:var(--muted);margin:14px 0}
+    .card{display:flex;gap:12px;align-items:center;max-width:640px;margin:12px auto;padding:12px;background:var(--surface);border-radius:16px}
+    .card img{width:76px;height:76px;flex:0 0 76px;object-fit:cover;border-radius:12px;background:var(--surface-2)}
+    .card-content{flex:1;min-width:0}
+    .card h3{margin:0;font-size:1rem;overflow-wrap:anywhere}
+    .card p{margin:5px 0;color:var(--muted);font-size:.88rem;overflow-wrap:anywhere}
+    .actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+    .actions button,.actions a{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:8px;background:var(--surface-2);text-decoration:none;color:var(--text);font-size:.88rem}
+    .actions .play{background:var(--green);color:#06140b}
+    .actions .save{background:var(--gold);color:#211900}
+    .actions .remove{background:#51232a;color:#fee2e2}
+    audio{display:block;width:100%;max-width:640px;margin:16px auto}
+    .panel{max-width:640px;margin:14px auto;padding:16px;background:var(--surface);border-radius:16px}
+    .panel h2{font-size:1.15rem;margin:0 0 10px}
+    .panel p{color:var(--muted);line-height:1.6}
+    textarea{min-height:110px;resize:vertical}
+    #translationResult{white-space:pre-wrap;overflow-wrap:anywhere;min-height:48px;margin-top:12px;padding:12px;border-radius:10px;background:#11111b;line-height:1.7}
+    .hidden{display:none!important}
+    .empty{padding:22px;text-align:center;color:var(--muted)}
+    .section-title{max-width:640px;margin:24px auto 8px}
+    .small{font-size:.85rem;color:var(--muted)}
+    @media(max-width:520px){body{padding:14px}.search{align-items:stretch}.search .btn{padding-inline:13px}.card{align-items:flex-start}.card img{width:62px;height:62px;flex-basis:62px}.actions button,.actions a{font-size:.82rem;padding:7px 8px}}
+  </style>
 </head>
 <body>
-<h1>🎵 My<span>Music</span></h1>
-<div class="tabs">
-<button class="active" onclick="show('searchTab',this)">🔍 بحث</button>
-<button onclick="show('transTab',this)">🎬 ترجمة فيديو</button>
-<button onclick="show('savedTab',this)">💾 المحفوظ</button>
-</div>
+  <main>
+    <h1>🎵 My<span>Music</span></h1>
+    <p class="intro">ابحث عن الأغاني واستمع إلى معايناتها</p>
+    <p class="notice">المعاينات الصوتية من Apple قصيرة وليست الأغنية كاملة. هذا الموقع لا يوفّر تنزيل الأغاني أو تحويلها إلى MP3؛ استخدم رابط Apple Music لمعرفة خيارات الاستماع الرسمية.</p>
 
-<div id="searchTab">
-<div class="search">
-<input id="q" placeholder="اكتب اسم اغنية... مثال: Training Season" onkeydown="if(event.key==='Enter')search()">
-<button class="btn" onclick="search()">ابحث</button>
-</div>
-<div id="list"></div>
-<audio id="player" controls style="max-width:600px;display:block;margin:16px auto"></audio>
-</div>
+    <nav class="tabs" aria-label="أقسام الموقع">
+      <button type="button" class="active" data-tab="searchTab">🔍 البحث</button>
+      <button type="button" data-tab="translateTab">🌐 ترجمة نص</button>
+      <button type="button" data-tab="savedTab">💾 المحفوظ</button>
+    </nav>
 
-<div id="transTab" class="hidden">
-<div class="box">
-<h3>🎬 ترجمة فيديو</h3>
-<input id="yt" placeholder="الصق لينك يوتيوب هنا" style="width:100%;margin-bottom:10px">
-<input id="txt" placeholder="اكتب عنوان الفيديو بالانجليزي عشان نترجمه" style="width:100%;margin-bottom:10px">
-<button class="btn" onclick="translateNow()" style="width:100%">ترجم للعربي</button>
-<div id="result">النتيجة هتظهر هنا...</div>
-<button class="btn" onclick="saveTrans()" style="width:100%;margin-top:10px;background:#eab308;color:#000">💾 حفظ الترجمة</button>
-</div>
-</div>
+    <section id="searchTab">
+      <form id="searchForm" class="search">
+        <input id="query" type="search" placeholder="اكتب اسم أغنية أو فنان..." autocomplete="off" aria-label="اسم الأغنية أو الفنان">
+        <button id="searchButton" class="btn" type="submit">ابحث</button>
+      </form>
+      <p id="searchStatus" class="status" role="status" aria-live="polite"></p>
+      <div id="results" aria-live="polite"></div>
+      <audio id="player" controls preload="none" aria-label="مشغل معاينة الأغنية"></audio>
+      <p id="playerStatus" class="small" style="text-align:center" role="status" aria-live="polite"></p>
+    </section>
 
-<div id="savedTab" class="hidden">
-<div id="savedList"></div>
-</div>
+    <section id="translateTab" class="hidden">
+      <div class="panel">
+        <h2>ترجمة نص إلى العربية</h2>
+        <p>اكتب أو الصق نصًا باللغة الإنجليزية لترجمته إلى العربية. هذه الأداة لا تستخرج الكلام من فيديو يوتيوب؛ لا تضع رابط فيديو هنا.</p>
+        <textarea id="translationInput" maxlength="5000" placeholder="اكتب النص الإنجليزي هنا..."></textarea>
+        <button id="translateButton" class="btn" type="button" style="width:100%;margin-top:10px">ترجم للعربية</button>
+        <p id="translationStatus" class="status" role="status" aria-live="polite"></p>
+        <div id="translationResult" aria-live="polite">ستظهر الترجمة هنا.</div>
+        <button id="saveTranslationButton" class="btn" type="button" style="width:100%;margin-top:10px;background:var(--gold);color:#211900" disabled>💾 حفظ الترجمة</button>
+      </div>
+    </section>
 
-<script>
-let saved = JSON.parse(localStorage.getItem('mymusic_saved')||'[]');
-function show(id,btn){document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');['searchTab','transTab','savedTab'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');if(id==='savedTab')renderSaved();}
-async function search(){
-let q=document.getElementById('q').value.trim();if(!q)return alert('اكتب اسم اغنية الاول');
-document.getElementById('list').innerHTML='⏳ جاري البحث...';
-try{
-let r=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=20&country=EG');
-let d=await r.json();
-if(!d.results.length){document.getElementById('list').innerHTML='مفيش نتائج';return;}
-document.getElementById('list').innerHTML=d.results.map((s,i)=>`
-<div class="card"><img src="${s.artworkUrl100}"><div style="flex:1"><h3>${s.trackName}</h3><p>${s.artistName} - ${s.collectionName||''}</p><div class="actions"><button class="play" onclick="playSong('${s.previewUrl}')">▶ تشغيل</button><button class="save" onclick="saveSong(${i})">💾 حفظ</button><a href="${s.previewUrl}" download><button>⬇ تحميل</button></a><button onclick="translateSong('${s.trackName}')">🌐 ترجم الاسم</button></div></div></div>`).join('');
-window._results=d.results;
-}catch(e){document.getElementById('list').innerHTML='حصل مشكلة في الاتصال، جرب تاني';}
-}
-function playSong(url){let p=document.getElementById('player');p.src=url;p.play();p.scrollIntoView({behavior:'smooth'});}
-function saveSong(i){let s=window._results[i];if(!saved.find(x=>x.trackId===s.trackId)){saved.push(s);localStorage.setItem('mymusic_saved',JSON.stringify(saved));alert('اتحفظت ✅');}else alert('محفوظة قبل كده');}
-function renderSaved(){let el=document.getElementById('savedList');if(!saved.length){el.innerHTML='<p style="text-align:center">لسه مفيش محفوظ</p>';return;}el.innerHTML=saved.map((s,i)=>`<div class="card"><img src="${s.artworkUrl100}"><div style="flex:1"><h3>${s.trackName}</h3><p>${s.artistName}</p><div class="actions"><button class="play" onclick="playSong('${s.previewUrl}')">▶ تشغيل</button><button onclick="removeSaved(${i})">🗑 حذف</button></div></div></div>`).join('');}
-function removeSaved(i){saved.splice(i,1);localStorage.setItem('mymusic_saved',JSON.stringify(saved));renderSaved();}
-async function translateNow(){let t=document.getElementById('txt').value.trim();if(!t)return alert('اكتب عنوان الفيديو الاول');document.getElementById('result').textContent='⏳ جاري الترجمة...';let r=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(t)+'&langpair=en|ar');let d=await r.json();document.getElementById('result').textContent=d.responseData.translatedText;}
-async function translateSong(name){let r=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(name)+'&langpair=en|ar');let d=await r.json();alert(name+'\nيعني بالعربي: '+d.responseData.translatedText);}
-function saveTrans(){let t=document.getElementById('result').textContent;localStorage.setItem('last_trans',t);alert('اتحفظت ✅: '+t);}
-</script>
+    <section id="savedTab" class="hidden">
+      <h2 class="section-title">الأغاني المحفوظة</h2>
+      <div id="savedSongs"></div>
+      <h2 class="section-title">الترجمات المحفوظة</h2>
+      <div id="savedTranslations"></div>
+    </section>
+  </main>
+
+  <script>
+    'use strict';
+
+    const STORAGE_KEYS = { songs: 'mymusic_saved', translations: 'mymusic_translations' };
+    const state = {
+      results: [],
+      savedSongs: readArray(STORAGE_KEYS.songs),
+      savedTranslations: readArray(STORAGE_KEYS.translations),
+      lastTranslation: null,
+      searchController: null
+    };
+
+    const byId = (id) => document.getElementById(id);
+    const text = (tag, value, className) => {
+      const node = document.createElement(tag);
+      node.textContent = value == null ? '' : String(value);
+      if (className) node.className = className;
+      return node;
+    };
+
+    function readArray(key) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key) || '[]');
+        return Array.isArray(value) ? value : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveArray(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function setStatus(id, message, isError) {
+      const node = byId(id);
+      node.textContent = message;
+      node.style.color = isError ? 'var(--danger)' : '';
+    }
+
+    function makeAction(label, className, onClick) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      if (className) button.className = className;
+      button.addEventListener('click', onClick);
+      return button;
+    }
+
+    function makeExternalLink(label, url) {
+      const link = document.createElement('a');
+      link.textContent = label;
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      return link;
+    }
+
+    function makeTrackCard(song, options = {}) {
+      const card = document.createElement('article');
+      card.className = 'card';
+      const image = document.createElement('img');
+      image.src = song.artworkUrl100 || '';
+      image.alt = `غلاف ${song.trackName || 'الأغنية'}`;
+      image.loading = 'lazy';
+      image.onerror = () => { image.hidden = true; };
+
+      const content = document.createElement('div');
+      content.className = 'card-content';
+      content.append(text('h3', song.trackName || 'أغنية بدون اسم'));
+      content.append(text('p', [song.artistName, song.collectionName].filter(Boolean).join(' — ')));
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      if (song.previewUrl) {
+        actions.append(makeAction('▶ تشغيل المعاينة', 'play', () => playPreview(song)));
+      } else {
+        const unavailable = text('span', 'لا تتوفر معاينة', 'small');
+        actions.append(unavailable);
+      }
+
+      if (!options.saved) {
+        actions.append(makeAction('💾 حفظ', 'save', () => saveSong(song)));
+      } else {
+        actions.append(makeAction('🗑 إزالة', 'remove', () => removeSong(song.trackId)));
+      }
+
+      if (song.trackViewUrl) actions.append(makeExternalLink('فتح في Apple Music', song.trackViewUrl));
+      content.append(actions);
+      card.append(image, content);
+      return card;
+    }
+
+    function playPreview(song) {
+      const player = byId('player');
+      if (!song.previewUrl) {
+        setStatus('playerStatus', 'لا تتوفر معاينة لهذا العنصر.', true);
+        return;
+      }
+      player.pause();
+      player.src = song.previewUrl;
+      player.load();
+      setStatus('playerStatus', `تشغيل معاينة: ${song.trackName || 'الأغنية'}`);
+      player.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      player.play().catch(() => {
+        setStatus('playerStatus', 'تعذّر تشغيل المعاينة. جرّب الضغط على زر التشغيل في المشغّل.', true);
+      });
+    }
+
+    async function searchSongs(event) {
+      event.preventDefault();
+      const query = byId('query').value.trim();
+      const resultsElement = byId('results');
+      if (!query) {
+        setStatus('searchStatus', 'اكتب اسم أغنية أو فنان أولًا.', true);
+        byId('query').focus();
+        return;
+      }
+
+      if (state.searchController) state.searchController.abort();
+      state.searchController = new AbortController();
+      const controller = state.searchController;
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      byId('searchButton').disabled = true;
+      resultsElement.replaceChildren();
+      setStatus('searchStatus', '⏳ جاري البحث...');
+
+      try {
+        const url = new URL('https://itunes.apple.com/search');
+        url.search = new URLSearchParams({ term: query, media: 'music', entity: 'song', limit: '20', country: 'EG' });
+        const response = await fetch(url, { signal: controller.signal });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        state.results = Array.isArray(data.results) ? data.results : [];
+        if (!state.results.length) {
+          setStatus('searchStatus', 'لم نعثر على نتائج. جرّب كتابة الاسم بطريقة أخرى.');
+          return;
+        }
+        const fragment = document.createDocumentFragment();
+        state.results.forEach((song) => fragment.append(makeTrackCard(song)));
+        resultsElement.replaceChildren(fragment);
+        setStatus('searchStatus', `عُثر على ${state.results.length} نتيجة.`);
+      } catch (error) {
+        if (error.name === 'AbortError' && state.searchController !== controller) return;
+        const message = error.name === 'AbortError'
+          ? 'انتهت مهلة البحث. تحقق من الاتصال ثم أعد المحاولة.'
+          : 'تعذّر الاتصال بخدمة البحث. تحقق من الإنترنت وأعد المحاولة.';
+        setStatus('searchStatus', message, true);
+      } finally {
+        clearTimeout(timeout);
+        if (state.searchController === controller) byId('searchButton').disabled = false;
+      }
+    }
+
+    function saveSong(song) {
+      if (state.savedSongs.some((item) => item.trackId === song.trackId)) {
+        setStatus('searchStatus', 'هذه الأغنية محفوظة بالفعل.');
+        return;
+      }
+      state.savedSongs.push(song);
+      if (!saveArray(STORAGE_KEYS.songs, state.savedSongs)) {
+        state.savedSongs.pop();
+        setStatus('searchStatus', 'تعذّر الحفظ في هذا المتصفح؛ قد تكون مساحة التخزين غير متاحة.', true);
+        return;
+      }
+      setStatus('searchStatus', 'تم حفظ الأغنية على هذا الجهاز.');
+    }
+
+    function removeSong(trackId) {
+      state.savedSongs = state.savedSongs.filter((song) => song.trackId !== trackId);
+      saveArray(STORAGE_KEYS.songs, state.savedSongs);
+      renderSaved();
+    }
+
+    function renderSaved() {
+      const songs = byId('savedSongs');
+      const translations = byId('savedTranslations');
+      songs.replaceChildren();
+      translations.replaceChildren();
+
+      if (!state.savedSongs.length) songs.append(text('p', 'لا توجد أغانٍ محفوظة بعد.', 'empty'));
+      else state.savedSongs.forEach((song) => songs.append(makeTrackCard(song, { saved: true })));
+
+      if (!state.savedTranslations.length) {
+        translations.append(text('p', 'لا توجد ترجمات محفوظة بعد.', 'empty'));
+      } else {
+        state.savedTranslations.slice().reverse().forEach((item, index) => {
+          const card = document.createElement('article');
+          card.className = 'panel';
+          card.append(text('p', `النص: ${item.source}`));
+          card.append(text('p', `الترجمة: ${item.translation}`));
+          const remove = makeAction('🗑 إزالة الترجمة', 'remove', () => {
+            state.savedTranslations.splice(state.savedTranslations.length - 1 - index, 1);
+            saveArray(STORAGE_KEYS.translations, state.savedTranslations);
+            renderSaved();
+          });
+          card.append(remove);
+          translations.append(card);
+        });
+      }
+    }
+
+    async function translateText() {
+      const source = byId('translationInput').value.trim();
+      if (!source) {
+        setStatus('translationStatus', 'اكتب النص المراد ترجمته أولًا.', true);
+        return;
+      }
+      if (source.length > 5000) {
+        setStatus('translationStatus', 'النص أطول من الحد المسموح.', true);
+        return;
+      }
+      const button = byId('translateButton');
+      button.disabled = true;
+      byId('translationResult').textContent = 'جارٍ الترجمة...';
+      byId('saveTranslationButton').disabled = true;
+      setStatus('translationStatus', '');
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 20000);
+
+      try {
+        const url = new URL('https://api.mymemory.translated.net/get');
+        url.search = new URLSearchParams({ q: source, langpair: 'en|ar' });
+        const response = await fetch(url, { signal: controller.signal });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const translated = data && data.responseData && data.responseData.translatedText;
+        if (!translated || (data.responseStatus && Number(data.responseStatus) >= 400)) {
+          throw new Error('Translation unavailable');
+        }
+        byId('translationResult').textContent = translated;
+        state.lastTranslation = { source, translation: translated };
+        byId('saveTranslationButton').disabled = false;
+        setStatus('translationStatus', 'اكتملت الترجمة.');
+      } catch (error) {
+        byId('translationResult').textContent = 'لم نتمكن من إتمام الترجمة الآن.';
+        setStatus('translationStatus', 'تحقق من الاتصال وحاول مرة أخرى.', true);
+      } finally {
+        clearTimeout(timeout);
+        button.disabled = false;
+      }
+    }
+
+    function saveTranslation() {
+      if (!state.lastTranslation) return;
+      state.savedTranslations.push(state.lastTranslation);
+      if (!saveArray(STORAGE_KEYS.translations, state.savedTranslations)) {
+        state.savedTranslations.pop();
+        setStatus('translationStatus', 'تعذّر الحفظ في هذا المتصفح.', true);
+        return;
+      }
+      setStatus('translationStatus', 'تم حفظ الترجمة على هذا الجهاز.');
+    }
+
+    document.querySelectorAll('.tabs button').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.tabs button').forEach((tab) => tab.classList.remove('active'));
+        button.classList.add('active');
+        document.querySelectorAll('main > section').forEach((section) => section.classList.add('hidden'));
+        byId(button.dataset.tab).classList.remove('hidden');
+        if (button.dataset.tab === 'savedTab') renderSaved();
+      });
+    });
+
+    byId('searchForm').addEventListener('submit', searchSongs);
+    byId('translateButton').addEventListener('click', translateText);
+    byId('saveTranslationButton').addEventListener('click', saveTranslation);
+    byId('player').addEventListener('error', () => {
+      if (byId('player').src) setStatus('playerStatus', 'تعذّر تحميل المعاينة من Apple. جرّب نتيجة أخرى أو افتح Apple Music.', true);
+    });
+  </script>
 </body>
-  </html>
+</html>
