@@ -1,155 +1,96 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyMusic 🎧 اسمع أغاني كاملة مجاناً - فنانين - كلمات - ترجمة</title>
-<meta name="description" content="MyMusic - اسمع أغاني كاملة مجاناً، عمرو دياب، شيرين، ويجز، دوا ليبا، شاكيرا، كلمات وترجمة ومزامنة وقوائم تشغيل وفنانين">
-<meta property="og:title" content="MyMusic 🎧 اسمع أغاني كاملة مجاناً">
-<meta property="og:description" content="كل الفنانين - أغاني كاملة - كلمات وترجمة ومزامنة - قوائم تشغيل - تحميل MP3">
-<meta property="og:type" content="website">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#b90000">
+<title>MyMusic | اسمع براحتك</title>
+<meta name="description" content="MyMusic للبحث عن الموسيقى والاستماع للمعاينات وإدارة المفضلة وقوائم التشغيل وعرض كلمات الأغاني.">
 <style>
- *{box-sizing:border-box} body{margin:0;font-family:sans-serif;background:#0a0a0a;color:#fff;text-align:center;padding-bottom:220px}
- .hero{background:linear-gradient(180deg,#ff0000,#7a0000 45%,#000);padding:20px 15px 28px;border-bottom-left-radius:35px;border-bottom-right-radius:35px}
- .logo{font-size:42px;font-weight:900} .logo span{background:#000;padding:2px 10px;border-radius:12px}
- .headphones{font-size:80px} .badge{background:#22c55e;color:#000;font-size:12px;padding:5px 12px;border-radius:20px;font-weight:bold}
- .tabs{display:flex;gap:8px;justify-content:center;margin:12px;flex-wrap:wrap} .tabs button{padding:10px 14px;border-radius:20px;border:none;background:#222;color:#fff;cursor:pointer} .tabs button.active{background:#ff0000}
- .box{margin:10px 15px;background:#1a1a1a;padding:14px;border-radius:20px;border:1px solid #333}
- input,select{width:100%;padding:12px;border-radius:25px;border:none;outline:none;text-align:center;background:#000;color:#fff;font-size:16px;margin:4px 0}
- .btn{width:100%;padding:12px;border:none;border-radius:25px;background:#ff0000;color:#fff;font-weight:bold;margin-top:8px;cursor:pointer}
- .artist{display:inline-block;width:88px;margin:6px;cursor:pointer;vertical-align:top;position:relative} .artist div{width:64px;height:64px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:28px;margin:auto} .artist span{font-size:12px;display:block;margin-top:4px;line-height:1.3}
- .artist .del{position:absolute;top:-5px;left:5px;background:#ff0000;color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer}
- .card{background:#1a1a1a;border:1px solid #2a2a2a;padding:12px;border-radius:18px;margin:10px 15px;text-align:right}
- .card img{width:60px;height:60px;border-radius:12px;float:left;object-fit:cover}
- .small{padding:9px 12px;border-radius:15px;border:none;margin:4px;cursor:pointer;color:#fff;font-size:14px}
- .filterBtn{padding:8px 14px;border-radius:20px;border:none;background:#333;color:#fff;margin:3px;cursor:pointer} .filterBtn.active{background:#ff0000}
- #player{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:2px solid #ff0000;padding:10px 12px;z-index:99;display:none;max-height:85vh;overflow:auto}
- #player .row{display:flex;align-items:center;gap:10px;text-align:right}
- #player img{width:55px;height:55px;border-radius:10px;object-fit:cover}
- #player .info{flex:1;overflow:hidden} #player .info b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} #player .info small{color:#aaa}
- #player .controls{display:flex;justify-content:center;gap:10px;margin-top:8px;align-items:center}
- #player .controls button{width:48px;height:48px;border-radius:50%;border:none;background:#ff0000;color:#fff;font-size:20px;cursor:pointer}
- #player .controls button.mini{width:38px;height:38px;background:#333;font-size:16px}
- #player .tools{display:flex;justify-content:center;gap:8px;margin-top:8px;flex-wrap:wrap}
- #player .tools button{padding:9px 14px;border-radius:20px;border:none;background:#222;color:#fff;cursor:pointer;font-size:13px}
- #player .tools button.on{background:#ff0000}
- #progress{width:100%;accent-color:#ff0000;margin-top:6px} #time{font-size:11px;color:#aaa;display:flex;justify-content:space-between}
- #syncLyrics{margin-top:10px;background:#000;border-radius:15px;padding:12px;max-height:160px;overflow:auto;text-align:center;display:none}
- #syncLyrics .line{padding:6px 4px;font-size:15px;line-height:1.6;color:#888}
- #syncLyrics .line.active{background:#ff0000;color:#fff;font-weight:bold;font-size:17px}
- #syncLyrics .line.trans{font-size:13px;color:#ffb300;direction:rtl}
- #ytInPlayer{width:100%;height:180px;border:none;border-radius:12px;margin-top:8px;display:none}
- .playlistCard{background:#222;border:1px solid #333;padding:12px;border-radius:15px;margin:10px 0;text-align:right}
- .shareBox{background:linear-gradient(90deg,#25D366,#128C7E);padding:15px;border-radius:20px;margin:10px 15px}
- .checkBox{background:#111;border:1px solid #333;padding:12px;border-radius:15px;margin:10px 15px;text-align:right;font-size:13px;line-height:1.9}
+:root{color-scheme:dark;--red:#e11d2e;--bg:#09090d;--panel:#17171e;--muted:#aaa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,Tahoma,Arial,sans-serif;padding-bottom:190px}
+button,input,select{font:inherit}button{cursor:pointer}.hero{padding:25px 15px 30px;text-align:center;background:linear-gradient(150deg,#f20b20,#65000b 70%,#100);border-radius:0 0 30px 30px}
+.logo{font-size:40px;font-weight:900}.logo span{background:#111;padding:0 9px;border-radius:10px}.hero p{margin:7px 0;color:#f5dede}
+.notice{margin:14px;background:#211a1b;border:1px solid #593238;padding:12px;border-radius:14px;color:#f4d6d9;font-size:13px;line-height:1.8}
+.tabs{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:8px}.tabs button,.filter{background:#292932;color:white;border:0;border-radius:20px;padding:10px 14px}.tabs button.active,.filter.active{background:var(--red)}
+.panel{margin:12px 14px;background:var(--panel);padding:15px;border:1px solid #30303a;border-radius:18px}
+input,select{width:100%;padding:12px;border:1px solid #333;background:#08080c;color:#fff;border-radius:22px;margin:5px 0;text-align:center}
+.btn{background:var(--red);color:white;border:0;border-radius:22px;padding:12px 16px;font-weight:700;margin:4px}.btn.secondary{background:#333}.btn:disabled{opacity:.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.song,.playlist{background:#202029;border:1px solid #33333e;border-radius:15px;padding:12px;text-align:right;min-width:0}
+.song img{width:62px;height:62px;object-fit:cover;border-radius:10px;float:left;margin:0 0 8px 10px}.song h3{font-size:15px;margin:3px 0}.song p{font-size:12px;color:var(--muted);margin:5px 0}.song .actions{clear:both;display:flex;flex-wrap:wrap;gap:4px}.small{border:0;border-radius:15px;padding:8px 10px;background:#383842;color:white;font-size:12px}.small.primary{background:var(--red)}
+.artist{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;background:#22222a;border:1px solid #383842;border-radius:15px;padding:10px;margin:4px;width:105px;min-height:90px}.artist b{font-size:13px}.muted{color:var(--muted);font-size:13px}.share{margin:14px;padding:15px;background:#075e45;border-radius:18px;text-align:center}
+#player{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#15151c;border-top:2px solid var(--red);padding:10px 14px;max-height:42vh;overflow:auto;box-shadow:0 -5px 25px #0009}
+.playerrow{display:flex;align-items:center;gap:10px}.playerrow img{width:48px;height:48px;border-radius:9px;object-fit:cover}.playerrow .meta{flex:1;min-width:0}.playerrow b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#progress{width:100%;accent-color:var(--red)}.controls,.tools{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.controls button{background:#333;color:#fff;border:0;border-radius:22px;padding:8px 16px}.controls .play{background:var(--red);font-size:18px}
+#lyrics{display:none;max-height:110px;overflow:auto;background:#08080c;padding:10px;border-radius:12px;white-space:pre-wrap;text-align:center;font-size:13px;line-height:1.7}
+a{color:#ff9aa3}footer{text-align:center;color:#888;font-size:12px;padding:20px}
+@media(min-width:700px){main{max-width:1000px;margin:auto}.hero{padding:35px}}
 </style>
 </head>
 <body>
-
-<div class="hero">
- <div class="headphones">🎧</div>
- <div class="logo">My<span>Music</span></div>
- <div>أغاني كاملة • فنانين • كلمات • ترجمة • مزامنة • قوائم</div><br>
- <span class="badge">✅ النسخة النهائية - كل الطلبات مجمعة</span>
+<header class="hero"><div style="font-size:55px">🎧</div><div class="logo">My<span>Music</span></div><p>اكتشف الموسيقى • استمع للمعاينات • كلمات • قوائم تشغيل</p></header>
+<main>
+<div class="notice">ملاحظة مهمة: نتائج Apple Music المتاحة هنا تتضمن معاينات صوتية قصيرة عند توفيرها، وليست ملفات أغاني كاملة. للاستماع الكامل افتح المصدر الرسمي للأغنية. لا نوفر تنزيلًا غير مصرح به.</div>
+<nav class="tabs">
+<button class="active" data-tab="search">🔍 البحث</button><button data-tab="artists">🌍 الفنانون</button><button data-tab="playlists">🎼 قوائمي</button><button data-tab="favorites">❤️ المفضلة</button>
+</nav>
+<section id="search" class="view">
+<div class="panel"><input id="query" placeholder="اكتب اسم أغنية أو فنان..." aria-label="بحث عن أغنية"><button class="btn" id="searchBtn">بحث الآن</button><p class="muted">البحث يعرض النتائج المتاحة مع معاينة صوتية ورابط للمصدر.</p></div>
+<div id="results" class="grid"><p class="muted">اكتب اسم أغنية للبدء.</p></div>
+</section>
+<section id="artists" class="view" hidden>
+<div class="panel"><h3>أضف فنانًا إلى قائمتك</h3><input id="artistName" placeholder="اسم الفنان"><button class="btn" id="addArtist">إضافة</button><div id="artistList"></div></div>
+</section>
+<section id="playlists" class="view" hidden>
+<div class="panel"><h3>إنشاء قائمة تشغيل</h3><input id="playlistName" placeholder="اسم القائمة"><button class="btn" id="createPlaylist">إنشاء القائمة</button></div><div id="playlistList"></div>
+</section>
+<section id="favorites" class="view" hidden><div id="favoriteList" class="grid"></div></section>
+<div class="share"><b>شارك MyMusic مع أصدقائك</b><br><button class="btn" id="shareBtn">مشاركة الموقع</button></div>
+</main>
+<div id="player" hidden>
+<div class="playerrow"><img id="pImg" alt="" src="https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/placeholder/60x60bb.jpg"><div class="meta"><b id="pTitle">لم يتم اختيار أغنية</b><span class="muted" id="pArtist"></span></div><button class="small" id="closePlayer">إغلاق</button></div>
+<audio id="audio" controls preload="none" style="width:100%;margin-top:7px"></audio>
+<div class="tools"><button class="small" id="lyricsBtn">📝 كلمات الأغنية</button><button class="small" id="googleTranslate">🌐 ترجمة Google</button><button class="small" id="bingTranslate">🌐 ترجمة Bing</button><button class="small" id="youtubeBtn">▶️ فتح YouTube</button></div>
+<div id="lyrics"></div>
 </div>
-
-<div class="checkBox">
-<b>✅ اللي في النسخة دي:</b><br>
-🎵 أغاني كاملة مش 30 ثانية &nbsp; 🎧 مشغل واحد بس &nbsp; ⏭️ التالي والسابق<br>
-🌍 31 فنان + إضافة فنان وحفظه &nbsp; 📝 كلمات &nbsp; 🌐 ترجمة &nbsp; 🎯 مزامنة<br>
-🎼 قوائم تشغيل محفوظة &nbsp; ❤️ مفضلة &nbsp; ⬇️ تحميل MP3 &nbsp; 📣 شير ودعاية
-</div>
-
-<div class="tabs">
- <button id="tab-search" class="active" onclick="showTab('search')">🔍 بحث</button>
- <button id="tab-artists" onclick="showTab('artists')">🌍 الفنانين <span id="artistCount"></span></button>
- <button id="tab-playlists" onclick="showTab('playlists')">🎼 قوائمي</button>
- <button id="tab-fav" onclick="showTab('fav')">❤️ المفضلة <span id="favCount"></span></button>
-</div>
-
-<div id="view-search">
- <div class="box"><input id="search" placeholder="ابحث... مثال: عمرو دياب - Dua Lipa - happy"><button class="btn" onclick="searchMusic()">🔍 بحث الآن</button><p style="font-size:12px;color:#aaa">التشغيل كامل من Audius أو YouTube - مش 30 ثانية</p></div>
- <div id="results"><p style="color:#aaa">اكتب اسم أغنية ودوس بحث</p></div>
-</div>
-
-<div id="view-artists" style="display:none">
- <div class="box" style="border:2px solid #ff0000">
-  <h3 style="margin:0">➕ ضيف فنان جديد للستتك</h3>
-  <input id="newArtistName" placeholder="اسم الفنان... مثال: حمزة نمرة">
-  <select id="newArtistCat">
-   <option value="eg">🇪🇬 مصر</option><option value="arab">🌍 عرب</option><option value="world">🌎 أجانب</option><option value="rap">🎤 راب</option><option value="latin">💃 لاتيني</option>
-  </select>
-  <button class="btn" onclick="addArtist()">➕ إضافة الفنان وحفظه</button>
-  <p style="font-size:12px;color:#aaa">هيتحفظ ويفضل موجود كل مرة تفتح الموقع</p>
- </div>
- <div class="box">
-  <input id="artistSearch" placeholder="🔍 دور على فنان..." oninput="renderArtistList()"><br><br>
-  <button class="filterBtn active" onclick="filterCat('all',this)">الكل</button>
-  <button class="filterBtn" onclick="filterCat('eg',this)">🇪🇬 مصر</button>
-  <button class="filterBtn" onclick="filterCat('arab',this)">🌍 عرب</button>
-  <button class="filterBtn" onclick="filterCat('world',this)">🌎 أجانب</button>
-  <button class="filterBtn" onclick="filterCat('rap',this)">🎤 راب</button>
-  <button class="filterBtn" onclick="filterCat('latin',this)">💃 لاتيني</button>
-  <button class="filterBtn" onclick="filterCat('my',this)">⭐ لستتي</button>
- </div>
- <div id="artistList"></div><div id="artistResults"></div>
-</div>
-
-<div id="view-playlists" style="display:none">
- <div class="box"><h3>🎼 إنشاء قائمة تشغيل</h3><input id="newPlaylistName" placeholder="اسم القايمة... مثال: أغاني السفر"><button class="btn" onclick="createPlaylist()">➕ إنشاء قايمة</button></div>
- <div id="playlistsList" style="padding:0 15px"></div>
-</div>
-
-<div id="view-fav" style="display:none"><div id="favList"></div></div>
-
-<div class="shareBox">
- <h3 style="margin:0">📣 شير الموقع لصحابك - دعاية مجانية</h3>
- <button class="small" style="background:#fff;color:#000;font-weight:bold;width:100%" onclick="shareSite()">💬 شير على واتساب</button>
- <button class="small" style="background:#000;width:100%" onclick="navigator.clipboard.writeText(location.href);alert('اتنسخ اللينك ✅')">🔗 انسخ اللينك</button>
- <p style="font-size:12px">بوست جاهز: MyMusic 🎧 اسمع أغاني كاملة مجاناً - كلمات وترجمة وقوائم تشغيل 👇</p>
-</div>
-
-<div id="player">
- <div class="row">
-  <img id="pImg" src="https://cdn-icons-png.flaticon.com/512/727/727269.png">
-  <div class="info"><b id="pTitle">لا توجد أغنية</b><small id="pArtist">اختر أغنية كاملة</small></div>
-  <button class="small" style="background:#333" onclick="closePlayer()">✖️</button>
- </div>
- <input type="range" id="progress" value="0" min="0" max="100" oninput="seek(this.value)">
- <div id="time"><span id="curTime">0:00</span><span id="durTime">0:00</span></div>
- <div class="controls">
-  <button class="mini" onclick="prevSong()">⏮️</button>
-  <button onclick="togglePlay()" id="playBtn">▶️</button>
-  <button class="mini" onclick="nextSong()">⏭️</button>
-  <button class="mini" onclick="toggleLoop()" id="loopBtn">🔁</button>
- </div>
- <div class="tools">
-  <button id="btnLyrics" onclick="togglePlayerLyrics()">📝 كلمات</button>
-  <button id="btnTrans" onclick="togglePlayerTranslate()">🌐 ترجمة</button>
-  <button id="btnSync" onclick="toggleSync()">🎯 مزامنة: إيقاف</button>
- </div>
- <div id="syncLyrics"></div>
- <iframe id="ytInPlayer" allow="autoplay; encrypted-media" allowfullscreen></iframe>
- <audio id="mainAudio" preload="auto"></audio>
-</div>
-
+<footer>MyMusic — واجهة مستقلة. توافر النتائج والمعاينات يعتمد على مزودي الخدمة.</footer>
 <script>
-let ALL_SONGS=[]; let currentQueue=[]; let currentIndex=0; let currentSong=null;
-let favs=[]; let playlists=[]; let myArtists=[];
-try{ favs=JSON.parse(localStorage.getItem('mymusic_fav')||'[]'); }catch(e){ favs=[]; }
-try{ playlists=JSON.parse(localStorage.getItem('mymusic_playlists')||'[]'); }catch(e){ playlists=[]; }
-try{ myArtists=JSON.parse(localStorage.getItem('mymusic_artists')||'[]'); }catch(e){ myArtists=[]; }
-let DEFAULT_ARTISTS=[
- {n:"Amr Diab",ar:"عمرو دياب",e:"🇪🇬",c:"eg"},{n:"Umm Kulthum",ar:"أم كلثوم",e:"👑",c:"eg"},{n:"Tamer Hosny",ar:"تامر حسني",e:"🎙️",c:"eg"},
- {n:"Sherine",ar:"شيرين",e:"🎵",c:"eg"},{n:"Mohamed Hamaki",ar:"محمد حماقي",e:"🔥",c:"eg"},{n:"Wegz",ar:"ويجز",e:"🎧",c:"rap"},
- {n:"Ahmed Saad",ar:"أحمد سعد",e:"🎶",c:"eg"},{n:"Ramy Sabry",ar:"رامي صبري",e:"⭐",c:"eg"},{n:"Elissa",ar:"إليسا",e:"💎",c:"arab"},
- {n:"Nancy Ajram",ar:"نانسي عجرم",e:"🌹",c:"arab"},{n:"Wael Kfoury",ar:"وائل كفوري",e:"🎸",c:"arab"},{n:"Kadim Al Sahir",ar:"كاظم الساهر",e:"🎼",c:"arab"},
- {n:"Hussain Al Jassmi",ar:"حسين الجسمي",e:"🎵",c:"arab"},{n:"Saad Lamjarred",ar:"سعد لمجرد",e:"🔥",c:"arab"},{n:"Assala",ar:"أصالة",e:"💜",c:"arab"},
- {n:"Dua Lipa",ar:"دوا ليبا",e:"💃",c:"world"},{n:"Shakira",ar:"شاكيرا",e:"💃",c:"latin"},{n:"Taylor Swift",ar:"تايلور سويفت",e:"⭐",c:"world"},
- {n:"Ed Sheeran",ar:"إد شيران",e:"🎸",c:"world"},{n:"Adele",ar:"أديل",e:"💜",c:"world"},{n:"BTS",ar:"بي تي اس",e:"💜",c:"world"},
- {n:"Billie Eilish",ar:"بيلي إيليش",e:"🌙",c:"world"},{n:"The Weeknd",ar:"ذا ويكند",e:"🌃",c:"world"},{n:"Eminem",ar:"إمينيم",e:"🎤",c:"rap"},
- {n:"Drake",ar:"دريك",e:"🔥",c:"rap"},{n:"Bad Bunny",ar:"باد باني",e:"🐰",c:"latin"},{n:"Maluma",ar:"مالوما",e:"💃",c:"latin"},
- {n:"BLACKPINK",ar:"بلاك بينك",e:"🖤",c:"world"},{n:"Ariana Grande",ar:"أريانا جراندي",e:"✨",c:"world"},{n:"Selena Gomez",ar:"سيلينا جوميز",e:"🌹",c:"world"}
-];
-function getAllArtists(){ return DEFAULT_ARTISTS.concat(myArtists); }
-function saveMyArtists(){ localStorage.setItem('mymusic_artists', JSON.stringify(myArtists)); }
+'use strict';
+const $=id=>document.getElementById(id);
+const safe=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback))}catch{return fallback}};
+let favorites=read('mymusic_fav',[]), artists=read('mymusic_artists',[]), playlists=read('mymusic_playlists',[]), activeSong=null;
+const save=()=>{localStorage.setItem('mymusic_fav',JSON.stringify(favorites));localStorage.setItem('mymusic_artists',JSON.stringify(artists));localStorage.setItem('mymusic_playlists',JSON.stringify(playlists))};
+function switchTab(name){document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!==name);document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));if(name==='favorites')renderFavorites();if(name==='artists')renderArtists();if(name==='playlists')renderPlaylists()}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+async function searchMusic(){
+ const q=$('query').value.trim();if(!q){$('query').focus();return}
+ $('results').innerHTML='<p class="muted">جارٍ البحث…</p>';$('searchBtn').disabled=true;
+ try{const url='https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&entity=song&limit=24&country=eg';
+ const res=await fetch(url);if(!res.ok)throw new Error('تعذر الاتصال بمصدر البحث');const data=await res.json();
+ if(!data.results?.length){$('results').innerHTML='<p class="muted">لم نعثر على نتائج. جرّب اسمًا آخر.</p>';return}
+ $('results').innerHTML=data.results.map((s,i)=>songCard(s,i)).join('');
+ data.results.forEach((s,i)=>{const b=document.querySelector('[data-play="'+i+'"]');if(b)b.addEventListener('click',()=>playSong(s));const f=document.querySelector('[data-fav="'+i+'"]');if(f)f.addEventListener('click',()=>toggleFavorite(s));const y=document.querySelector('[data-yt="'+i+'"]');if(y)y.addEventListener('click',()=>openYouTube(s));});
+ }catch(e){$('results').innerHTML='<p class="muted">حدث خطأ أثناء البحث. تحقق من الإنترنت وحاول مرة أخرى.</p>'}
+ finally{$('searchBtn').disabled=false}
+}
+function songCard(s,i){return '<article class="song"><img src="'+safe(s.artworkUrl100||'')+'" alt=""><h3>'+safe(s.trackName)+'</h3><p>'+safe(s.artistName)+' • '+safe(s.collectionName||'')+'</p><div class="actions">'+(s.previewUrl?'<button class="small primary" data-play="'+i+'">▶ معاينة</button>':'<span class="muted">لا توجد معاينة</span>')+'<button class="small" data-fav="'+i+'">❤️</button><button class="small" data-yt="'+i+'">YouTube</button></div></article>'}
+function playSong(s){if(!s.previewUrl){alert('لا تتوفر معاينة لهذه الأغنية.');return}activeSong=s;$('player').hidden=false;$('pTitle').textContent=s.trackName;$('pArtist').textContent=s.artistName;$('pImg').src=s.artworkUrl100||'';$('audio').src=s.previewUrl;$('audio').play().catch(()=>{});$('lyrics').style.display='none';}
+function songKey(s){return String(s.trackId||s.trackName+'-'+s.artistName)}
+function toggleFavorite(s){const k=songKey(s);favorites=favorites.some(x=>songKey(x)===k)?favorites.filter(x=>songKey(x)!==k):[...favorites,s];save();if(!$('favorites').hidden)renderFavorites()}
+function renderFavorites(){$('favoriteList').innerHTML=favorites.length?favorites.map((s,i)=>'<article class="song"><h3>'+safe(s.trackName)+'</h3><p>'+safe(s.artistName)+'</p><div class="actions"><button class="small primary" data-fplay="'+i+'">▶ معاينة</button><button class="small" data-fremove="'+i+'">إزالة</button><button class="small" data-fyt="'+i+'">YouTube</button></div></article>').join():'<p class="muted">لم تضف أغاني للمفضلة بعد.</p>';favorites.forEach((s,i)=>{document.querySelector('[data-fplay="'+i+'"]')?.addEventListener('click',()=>playSong(s));document.querySelector('[data-fremove="'+i+'"]')?.addEventListener('click',()=>{favorites.splice(i,1);save();renderFavorites()});document.querySelector('[data-fyt="'+i+'"]')?.addEventListener('click',()=>openYouTube(s))})}
+function openYouTube(s){window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(s.artistName+' '+s.trackName),'_blank','noopener')}
+async function loadLyrics(){if(!activeSong)return;const box=$('lyrics');box.style.display='block';box.textContent='جارٍ البحث عن الكلمات…';try{const r=await fetch('https://api.lyrics.ovh/v1/'+encodeURIComponent(activeSong.artistName)+'/'+encodeURIComponent(activeSong.trackName));if(!r.ok)throw 0;const d=await r.json();box.textContent=d.lyrics||'لم تتوفر كلمات لهذه الأغنية.'}catch{box.textContent='لم نتمكن من جلب الكلمات. قد لا تكون متاحة لدى مزود الخدمة.'}}
+function renderArtists(){const defaults=['عمرو دياب','أم كلثوم','شيرين','تامر حسني','ويجز','محمد حماقي','نانسي عجرم','إليسا','دوا ليبا','شاكيرا','Taylor Swift','Adele','Ed Sheeran','The Weeknd','Eminem'];const all=[...new Set([...defaults,...artists])];$('artistList').innerHTML=all.map(a=>'<button class="artist" data-artist="'+safe(a)+'">🎤<b>'+safe(a)+'</b></button>').join('');document.querySelectorAll('[data-artist]').forEach(b=>b.addEventListener('click',()=>{$('query').value=b.dataset.artist;switchTab('search');searchMusic()}))}
+function renderPlaylists(){$('playlistList').innerHTML=playlists.length?playlists.map((p,i)=>'<div class="playlist"><b>'+safe(p.name)+'</b><p class="muted">'+p.songs.length+' أغنية محفوظة</p><button class="small" data-pladd="'+i+'">إضافة نتيجة البحث</button><button class="small" data-pldel="'+i+'">حذف</button><ul>'+p.songs.map(s=>'<li>'+safe(s.trackName)+' — '+safe(s.artistName)+'</li>').join('')+'</ul></div>').join(''):'<p class="muted">أنشئ قائمة تشغيل للبدء.</p>';document.querySelectorAll('[data-pladd]').forEach(b=>b.addEventListener('click',()=>{if(!activeSong){alert('شغّل أو اختر أغنية أولاً من البحث.');return}playlists[+b.dataset.pladd].songs.push(activeSong);save();renderPlaylists()}));document.querySelectorAll('[data-pldel]').forEach(b=>b.addEventListener('click',()=>{playlists.splice(+b.dataset.pldel,1);save();renderPlaylists()}))}
+$('searchBtn').addEventListener('click',searchMusic);$('query').addEventListener('keydown',e=>{if(e.key==='Enter')searchMusic()});
+$('addArtist').addEventListener('click',()=>{const n=$('artistName').value.trim();if(!n)return;if(!artists.includes(n))artists.push(n);$('artistName').value='';save();renderArtists()});
+$('createPlaylist').addEventListener('click',()=>{const n=$('playlistName').value.trim();if(!n)return;playlists.push({name:n,songs:[]});$('playlistName').value='';save();renderPlaylists()});
+$('lyricsBtn').addEventListener('click',loadLyrics);$('closePlayer').addEventListener('click',()=>{$('audio').pause();$('player').hidden=true});
+$('youtubeBtn').addEventListener('click',()=>activeSong&&openYouTube(activeSong));
+$('googleTranslate').addEventListener('click',()=>window.open('https://translate.google.com/','_blank','noopener'));
+$('bingTranslate').addEventListener('click',()=>window.open('https://www.bing.com/translator','_blank','noopener'));
+$('shareBtn').addEventListener('click',async()=>{const data={title:'MyMusic',text:'جرّب MyMusic للبحث عن الموسيقى',url:location.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(location.href);alert('تم نسخ رابط الموقع')}}catch{}});
+renderArtists();renderPlaylists();renderFavorites();
+</script>
+</body></html>
