@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MyMusic AI 🎧 - موسيقى وانت شغال على أدوات الذكاء الاصطناعي</title>
+<style>
+body{margin:0;font-family:sans-serif;background:linear-gradient(180deg,#0a0a0a,#1a0a2e);color:#fff;padding-bottom:210px}
+.top{background:linear-gradient(135deg,#ff0000,#7c3aed);padding:20px;border-radius:0 0 30px 30px;text-align:center}
+.box{background:rgba(255,255,255,.08);margin:12px;padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.1)}
+h2{margin:5px 0 12px;font-size:19px}
+.clock-box{background:linear-gradient(135deg,#0f172a,#7c3aed);text-align:center;padding:18px;border-radius:20px;margin:12px;box-shadow:0 10px 30px rgba(124,58,237,.4)}
+#clock{font-size:52px;font-weight:bold;letter-spacing:2px;margin:0}
+#date{font-size:18px;color:#ddd;margin:5px 0}
+#dayName{font-size:16px;color:#fbbf24}
+.weather{background:linear-gradient(135deg,#0ea5e9,#0f766e);padding:16px;border-radius:20px;margin:12px;text-align:center}
+.weather-temp{font-size:52px;font-weight:bold}
+.weather-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.w-item{background:rgba(255,255,255,.15);padding:10px;border-radius:14px}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ai-btn{display:block;text-align:center;padding:14px;border-radius:16px;color:#fff;text-decoration:none;font-weight:bold;font-size:15px}
+.chatgpt{background:#10a37f}.gemini{background:#1a73e8}.manus{background:#ff5c00}.claude{background:#d97757}.perplexity{background:#20b8cd}.copilot{background:#0078d4}.canva{background:#8b3dff}.midjourney{background:#111;border:1px solid #fff}.capcut{background:#000;border:1px solid #fff}.suno{background:#ff2d55}.eleven{background:#00c2a8}.cursor{background:#000;border:1px solid #0ff}
+input,select{width:92%;padding:13px;border-radius:25px;border:none;text-align:center;font-size:16px;margin:8px 0;color:#000}
+button{padding:12px 15px;border-radius:20px;border:none;background:#ff0000;color:#fff;font-weight:bold;margin:4px;cursor:pointer}
+.btn-green{background:#22c55e}.btn-white{background:#fff;color:#000}.btn-dark{background:#333}.btn-gold{background:#f59e0b}.btn-blue{background:#2563eb}
+.card{background:#222;margin:10px;padding:12px;border-radius:14px;text-align:right}
+#pomodoro{font-size:48px;font-weight:bold;text-align:center}
+#sleepTimer{font-size:36px;font-weight:bold;text-align:center;color:#fbbf24}
+#player{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:2px solid red;padding:12px;text-align:center;z-index:99}
+audio{width:100%}
+.progress{height:8px;background:#333;border-radius:10px;overflow:hidden;margin:10px 0}
+#progressBar{height:100%;background:linear-gradient(90deg,#ff0000,#f59e0b);width:0%}
+#sleepBar{height:100%;background:#f59e0b;width:0%}
+.cat{display:inline-block;background:#333;padding:6px 12px;border-radius:20px;margin:3px;font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="top">
+<h1 style="margin:0">🎧 MyMusic AI</h1>
+<p style="margin:5px">اسمع موسيقى وانت شغال على أدوات الذكاء الاصطناعي<br>شغل - ركز - أنجز</p>
+<button class="btn-green" onclick="alert('الأزرار شغالة ✅')">✅ جرب الزرار ده الأول</button>
+<button class="btn-white" onclick="toggleNight()">🌙 وضع ليلي للعين / ☀️ عادي</button>
+</div>
+
+<div class="clock-box">
+<div id="clock">00:00:00</div>
+<div id="date">--</div>
+<div id="dayName">--</div>
+<div style="font-size:13px;color:#ddd;margin-top:6px">⏰ بتتحدث تلقائي كل ثانية • أول ما تفتح الموقع</div>
+</div>
+
+<div class="weather">
+<h2 style="margin:0">🌤️ الطقس الآن</h2>
+<div id="weatherCity" style="font-size:15px;margin:4px">📍 جاري تحديد مكانك...</div>
+<div class="weather-temp" id="weatherTemp">--°</div>
+<div id="weatherDesc" style="font-size:18px">جاري تحميل الطقس...</div>
+<div class="weather-grid">
+<div class="w-item">💧 رطوبة<br><b id="weatherHum">--%</b></div>
+<div class="w-item">💨 رياح<br><b id="weatherWind">--</b></div>
+<div class="w-item">👁️ الإحساس<br><b id="weatherFeel">--°</b></div>
+</div>
+<button class="btn-white" onclick="getWeather()">🔄 تحديث الطقس</button>
+<button class="btn-dark" onclick="getWeatherCairo()">📍 طقس القاهرة</button>
+<p style="font-size:12px;color:#ddd">مزامنة تلقائية كل 10 دقايق وانت فاتح الموقع</p>
+</div>
+
+<div class="box">
+<h2>🤖 أهم أدوات الذكاء الاصطناعي</h2>
+<div class="ai-grid">
+<a class="ai-btn chatgpt" href="https://chatgpt.com" target="_blank">💬 ChatGPT</a>
+<a class="ai-btn gemini" href="https://gemini.google.com" target="_blank">✨ Gemini</a>
+<a class="ai-btn manus" href="https://manus.im" target="_blank">🚀 Manus</a>
+<a class="ai-btn claude" href="https://claude.ai" target="_blank">🧠 Claude</a>
+<a class="ai-btn perplexity" href="https://www.perplexity.ai" target="_blank">🔍 Perplexity</a>
+<a class="ai-btn copilot" href="https://copilot.microsoft.com" target="_blank">🪟 Copilot</a>
+</div>
+</div>
+
+<div class="box">
+<h2>✍️ أدوات الكتابة والشغل</h2>
+<div class="ai-grid">
+<a class="ai-btn chatgpt" href="https://chatgpt.com" target="_blank">✍️ كتابة مقالات</a>
+<a class="ai-btn gemini" href="https://gemini.google.com" target="_blank">📝 تلخيص وترجمة</a>
+<a class="ai-btn perplexity" href="https://www.perplexity.ai" target="_blank">📚 بحث ذكي</a>
+<a class="ai-btn claude" href="https://claude.ai" target="_blank">📄 كتابة طويلة</a>
+</div>
+</div>
+
+<div class="box">
+<h2>🎨 أدوات التصميم والصور</h2>
+<div class="ai-grid">
+<a class="ai-btn canva" href="https://www.canva.com" target="_blank">🎨 Canva تصميم</a>
+<a class="ai-btn midjourney" href="https://www.midjourney.com" target="_blank">🖼️ Midjourney صور</a>
+<a class="ai-btn gemini" href="https://gemini.google.com/app" target="_blank">✨ Gemini صور</a>
+<a class="ai-btn chatgpt" href="https://chatgpt.com" target="_blank">🎨 ChatGPT صور</a>
+</div>
+</div>
+
+<div class="box">
+<h2>💻 أدوات البرمجة</h2>
+<div class="ai-grid">
+<a class="ai-btn cursor" href="https://cursor.com" target="_blank">💻 Cursor</a>
+<a class="ai-btn copilot" href="https://github.com/features/copilot" target="_blank">🐙 GitHub Copilot</a>
+<a class="ai-btn chatgpt" href="https://chatgpt.com" target="_blank">💬 ChatGPT كود</a>
+<a class="ai-btn claude" href="https://claude.ai" target="_blank">🧠 Claude كود</a>
+</div>
+</div>
+
+<div class="box">
+<h2>🎬 أدوات الفيديو والصوت</h2>
+<div class="ai-grid">
+<a class="ai-btn capcut" href="https://www.capcut.com" target="_blank">🎬 CapCut فيديو</a>
+<a class="ai-btn suno" href="https://suno.com" target="_blank">🎵 Suno موسيقى AI</a>
+<a class="ai-btn eleven" href="https://elevenlabs.io" target="_blank">🎙️ ElevenLabs صوت</a>
+<a class="ai-btn manus" href="https://manus.im" target="_blank">🤖 Manus مهام</a>
+</div>
+</div>
+
+<div class="box">
+<h2>🍅 مؤقت التركيز Pomodoro</h2>
+<div id="pomodoro">25:00</div>
+<p style="text-align:center" id="pomodoroStatus">جاهز؟</p>
+<div class="progress"><div id="progressBar"></div></div>
+<div style="text-align:center">
+<button class="btn-green" onclick="startPomodoro(25,'شغل وركز 💪')">▶️ ابدأ شغل 25 دقيقة</button>
+<button class="btn-gold" onclick="startPomodoro(5,'راحة ☕')">☕ راحة 5 دقايق</button>
+<button class="btn-dark" onclick="stopPomodoro()">⏹️ إيقاف</button>
+</div>
+</div>
+
+<div class="box" style="border:2px solid #f59e0b">
+<h2>😴 مؤقت النوم والإغلاق - من ربع ساعة لـ 24 ساعة</h2>
+<p style="color:#ddd;font-size:14px;text-align:center">هيقفل الموسيقى لوحده بعد الوقت اللي تختاره</p>
+<label>اختر المدة:</label>
+<select id="sleepSelect">
+<option value="15">⏰ 15 دقيقة - ربع ساعة</option>
+<option value="30">⏰ 30 دقيقة - نص ساعة</option>
+<option value="45">⏰ 45 دقيقة</option>
+<option value="60" selected>⏰ 1 ساعة</option>
+<option value="90">⏰ ساعة ونص</option>
+<option value="120">⏰ ساعتين</option>
+<option value="180">⏰ 3 ساعات</option>
+<option value="240">⏰ 4 ساعات</option>
+<option value="360">⏰ 6 ساعات</option>
+<option value="480">⏰ 8 ساعات - نوم كامل</option>
+<option value="720">⏰ 12 ساعة</option>
+<option value="1440">⏰ 24 ساعة - يوم كامل</option>
+</select>
+<div id="sleepTimer">--:--:--</div>
+<p style="text-align:center" id="sleepStatus">مؤقت النوم متوقف</p>
+<div class="progress"><div id="sleepBar"></div></div>
+<div style="text-align:center">
+<button class="btn-gold" onclick="startSleep()">😴 ابدأ مؤقت النوم</button>
+<button class="btn-blue" onclick="startSleepCustom()">⏱️ مؤقت سريع 15 دقيقة</button>
+<button class="btn-dark" onclick="stopSleep()">⏹️ إلغاء المؤقت</button>
+</div>
+</div>
+
+<div class="box">
+<h2>🎯 مود التركيز</h2>
+<div style="text-align:center">
+<button onclick="playFocus('lofi')">🎧 Lo-Fi</button>
+<button onclick="playFocus('rain')">🌧️ مطر</button>
+<button onclick="playFocus('focus')">🧠 تركيز عميق</button>
+<button class="btn-white" onclick="playTest()">▶️ أغنية تجريبية</button>
+</div>
+</div>
+
+<div class="box">
+<h2>🔍 ابحث عن أغنية</h2>
+<span class="cat" onclick="quickSearch('lofi')">Lo-Fi</span>
+<span class="cat" onclick="quickSearch('calm')">هادية</span>
+<span class="cat" onclick="quickSearch('focus')">تركيز</span>
+<span class="cat" onclick="quickSearch('happy')">نشاط</span>
+<br><input id="search" placeholder="اكتب اسم أغنية...">
+<br><button onclick="searchMusic()">🔍 بحث الآن</button>
+<div id="results"><p style="color:#aaa">اكتب اسم أغنية أو دوس على أي تصنيف فوق</p></div>
+</div>
+
+<div class="box">
+<h2>💡 ازاي تشتغل صح؟</h2>
+<p style="line-height:1.9;color:#ddd">1. شغل موسيقى من هنا<br>2. دوس على أي أداة AI هتفتح في تاب جديد<br>3. شغل مؤقت 25 دقيقة<br>4. شغل الوضع الليلي لو بتشتغل بالليل<br>5. قبل ما تنام شغل مؤقت النوم وهيقفل لوحده</p>
+</div>
+
+<div id="player" style="display:none">
+<b id="pTitle">لا توجد أغنية</b><br><small id="pArtist"></small><br>
+<audio id="mainAudio" controls></audio><br>
+<button onclick="prevSong()">⏮️ السابق</button>
+<button onclick="togglePlay()">⏯️ تشغيل / إيقاف</button>
+<button onclick="nextSong()">⏭️ التالي</button>
+</div>
+
+<script>
+let ALL=[]; let idx=0; let audio=document.getElementById('mainAudio');
+function updateClock(){
+  let now=new Date(); let h=now.getHours(), m=now.getMinutes(), s=now.getSeconds();
+  let ampm=h>=12?'م':'ص'; let h12=h%12||12;
+  document.getElementById('clock').innerText=(h12<10?'0'+h12:h12)+':'+(m<10?'0'+m:m)+':'+(s<10?'0'+s:s)+' '+ampm;
+  let days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  let months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  document.getElementById('date').innerText=now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+  document.getElementById('dayName').innerText='📅 '+days[now.getDay()];
+}
+setInterval(updateClock,1000); updateClock();
+function toggleNight(){ let b=document.body; if(b.style.background.includes('fef3c7')){ b.style.background='linear-gradient(180deg,#0a0a0a,#1a0a2e)'; b.style.color='#fff'; } else { b.style.background='linear-gradient(180deg,#fef3c7,#fff)'; b.style.color='#000'; } }
+async function fetchWeather(lat,lon,name){
+  try{
+    document.getElementById('weatherDesc').innerText='⏳ جاري التحميل...';
+    let r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto');
+    let d=await r.json(); let c=d.current;
+    let codes={0:'☀️ صافي',1:'🌤️ صافي غالباً',2:'⛅ غائم جزئياً',3:'☁️ غائم',45:'🌫️ ضباب',48:'🌫️ ضباب',51:'🌦️ رذاذ',61:'🌧️ مطر خفيف',63:'🌧️ مطر',65:'🌧️ مطر غزير',71:'❄️ ثلج',80:'🌧️ أمطار',95:'⛈️ عاصفة'};
+    document.getElementById('weatherCity').innerText='📍 '+name;
+    document.getElementById('weatherTemp').innerText=Math.round(c.temperature_2m)+'°';
+    document.getElementById('weatherDesc').innerText=codes[c.weather_code]||'🌤️ جميل';
+    document.getElementById('weatherHum').innerText=c.relative_humidity_2m+'%';
+    document.getElementById('weatherWind').innerText=c.wind_speed_10m+' كم/س';
+    document.getElementById('weatherFeel').innerText=Math.round(c.apparent_temperature)+'°';
+  }catch(e){ document.getElementById('weatherDesc').innerText='مش قادر أجيب الطقس - جرب تاني'; }
+}
+function getWeather(){ if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(p=>fetchWeather(p.coords.latitude,p.coords.longitude,'مكانك الحالي'),()=>getWeatherCairo()); } else getWeatherCairo(); }
+function getWeatherCairo(){ fetchWeather(30.0444,31.2357,'القاهرة، مصر'); }
+getWeather();
+setInterval(getWeather,600000);
+let pomTimer=null, pomSec=25*60, pomTotal=25*60;
+function updatePom(){ let m=Math.floor(pomSec/60), s=pomSec%60; document.getElementById('pomodoro').innerText=(m<10?'0'+m:m)+':'+(s<10?'0'+s:s); document.getElementById('progressBar').style.width=((pomTotal-pomSec)/pomTotal*100)+'%'; }
+function startPomodoro(min,txt){ stopPomodoro(); pomSec=min*60; pomTotal=min*60; updatePom(); document.getElementById('pomodoroStatus').innerText=txt; pomTimer=setInterval(()=>{ pomSec--; updatePom(); if(pomSec<=0){ clearInterval(pomTimer); alert('خلص الوقت! '+txt); document.getElementById('pomodoroStatus').innerText='خلص الوقت ✅'; } },1000); }
+function stopPomodoro(){ if(pomTimer) clearInterval(pomTimer); document.getElementById('pomodoroStatus').innerText='متوقف'; }
+let sleepTimer=null, sleepSec=0, sleepTotal=0;
+function formatSleep(sec){ let h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60; return (h<10?'0'+h:h)+':'+(m<10?'0'+m:m)+':'+(s<10?'0'+s:s); }
+function startSleep(){ let min=parseInt(document.getElementById('sleepSelect').value); startSleepMinutes(min); }
+function startSleepCustom(){ startSleepMinutes(15); }
+function startSleepMinutes(min){ stopSleep(); sleepSec=min*60; sleepTotal=min*60; document.getElementById('sleepTimer').innerText=formatSleep(sleepSec); document.getElementById('sleepStatus').innerText='😴 شغال - هيقفل الموسيقى بعد '+min+' دقيقة'; sleepTimer=setInterval(()=>{ sleepSec--; document.getElementById('sleepTimer').innerText=formatSleep(sleepSec); document.getElementById('sleepBar').style.width=((sleepTotal-sleepSec)/sleepTotal*100)+'%'; if(sleepSec<=0){ clearInterval(sleepTimer); audio.pause(); document.getElementById('sleepStatus').innerText='😴 خلص الوقت - الموسيقى وقفت - تصبح على خير'; alert('😴 خلص مؤقت النوم - الموسيقى وقفت - تصبح على خير 🌙'); } },1000); }
+function stopSleep(){ if(sleepTimer) clearInterval(sleepTimer); document.getElementById('sleepTimer').innerText='--:--:--'; document.getElementById('sleepStatus').innerText='مؤقت النوم متوقف'; document.getElementById('sleepBar').style.width='0%'; }
+function playTest(){ ALL=[{name:'أغنية تجريبية',artist_name:'Test',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'}]; playByIndex(0); }
+function playFocus(t){ if(t=='lofi') ALL=[{name:'Lo-Fi للتركيز',artist_name:'Focus',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'}]; if(t=='rain') ALL=[{name:'موسيقى هادية',artist_name:'Calm',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'}]; if(t=='focus') ALL=[{name:'تركيز عميق',artist_name:'Deep Focus',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'}]; playByIndex(0); }
+function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; document.getElementById('player').style.display='block'; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
+function togglePlay(){ if(audio.paused) audio.play(); else audio.pause(); }
+function nextSong(){ if(!ALL.length) return; playByIndex((idx+1)%ALL.length); }
+function prevSong(){ if(!ALL.length) return; playByIndex((idx-1+ALL.length)%ALL.length); }
+function quickSearch(q){ document.getElementById('search').value=q; searchMusic(); }
+async function searchMusic(){ let q=document.getElementById('search').value.trim(); if(!q) return alert('اكتب اسم أغنية الأول'); document.getElementById('results').innerHTML='⏳ جاري البحث...'; try{ let r=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=10&country=EG'); let d=await r.json(); if(!d.results||!d.results.length){ document.getElementById('results').innerHTML='مفيش نتائج'; return; } ALL=d.results.map(s=>({name:s.trackName,artist_name:s.artistName,audio:s.previewUrl})); let h=''; for(let i=0;i<ALL.length;i++){ h+='<div class="card"><b>'+ALL[i].name+'</b><br><small>'+ALL[i].artist_name+'</small><br><button onclick="playByIndex('+i+')">▶️ تشغيل</button></div>'; } document.getElementById('results').innerHTML=h; }catch(e){ document.getElementById('results').innerHTML='مشكلة في النت'; } }
+document.getElementById('search').addEventListener('keypress',e=>{ if(e.key=='Enter') searchMusic(); });
+updatePom();
+</script>
+</body>
+</html>
