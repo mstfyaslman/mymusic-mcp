@@ -173,6 +173,23 @@ body.light-theme input,body.light-theme select,body.light-theme textarea{backgro
 @media(max-width:600px){#vevoAiHub .vevo-result img{width:96px}#vevoAiHub .vevo-player{border-radius:12px}}
 
 
+
+/* VEVO AI companion — stays outside the iframe so chat never reloads playback */
+#vevoAiChatToggle{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin:12px 0 8px;padding:14px 16px;border-radius:16px;background:linear-gradient(120deg,#f5d778,#d4af37 55%,#9c7018)!important;color:#100d06!important;border:1px solid #ffe59a!important;font-size:16px;box-shadow:0 8px 28px #d4af3733}
+#vevoAiChatToggle .vevo-key-icon{font-size:25px;filter:drop-shadow(0 2px 2px #0005)}
+#vevoAiChat{display:none;background:linear-gradient(145deg,#17130a,#080808);border:1px solid #bd922e;border-radius:16px;padding:14px;margin:8px 0 14px;box-shadow:0 12px 34px #0009}
+#vevoAiChat.open{display:block}
+#vevoAiChat h3{color:#f3d477;margin:0 0 4px}
+#vevoAiChatMessages{display:flex;flex-direction:column;gap:9px;max-height:340px;overflow:auto;padding:8px 2px;scroll-behavior:smooth}
+.vevo-chat-msg{white-space:pre-wrap;overflow-wrap:anywhere;padding:10px 12px;border-radius:13px;line-height:1.75;max-width:96%}
+.vevo-chat-user{align-self:flex-start;background:#2a2110;border:1px solid #8b6b28;color:#fff2cf}
+.vevo-chat-ai{align-self:flex-end;background:#151515;border:1px solid #57451f;color:#f7f4eb}
+#vevoAiChatInput{width:100%;min-height:58px;text-align:right;resize:vertical}
+#vevoAiChat .vevo-chat-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+#vevoAiChat .vevo-chat-actions button{flex:1;min-width:125px}
+#vevoAiChatHint{color:#c9c1ad;font-size:12px;line-height:1.7}
+@media(max-width:520px){#vevoAiChat{padding:10px}#vevoAiChatMessages{max-height:280px}}
+
 </style>
 </head>
 <body>
@@ -208,6 +225,21 @@ body.light-theme input,body.light-theme select,body.light-theme textarea{backgro
   <div id="vevoResults" class="vevo-grid"></div>
   <div id="vevoNowPlaying" class="small" style="margin-top:10px;color:#e8bd55">لم يتم اختيار فيديو بعد.</div>
   <div id="vevoPlayer" class="vevo-player"><div style="position:absolute;inset:0;display:grid;place-items:center;color:#c8aa65">سيظهر الفيديو هنا داخل الموقع بعد اختياره</div></div>
+  <button id="vevoAiChatToggle" type="button" aria-expanded="false" aria-controls="vevoAiChat" onclick="toggleVevoAiChat()">
+    <span class="vevo-key-icon" aria-hidden="true">🔑</span><span>اسأل MyMusic AI عن الفيديو والفنان</span><span aria-hidden="true">✨</span>
+  </button>
+  <section id="vevoAiChat" aria-label="مساعد الذكاء الاصطناعي الخاص بالفيديو">
+    <h3>🤖 مساعد VEVO الذكي</h3>
+    <p id="vevoAiChatHint">اسأل عن الفنان، الأغنية، معنى الكلمات، الألبوم، خلفية الفيديو أو أي سؤال آخر. ستظل المشاهدة مستمرة أثناء المحادثة.</p>
+    <div id="vevoAiChatMessages" role="log" aria-live="polite"><div class="vevo-chat-msg vevo-chat-ai">أهلًا بك! اختر فيديو ثم اسألني عنه. أستطيع استخدام عنوان الفيديو والقناة والنص المستخرج إن توفر.</div></div>
+    <textarea id="vevoAiChatInput" class="vevo-field" maxlength="1800" placeholder="اكتب سؤالك عن الفيديو أو الفنان..."></textarea>
+    <div class="vevo-chat-actions">
+      <button class="btn-gold" id="vevoAiChatSend" type="button" onclick="sendVevoAiQuestion()">إرسال السؤال</button>
+      <button class="btn-dark" type="button" onclick="clearVevoAiChat()">مسح المحادثة</button>
+      <button class="btn-dark" type="button" onclick="toggleVevoAiChat(false)">إخفاء المساعد</button>
+    </div>
+    <p class="small">ملاحظة: المساعد لا يلتقط صوت YouTube مباشرة من المشغل المحمي. دقة الإجابة عن تفاصيل المشهد أو كلمات الأغنية تتحسن بعد استخراج النص من الفيديو.</p>
+  </section>
   <div class="vevo-grid">
     <button class="btn-gold" type="button" onclick="transcribeVevoVideo()">🎤 استخراج الكلام والكلمات من الفيديو</button>
     <button class="btn-dark" type="button" onclick="downloadVevoSrt()" id="vevoDownloadBtn" disabled>⬇️ تنزيل SRT المترجم</button>
@@ -1191,6 +1223,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.se
 /* VEVO in-page discovery, playback and AI translation. No external-window navigation. */
 let myMusicVevoCurrentId = "";
 let myMusicVevoCurrentTitle = "";
+let myMusicVevoCurrentChannel = "";
+let myMusicVevoChatHistory = [];
 let myMusicVevoOriginalSrt = "";
 let myMusicVevoTranslatedSrt = "";
 function vevoSetStatus(message){const el=document.getElementById("vevoStatus");if(el)el.textContent=message;}
@@ -1220,7 +1254,7 @@ async function searchVevoVideos(){
 }
 function playVevoVideo(id,title,channel){
   if(!/^[A-Za-z0-9_-]{11}$/.test(id))return;
-  myMusicVevoCurrentId=id;myMusicVevoCurrentTitle=title||"VEVO";
+  myMusicVevoCurrentId=id;myMusicVevoCurrentTitle=title||"VEVO";myMusicVevoCurrentChannel=channel||"YouTube";myMusicVevoChatHistory=[];renderVevoAiChatWelcome();
   myMusicVevoOriginalSrt="";myMusicVevoTranslatedSrt="";
   document.getElementById("vevoDownloadBtn").disabled=true;
   document.getElementById("vevoNowPlaying").textContent="يتم التشغيل داخل MyMusic AI: "+myMusicVevoCurrentTitle+" — "+(channel||"VEVO");
@@ -1229,6 +1263,60 @@ function playVevoVideo(id,title,channel){
   document.getElementById("vevoTranslatedOutput").textContent="ارفع ملفًا تملكه من أداة ترجمة الفيديو والصوت، أو الصق الكلمات أعلاه للترجمة.";
   vevoSetStatus("▶️ تم تحميل مشغل الفيديو داخل الصفحة. إذا منع صاحب الفيديو التضمين فلن يعمل المشغل لهذا الفيديو.");
 }
+
+function toggleVevoAiChat(force){
+  const panel=document.getElementById("vevoAiChat"),button=document.getElementById("vevoAiChatToggle");
+  if(!panel||!button)return;
+  const open=typeof force==="boolean"?force:!panel.classList.contains("open");
+  panel.classList.toggle("open",open);button.setAttribute("aria-expanded",String(open));
+  if(open)document.getElementById("vevoAiChatInput")?.focus({preventScroll:true});
+}
+function addVevoAiChatMessage(text,role){
+  const list=document.getElementById("vevoAiChatMessages");if(!list)return;
+  const item=document.createElement("div");item.className="vevo-chat-msg "+(role==="user"?"vevo-chat-user":"vevo-chat-ai");
+  item.textContent=text;list.appendChild(item);list.scrollTop=list.scrollHeight;
+}
+function renderVevoAiChatWelcome(){
+  const list=document.getElementById("vevoAiChatMessages");if(!list)return;list.innerHTML="";
+  addVevoAiChatMessage("أهلًا بك! اسألني عن هذا الفيديو أو الفنان: "+(myMusicVevoCurrentTitle||"اختر فيديو أولاً")+".","ai");
+}
+function clearVevoAiChat(){myMusicVevoChatHistory=[];renderVevoAiChatWelcome();}
+async function sendVevoAiQuestion(){
+  const input=document.getElementById("vevoAiChatInput"),button=document.getElementById("vevoAiChatSend");
+  const question=(input?.value||"").trim();if(!question){input?.focus();return;}
+  if(question.length>1800){addVevoAiChatMessage("اختصر السؤال إلى 1800 حرف من فضلك.","ai");return;}
+  if(!myMusicVevoCurrentId){addVevoAiChatMessage("اختَر فيديو من نتائج VEVO أو YouTube أولاً حتى أربط السؤال بالمحتوى الصحيح.","ai");return;}
+  input.value="";addVevoAiChatMessage(question,"user");button.disabled=true;
+  const list=document.getElementById("vevoAiChatMessages"),wait=document.createElement("div");
+  wait.className="vevo-chat-msg vevo-chat-ai";wait.textContent="⏳ أفكر في إجابتك...";list.appendChild(wait);list.scrollTop=list.scrollHeight;
+  const transcript=(myMusicVevoOriginalSrt||"").slice(0,6500);
+  const history=myMusicVevoChatHistory.slice(-8).map(x=>(x.role==="user"?"المستخدم: ":"المساعد: ")+x.text).join("\n");
+  const prompt=[
+    "أنت مساعد محادثة ذكي داخل منصة MyMusic AI، متخصص في الموسيقى والفيديو والفنانين. أجب بالعربية الواضحة وبأسلوب مفيد وممتاز، ويمكنك الإجابة عن الأسئلة العامة أيضًا. لا تختلق حقائق أو كلمات أغنية أو تفاصيل مشهد لا تعرفها؛ وضح عندما تكون المعلومة غير مؤكدة. استخدم سياق الفيديو والنص المستخرج إن وجد. لا تدّع أنك تشاهد أو تسمع البث الحي مباشرة.",
+    "بيانات الفيديو الحالي:",
+    "العنوان: "+myMusicVevoCurrentTitle,
+    "القناة/الفنان الظاهر في نتيجة البحث: "+myMusicVevoCurrentChannel,
+    "رابط الفيديو: https://www.youtube.com/watch?v="+myMusicVevoCurrentId,
+    "النص المستخرج من الفيديو إن توفر:\n"+(transcript||"لم يتم استخراج نص من هذا الفيديو حتى الآن."),
+    "سياق المحادثة السابقة:\n"+(history||"لا توجد أسئلة سابقة."),
+    "سؤال المستخدم الحالي: "+question,
+    "أجب مباشرة، واذكر إن كانت إجابتك مبنية على بيانات الفيديو المتاحة أو على معرفة عامة."
+  ].join("\n\n");
+  try{
+    const response=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({prompt})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||"تعذر الاتصال بمساعد الذكاء الاصطناعي.");
+    const answer=String(data.text||"").trim();if(!answer)throw new Error("لم يصل رد من Gemini.");
+    wait.remove();addVevoAiChatMessage(answer,"ai");
+    myMusicVevoChatHistory.push({role:"user",text:question},{role:"model",text:answer});myMusicVevoChatHistory=myMusicVevoChatHistory.slice(-12);
+  }catch(error){wait.remove();addVevoAiChatMessage("تعذر الحصول على الإجابة: "+error.message+" تأكد من ضبط GEMINI_API_KEY في Cloudflare Pages ثم أعد النشر.","ai");}
+  finally{button.disabled=false;input?.focus({preventScroll:true});}
+}
+document.addEventListener("DOMContentLoaded",()=>{
+  const chatInput=document.getElementById("vevoAiChatInput");
+  if(chatInput)chatInput.addEventListener("keydown",event=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();sendVevoAiQuestion();}});
+});
+
 async function transcribeVevoVideo(){
   if(!myMusicVevoCurrentId){vevoSetStatus("اختر فيديو من نتائج البحث أولاً.");return;}
   vevoSetStatus("⏳ يحاول Gemini تحليل الفيديو العام واستخراج الكلام والكلمات مع التوقيتات...");
