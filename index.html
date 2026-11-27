@@ -269,7 +269,28 @@ function sendMsg(){ let n=document.getElementById('msgName').value||'صديقن�
 function toggleFloat(){ floatHidden=!floatHidden; document.getElementById('floatBtn').style.display=floatHidden?'none':'block'; document.getElementById('floatMenu').style.display='none'; if(floatHidden) alert('الزر العائم اتخفى - دوس على زرار إخفاء / إظهار الزر العائم فوق عشان يرجع'); }
 function toggleFloatMenu(){ let m=document.getElementById('floatMenu'); m.style.display=(m.style.display=='block')?'none':'block'; }
 async function shareMyMusic(){ const data={title:'MyMusic AI',text:'اكتشف MyMusic للبحث عن الأغاني والفنانين والاستماع إلى المعاينات الموسيقية.',url:'https://mymusic-3k6.pages.dev/'}; try{ if(navigator.share){await navigator.share(data);} else if(navigator.clipboard){await navigator.clipboard.writeText(data.url);alert('تم نسخ رابط MyMusic للمشاركة');} else {window.prompt('انسخ رابط MyMusic',data.url);} }catch(e){} }
-function installApp(){ alert('عشان تثبته كتطبيق:\n1- دوس 3 نقط ⋮ فوق\n2- إضافة إلى الشاشة الرئيسية\n3- إضافة'); }
+let myMusicInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault();
+  myMusicInstallPrompt = event;
+});
+window.addEventListener('appinstalled', () => {
+  myMusicInstallPrompt = null;
+  alert('تم تثبيت MyMusic على جهازك بنجاح 🎧');
+});
+async function installApp(){
+  if(myMusicInstallPrompt){
+    myMusicInstallPrompt.prompt();
+    const choice = await myMusicInstallPrompt.userChoice;
+    myMusicInstallPrompt = null;
+    if(choice && choice.outcome === 'accepted') return;
+  }
+  if(window.matchMedia('(display-mode: standalone)').matches){
+    alert('MyMusic مثبت بالفعل على جهازك 🎧');
+    return;
+  }
+  alert('لتثبيت MyMusic: افتح قائمة المتصفح ⋮ ثم اختر «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق» إذا ظهر الخيار.');
+}
 audio.addEventListener('timeupdate',()=>{ if(audio.duration) document.getElementById('progressBar').style.width=(audio.currentTime/audio.duration*100)+'%'; });
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
 </script>
