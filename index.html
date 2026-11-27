@@ -182,7 +182,7 @@ body.light-theme input,body.light-theme select,body.light-theme textarea{backgro
 
 <section class="box" id="vevoAiHub" aria-labelledby="vevoAiTitle">
   <h2 id="vevoAiTitle">🎬 MyMusic AI — الواجهة الرئيسية للموسيقى وVEVO</h2>
-  <p class="small">ابحث عن فيديوهات VEVO الرسمية وشغّل الفيديو هنا داخل الموقع، ثم جرّب استخراج الكلام/الكلمات وترجمتها بالذكاء الاصطناعي. التشغيل يتم من مشغل YouTube المضمّن، وليس بفتح نافذة جديدة.</p>
+  <p class="small">ابحث عن فيديوهات VEVO الرسمية وشغّل الفيديو هنا داخل الموقع، ثم ترجم الكلمات أو النصوص بالذكاء الاصطناعي. لا يسحب الموقع صوت YouTube من الرابط؛ يمكنك رفع ملف تملكه أو لصق النص. التشغيل يتم من مشغل YouTube المضمّن، وليس بفتح نافذة جديدة.</p>
   <div>
     <input id="vevoSearchInput" class="vevo-field" type="search" maxlength="120" placeholder="ابحث باسم الفنان أو الأغنية — مثال: Adele Hello">
     <button class="btn-gold" type="button" onclick="searchVevoVideos()">🔎 ابحث عن VEVO</button>
@@ -1208,23 +1208,21 @@ function playVevoVideo(id,title,channel){
   document.getElementById("vevoNowPlaying").textContent="يتم التشغيل داخل MyMusic AI: "+myMusicVevoCurrentTitle+" — "+(channel||"VEVO");
   document.getElementById("vevoPlayer").innerHTML='<iframe title="VEVO music video" src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0&playsinline=1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
   document.getElementById("vevoOriginalOutput").textContent="لم يتم استخراج النص بعد.";
-  document.getElementById("vevoTranslatedOutput").textContent="اضغط استخراج الكلام والكلمات لبدء التحليل.";
+  document.getElementById("vevoTranslatedOutput").textContent="ارفع ملفًا تملكه من أداة ترجمة الفيديو والصوت، أو الصق الكلمات أعلاه للترجمة.";
   vevoSetStatus("▶️ تم تحميل مشغل الفيديو داخل الصفحة. إذا منع صاحب الفيديو التضمين فلن يعمل المشغل لهذا الفيديو.");
 }
-async function transcribeVevoVideo(){
-  if(!myMusicVevoCurrentId){vevoSetStatus("اختر فيديو من نتائج البحث أولاً.");return;}
-  vevoSetStatus("⏳ يطلب MyMusic من Gemini استخراج الكلام والكلمات مع التوقيت. قد يستغرق ذلك بعض الوقت...");
-  try{
-    const response=await fetch("/api/transcribe-youtube",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:"https://www.youtube.com/watch?v="+myMusicVevoCurrentId})});
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(data.error||"تعذر استخراج النص من هذا الفيديو.");
-    const srt=String(data.text||"").trim();
-    if(!srt||srt==="NO_SPEECH")throw new Error("لم يتم العثور على كلام أو كلمات قابلة للاستخراج في الفيديو.");
-    myMusicVevoOriginalSrt=srt;
-    document.getElementById("vevoOriginalOutput").textContent=srt;
-    vevoSetStatus("✅ تم استخراج النص. جارٍ ترجمته إلى اللغة المختارة...");
-    await translateVevoSrt(srt);
-  }catch(error){vevoSetStatus("⚠️ "+error.message+" يمكنك لصق الكلمات يدويًا في مربع النص وتجربة ترجمتها.");}
+function transcribeVevoVideo(){
+  if(!myMusicVevoCurrentId){vevoSetStatus("اختر فيديو أولاً، أو الصق الكلمات في مربع النص.");return;}
+  vevoSetStatus("ℹ️ لا يمكن لـ Gemini سحب صوت فيديو YouTube مباشرةً من رابطه. للحفاظ على حقوق النشر، لن نحاول تنزيل الفيديو. اختر ملف MP3/MP4 تملكه من أداة ترجمة الفيديو والصوت أسفل الصفحة، أو الصق النص/الكلمات هنا للترجمة.");
+  const fileInput=document.getElementById("myFiles");
+  const mediaSection=document.getElementById("mediaTranslationTools");
+  if(mediaSection)mediaSection.scrollIntoView({behavior:"smooth",block:"start"});
+  if(fileInput){
+    setTimeout(()=>fileInput.click(),450);
+  }else{
+    const lyrics=document.getElementById("vevoLyricsInput");
+    if(lyrics)lyrics.focus();
+  }
 }
 async function translateVevoSrt(sourceText){
   const target=document.getElementById("vevoTargetLanguage").value;
