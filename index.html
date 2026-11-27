@@ -544,10 +544,26 @@ async function translateTranscriptText(text,target,source){
   }
   return translated.join('\\n');
 }
+function cleanSubtitleText(text){
+  let value=String(text||'').trim();const fence=String.fromCharCode(96).repeat(3);
+  if(value.startsWith(fence))value=value.slice(3).replace(/^srt\\s*/i,'').replace(new RegExp(fence+'$'),'').trim();
+  return value;
+}
 function downloadSubtitleFile(text, fileName){
-  const clean=String(text||'').replace(/^```(?:srt)?\s*/i,'').replace(/\s*```$/,'').trim();
-  const blob=new Blob(['\uFEFF'+clean],{type:'text/plain;charset=utf-8'});
+  const clean=cleanSubtitleText(text);
+  const blob=new Blob(['\\uFEFF'+clean],{type:'text/plain;charset=utf-8'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fileName||'MyMusic-Subtitles.srt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function showTranslatedSubtitles(index,text,target){
+  const video=document.getElementById('localVideo'+index);if(!video)return;
+  const previous=video.querySelector('track[data-mymusic-subtitles]');
+  if(previous){if(previous.dataset.objectUrl)URL.revokeObjectURL(previous.dataset.objectUrl);previous.remove();}
+  const vtt='WEBVTT\\n\\n'+cleanSubtitleText(text).replace(/,(\\d{3})/g,'.$1');
+  const url=URL.createObjectURL(new Blob([vtt],{type:'text/vtt;charset=utf-8'}));
+  const track=document.createElement('track');track.kind='subtitles';track.label='MyMusic AI';track.srclang=target||'ar';track.default=true;track.dataset.mymusicSubtitles='1';track.dataset.objectUrl=url;track.src=url;
+  video.appendChild(track);
+  track.addEventListener('load',()=>{try{track.track.mode='showing';}catch(e){}});
+  try{for(const t of video.textTracks)t.mode='showing';}catch(e){}
 }
 async function transcribeLocalMedia(index){
   const item=myLocalMedia[index];
@@ -573,7 +589,7 @@ async function transcribeLocalMedia(index){
     const reportedLanguage=String(data.language||'').toLowerCase();
     const sourceLanguage=/^[a-z]{2,3}$/.test(reportedLanguage)?reportedLanguage:(selectedLanguage==='auto'?detectTranscriptLanguage(original):selectedLanguage.split('-')[0]);
     const translated=await translateTranscriptText(original,target,sourceLanguage);
-    output.innerText='📝 النص الأصلي:\n'+original+'\n\n🌐 الترجمة:\n'+translated;
+    output.innerText='📝 النص الأصلي:\n'+original+'\n\n🌐 الترجمة:\n'+translated;\n    if(item.file.type.startsWith('video/'))showTranslatedSubtitles(index,translated,target);
     const downloadButton=document.createElement('button');
     downloadButton.className='btn-blue';
     downloadButton.textContent='⬇️ تنزيل الترجمة بصيغة SRT';
