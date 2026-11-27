@@ -55,6 +55,10 @@ audio,video{width:100%}
 #floatMenu{position:fixed;bottom:245px;left:12px;z-index:999;background:#111;border:1px solid #444;border-radius:18px;padding:10px;display:none;width:220px}
 #floatMenu button{display:block;width:100%;margin:5px 0}
 #floatMenu{width:min(320px,calc(100vw - 24px));max-height:70vh;overflow:auto}
+#floatMenu .floatLink{display:block;background:#252525;color:#fff;text-decoration:none;padding:9px 10px;margin:5px 0;border-radius:12px;font-size:13px;line-height:1.5;border:1px solid #444}
+#floatMenu .floatLink:active{background:#444}
+#floatMenu b{display:block;margin:8px 2px 4px;color:#ffd166;font-size:13px}
+
 #liveTranslate{background:#202020;border:1px solid #555;border-radius:12px;padding:10px;margin:8px 0;text-align:right}
 #liveTranslatePanel{position:fixed;right:12px;left:12px;bottom:155px;z-index:1001;background:#111;border:1px solid #777;border-radius:16px;padding:12px;max-height:55vh;overflow:auto;box-shadow:0 8px 28px #000b;text-align:right}
 #liveTranslatePanel button{max-width:100%}
@@ -250,6 +254,35 @@ audio,video{width:100%}
 <button onclick="openSearch('google')">🔍 بحث جوجل</button>
 <button onclick="toggleFloat()">👁️ إخفاء الزر</button>
 <button onclick="toggleFloatMenu()">❌ إغلاق</button>
+
+<div id="mymusicLearningLinks" style="margin-top:8px;border-top:1px solid #555;padding-top:8px;max-height:48vh;overflow-y:auto">
+  <b>🎼 الموسيقى والكلمات</b>
+  <a class="floatLink" href="https://www.musixmatch.com/" target="_blank" rel="noopener noreferrer">🎵 Musixmatch – كلمات الأغاني وترجماتها</a>
+  <a class="floatLink" href="https://genius.com/" target="_blank" rel="noopener noreferrer">🎤 Genius – كلمات ومعلومات الأغاني</a>
+  <b>🌐 مواقع الترجمة</b>
+  <a class="floatLink" href="https://translate.google.com/" target="_blank" rel="noopener noreferrer">Google Translate – ترجمة النصوص والصور</a>
+  <a class="floatLink" href="https://www.deepl.com/translator" target="_blank" rel="noopener noreferrer">DeepL – ترجمة النصوص والملفات</a>
+  <a class="floatLink" href="https://www.bing.com/translator" target="_blank" rel="noopener noreferrer">Microsoft Translator</a>
+  <a class="floatLink" href="https://www.reverso.net/text-translation" target="_blank" rel="noopener noreferrer">Reverso – ترجمة وأمثلة لغوية</a>
+  <a class="floatLink" href="https://translate.yandex.com/" target="_blank" rel="noopener noreferrer">Yandex Translate</a>
+  <b>🔬 البحث العلمي والتجارب</b>
+  <a class="floatLink" href="https://scholar.google.com/" target="_blank" rel="noopener noreferrer">Google Scholar – الأبحاث العلمية</a>
+  <a class="floatLink" href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubMed – الأبحاث الطبية</a>
+  <a class="floatLink" href="https://arxiv.org/" target="_blank" rel="noopener noreferrer">arXiv – أبحاث الفيزياء والرياضيات والحوسبة</a>
+  <a class="floatLink" href="https://www.sciencedirect.com/" target="_blank" rel="noopener noreferrer">ScienceDirect – الدوريات العلمية</a>
+  <a class="floatLink" href="https://www.wolframalpha.com/" target="_blank" rel="noopener noreferrer">WolframAlpha – الحسابات والمسائل العلمية</a>
+  <a class="floatLink" href="https://phet.colorado.edu/" target="_blank" rel="noopener noreferrer">PhET – محاكاة وتجارب تفاعلية</a>
+  <a class="floatLink" href="https://www.geogebra.org/" target="_blank" rel="noopener noreferrer">GeoGebra – الرياضيات والهندسة</a>
+  <b>🎓 التعليم والمناهج للطلاب في مصر</b>
+  <a class="floatLink" href="https://moe.gov.eg/ar/" target="_blank" rel="noopener noreferrer">وزارة التربية والتعليم المصرية</a>
+  <a class="floatLink" href="https://elearning1.moe.gov.eg/" target="_blank" rel="noopener noreferrer">بوابة التعليم الإلكتروني والكتب</a>
+  <a class="floatLink" href="https://www.ekb.eg/" target="_blank" rel="noopener noreferrer">بنك المعرفة المصري</a>
+  <a class="floatLink" href="https://study.ekb.eg/" target="_blank" rel="noopener noreferrer">Study – المذاكرة الرقمية</a>
+  <a class="floatLink" href="https://madrasetnaplus.eg/home" target="_blank" rel="noopener noreferrer">مدرستنا بلس – دروس ومحتوى تعليمي</a>
+  <a class="floatLink" href="https://www.khanacademy.org/" target="_blank" rel="noopener noreferrer">Khan Academy – شرح وتدريب مجاني</a>
+  <a class="floatLink" href="https://www.nafham.com/" target="_blank" rel="noopener noreferrer">نفهم – شروحات تعليمية</a>
+  <a class="floatLink" href="https://www.edraak.org/" target="_blank" rel="noopener noreferrer">إدراك – دورات تعليمية عربية</a>
+</div>
 </div>
 
 <div id="liveTranslatePanel" role="region" aria-label="لوحة الترجمة المباشرة" style="display:none">
