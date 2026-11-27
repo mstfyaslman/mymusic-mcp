@@ -340,9 +340,18 @@ function saveMyFiles(inp){
   document.getElementById('myFilesList').innerHTML=markup||'لم يتم اختيار ملفات مدعومة.';
 }
 
-function detectTranscriptLanguage(text){\n  if(/[\\u0600-\\u06FF]/.test(text))return 'ar';\n  if(/[\\u0900-\\u097F]/.test(text))return 'hi';\n  if(/[\\u0400-\\u04FF]/.test(text))return 'ru';\n  if(/[\\u4E00-\\u9FFF]/.test(text))return 'zh';\n  if(/[\\u3040-\\u30FF]/.test(text))return 'ja';\n  if(/[\\uAC00-\\uD7AF]/.test(text))return 'ko';\n  return 'en';\n}\nasync function translateTranscriptText(text,target,source){
+function detectTranscriptLanguage(text){
+  if(/[\u0600-\u06FF]/.test(text))return 'ar';
+  if(/[\u0900-\u097F]/.test(text))return 'hi';
+  if(/[\u0400-\u04FF]/.test(text))return 'ru';
+  if(/[\u4E00-\u9FFF]/.test(text))return 'zh';
+  if(/[\u3040-\u30FF]/.test(text))return 'ja';
+  if(/[\uAC00-\uD7AF]/.test(text))return 'ko';
+  return 'en';
+}
+async function translateTranscriptText(text,target,source){
   const chunks=[];
-  const sentences=String(text||'').split(/(?<=[.!?؟。])\\s+/);
+  const sentences=String(text||'').split(/(?<=[.!?؟。])\s+/);
   let current='';
   for(const sentence of sentences){
     if((current+' '+sentence).trim().length>450 && current){chunks.push(current);current=sentence;}
@@ -379,10 +388,11 @@ async function transcribeLocalMedia(index){
     if(!response.ok)throw new Error(data.error||('خطأ من الخادم '+response.status));
     const original=String(data.text||'').trim();
     if(!original)throw new Error('لم يتم التعرف على كلام واضح في الملف');
-    output.innerText='📝 النص الأصلي:\\n'+original+'\\n\\n⏳ جارٍ ترجمة النص...';
+    output.innerText='📝 النص الأصلي:\n'+original+'\n\n⏳ جارٍ ترجمة النص...';
     const target=document.getElementById('speechTarget')?.value||'ar';
-    const selectedLanguage=document.getElementById('speechSource')?.value||'auto';\n    const sourceLanguage=data.language|| (selectedLanguage==='auto'?detectTranscriptLanguage(original):selectedLanguage.split('-')[0]);\n    const translated=await translateTranscriptText(original,target,sourceLanguage);
-    output.innerText='📝 النص الأصلي:\\n'+original+'\\n\\n🌐 الترجمة:\\n'+translated;
+    const sourceLanguage=data.language|| (selectedLanguage==='auto'?detectTranscriptLanguage(original):selectedLanguage.split('-')[0]);
+    const translated=await translateTranscriptText(original,target,sourceLanguage);
+    output.innerText='📝 النص الأصلي:\n'+original+'\n\n🌐 الترجمة:\n'+translated;
     lastLiveTranslation=translated;
     document.getElementById('liveOriginal').innerText=original;
     document.getElementById('liveResult').innerText=translated;
@@ -390,7 +400,7 @@ async function transcribeLocalMedia(index){
     translationHistory=translationHistory.slice(0,100);
     try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}
   }catch(error){
-    output.innerText='⚠️ تعذرت المعالجة: '+error.message+'\\nتأكد من تفعيل Workers AI في Cloudflare ثم أعد المحاولة.';
+    output.innerText='⚠️ تعذرت المعالجة: '+error.message+'\nتأكد من تفعيل Workers AI في Cloudflare ثم أعد المحاولة.';
   }
 }
 function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; currentUrl=s.audio; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
