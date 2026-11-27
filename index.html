@@ -710,33 +710,33 @@ function createSrtEditor(output, originalSrt, translatedSrt, fileName, videoInde
   if (videoIndex !== null && videoIndex !== undefined) showTranslatedSubtitles(videoIndex, translatedSrt, target);
 }
 function validateAndNormalizeSrt(value) {
-  const raw = cleanSubtitleText(value).replace(/\\r/g, '').trim();
-  const blocks = raw.split(/\\n\\s*\\n/).map(block => block.trim()).filter(Boolean);
+  const raw = cleanSubtitleText(value).replace(/\r/g, '').trim();
+  const blocks = raw.split(/\n\s*\n/).map(block => block.trim()).filter(Boolean);
   const cues = [];
   const toMs = stamp => {
-    const match = /^(\\d{2,}):(\\d{2}):(\\d{2})[,\\.](\\d{3})$/.exec(stamp);
+    const match = /^(\d{2,}):(\d{2}):(\d{2})[,\.](\d{3})$/.exec(stamp);
     if (!match) return null;
     const h=Number(match[1]), m=Number(match[2]), s=Number(match[3]), ms=Number(match[4]);
     if (m>59 || s>59) return null;
     return (((h*60)+m)*60+s)*1000+ms;
   };
   for (const block of blocks) {
-    const lines = block.split('\\n');
-    const timeIndex = lines.findIndex(line => /\\d{2,}:\\d{2}:\\d{2}[,\\.]\\d{3}\\s*-->\\s*\\d{2,}:\\d{2}:\\d{2}[,\\.]\\d{3}/.test(line));
+    const lines = block.split('\n');
+    const timeIndex = lines.findIndex(line => /\d{2,}:\d{2}:\d{2}[,\.]\d{3}\s*-->\s*\d{2,}:\d{2}:\d{2}[,\.]\d{3}/.test(line));
     if (timeIndex < 0) continue;
-    const match = /^(\\d{2,}:\\d{2}:\\d{2})[,\\.](\\d{3})\\s*-->\\s*(\\d{2,}:\\d{2}:\\d{2})[,\\.](\\d{3})(?:\\s+.*)?$/.exec(lines[timeIndex].trim());
+    const match = /^(\d{2,}:\d{2}:\d{2})[,\.](\d{3})\s*-->\s*(\d{2,}:\d{2}:\d{2})[,\.](\d{3})(?:\s+.*)?$/.exec(lines[timeIndex].trim());
     if (!match) return {ok:false,error:'يوجد سطر توقيت غير صحيح في ملف SRT.'};
     const start = match[1]+','+match[2], end = match[3]+','+match[4];
     const startMs=toMs(start), endMs=toMs(end);
     if (startMs===null || endMs===null || endMs<=startMs) return {ok:false,error:'توقيت أحد المقاطع غير صحيح أو وقت النهاية يسبق البداية.'};
-    const text = lines.slice(timeIndex+1).join('\\n').trim();
+    const text = lines.slice(timeIndex+1).join('\n').trim();
     if (!text) return {ok:false,error:'يوجد مقطع ترجمة فارغ.'};
     cues.push({start,end,startMs,endMs,text});
   }
   if (!cues.length) return {ok:false,error:'لم يتم العثور على مقاطع SRT بتوقيتات صحيحة. لن يتم تنزيل نص غير مؤقت.'};
   cues.sort((a,b)=>a.startMs-b.startMs);
   for (let i=1;i<cues.length;i++) if(cues[i].startMs<cues[i-1].startMs) return {ok:false,error:'ترتيب التوقيتات غير صحيح.'};
-  return {ok:true,text:cues.map((cue,i)=>(i+1)+'\\n'+cue.start+' --> '+cue.end+'\\n'+cue.text).join('\\n\\n')};
+  return {ok:true,text:cues.map((cue,i)=>(i+1)+'\n'+cue.start+' --> '+cue.end+'\n'+cue.text).join('\n\n')};
 }
 async function transcribeLocalMedia(index){
   const item=myLocalMedia[index];
@@ -756,7 +756,7 @@ async function transcribeLocalMedia(index){
     const originalResult=validateAndNormalizeSrt(String(data.text||''));
     if(!originalResult.ok)throw new Error('لم يُرجع Gemini ترجمة SRT صالحة: '+originalResult.error);
     const originalSrt=originalResult.text;
-    output.innerText='📝 تم استخراج '+originalSrt.split('\\n\\n').length+' مقطعًا. ⏳ جارٍ ترجمة النص مع تثبيت التوقيتات...';
+    output.innerText='📝 تم استخراج '+originalSrt.split('\n\n').length+' مقطعًا. ⏳ جارٍ ترجمة النص مع تثبيت التوقيتات...';
     const selectedLanguage=document.getElementById('mediaSpeechSource')?.value||'auto';
     const target=document.getElementById('mediaSpeechTarget')?.value||'ar';
     const sourceLanguage=selectedLanguage==='auto'?detectTranscriptLanguage(originalSrt):selectedLanguage.split('-')[0];
@@ -771,7 +771,7 @@ async function transcribeLocalMedia(index){
     translationHistory=translationHistory.slice(0,100);
     try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}
   }catch(error){
-    output.innerText='⚠️ تعذرت معالجة الملف عبر Gemini: '+error.message+'\\nلم يتم إنشاء ملف SRT غير صالح. تحقق من GEMINI_API_KEY في Cloudflare Pages Secrets.';
+    output.innerText='⚠️ تعذرت معالجة الملف عبر Gemini: '+error.message+'\nلم يتم إنشاء ملف SRT غير صالح. تحقق من GEMINI_API_KEY في Cloudflare Pages Secrets.';
   }
 }
 function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; currentUrl=s.audio; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
