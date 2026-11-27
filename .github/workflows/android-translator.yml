@@ -1,8 +1,5 @@
 name: Android translator build
 on:
-concurrency:
-  group: android-translator-${{ github.ref }}
-  cancel-in-progress: true
   push:
     paths:
       - "android-translator/**"
@@ -11,6 +8,9 @@ concurrency:
     paths:
       - "android-translator/**"
       - ".github/workflows/android-translator.yml"
+concurrency:
+  group: android-translator-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
