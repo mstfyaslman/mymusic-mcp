@@ -72,6 +72,7 @@ export async function onRequest({ request, env }) {
 
       lastError = new Error(data?.error?.message || "تعذر تحليل فيديو YouTube.");
       lastError.status = response.status;
+      if ([400, 404].includes(response.status)) break;
       if (![429, 500, 502, 503, 504].includes(response.status)) {
         return json({ error: lastError.message }, 502);
       }
