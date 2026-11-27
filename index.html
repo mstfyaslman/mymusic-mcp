@@ -520,7 +520,7 @@ function startLiveTranslation(){
       document.getElementById('liveStatus').innerText='تم إيقاف الاستماع.';
     }
   };
-  try{if(liveInputTrack&&liveInputTrack.readyState==='live'){try{liveRecognition.start(liveInputTrack);}catch(trackError){liveInputTrack=null;document.getElementById('liveStatus').innerText='مسار الصوت المباشر غير مدعوم؛ جاري استخدام الميكروفون.';liveRecognition.start();}}else liveRecognition.start();}catch(error){document.getElementById('liveStatus').innerText='تعذر بدء الاستماع. تحقق من إذن الميكروفون.';}
+  try{if(liveInputTrack&&liveInputTrack.readyState==='live'){try{liveRecognition.start(liveInputTrack);}catch(trackError){liveRestartAllowed=false;document.getElementById('liveStatus').innerText='المتصفح لا يدعم ترجمة مسار الملف مباشرة. لم نشغّل الميكروفون حتى لا يتوقف صوت الأغنية؛ جرّب Chrome محدّثًا.';}}else{liveRecognition.start();}}catch(error){liveRestartAllowed=false;document.getElementById('liveStatus').innerText='تعذر بدء الاستماع. لم يتم إيقاف ملف الصوت؛ تحقق من دعم المتصفح.';}
 }
 function stopLiveTranslation(){
   liveRestartAllowed=false;
