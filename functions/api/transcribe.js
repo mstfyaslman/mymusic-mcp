@@ -44,12 +44,20 @@ export async function onRequest({ request, env }) {
     const prompt = mime.startsWith("video/")
       ? "Transcribe all audible speech and sung lyrics in the original language. Return valid SubRip SRT subtitles with timestamps for every cue (HH:MM:SS,mmm --> HH:MM:SS,mmm). Preserve speaker labels when clear. Include clearly readable on-screen text only when relevant, marked [ON-SCREEN]. Do not translate, summarize, or invent words. If no speech is audible, say so clearly."
       : "Transcribe all audible speech and sung lyrics in the original language. Return valid SubRip SRT subtitles with timestamps for every cue (HH:MM:SS,mmm --> HH:MM:SS,mmm). Preserve speaker labels when clear. Do not translate, summarize, or invent words. If no speech is audible, say so clearly.";
-    const generated = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent", {
-      method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-      body: JSON.stringify({ contents: [{ role: "user", parts: [{ file_data: { mime_type: mime, file_uri: metadata.uri || uploadData.file.uri } }, { text: prompt }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 8192 } })
-    });
-    const result = await generated.json().catch(() => ({}));
-    if (!generated.ok) throw new Error(result.error?.message || "تعذر على Gemini تحليل الملف.");
+    let generated, result = {};
+    for (const model of ["gemini-3.1-flash-lite", "gemini-3.8-flash"]) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        generated = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent", {
+          method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+          body: JSON.stringify({ contents: [{ role: "user", parts: [{ file_data: { mime_type: mime, file_uri: metadata.uri || uploadData.file.uri } }, { text: prompt }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 8192 } })
+        });
+        result = await generated.json().catch(() => ({}));
+        if (generated.ok) break;
+        if (![429, 500, 502, 503, 504].includes(generated.status)) break;
+        if (attempt === 0) await sleep(900);
+      }
+      if (generated.ok || ![429, 500, 502, 503, 504].includes(generated.status)) break;
+    }
     const text = (result.candidates?.[0]?.content?.parts || []).map(part => part.text || "").join("").trim();
     if (!text) throw new Error("لم يُرجع Gemini نصًا من الملف.");
     return json({ text, mimeType: mime, fileName: file.name || "", provider: "Gemini" });
