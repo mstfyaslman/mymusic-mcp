@@ -336,7 +336,28 @@ function nextSong(){ if(!ALL.length) return; playByIndex((idx+1)%ALL.length); }
 function prevSong(){ if(!ALL.length) return; playByIndex((idx-1+ALL.length)%ALL.length); }
 function downloadCurrent(){ if(!currentUrl) return alert('شغل أغنية الأول'); let a=document.createElement('a'); a.href=currentUrl; a.download='MyMusic.mp3'; a.click(); }
 function playTest(){ ALL=[{name:'أغنية تجريبية',artist_name:'Test',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'}]; playByIndex(0); }
-async function searchMusic(){ let q=document.getElementById('search').value.trim(); if(!q) return alert('اكتب اسم أغنية الأول'); document.getElementById('results').innerHTML='⏳ جاري البحث...'; try{ let r=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=10&country=EG'); let d=await r.json(); ALL=d.results.map(s=>({name:s.trackName,artist_name:s.artistName,audio:s.previewUrl})); let h=''; for(let i=0;i<ALL.length;i++){ h+='<div class="card"><b>'+ALL[i].name+'</b><br><small>'+ALL[i].artist_name+'</small><br><button onclick="playByIndex('+i+')">▶️ تشغيل</button> <a href="'+ALL[i].audio+'" download style="color:#fff">⬇️ تحميل MP3</a></div>'; } document.getElementById('results').innerHTML=h; }catch(e){ document.getElementById('results').innerHTML='مشكلة في النت - جرب تاني'; } }
+async function searchMusic(){
+ const q=document.getElementById('search').value.trim();
+ if(!q)return alert('اكتب اسم أغنية أو فنان الأول');
+ const box=document.getElementById('results');box.innerHTML='⏳ جاري البحث عن تسجيلات مرخصة...';
+ try{
+  const query='mediatype:audio AND licenseurl:* AND '+q;
+  const api='https://archive.org/advancedsearch.php?'+new URLSearchParams({q:query,'fl[]':'identifier,title,creator,licenseurl',rows:'15',page:'1',output:'json'});
+  const response=await fetch(api);if(!response.ok)throw new Error('تعذر الوصول لأرشيف الموسيقى');
+  const data=await response.json();const docs=(data.response&&data.response.docs)||[];const found=[];
+  for(const item of docs.slice(0,12)){
+   try{const mr=await fetch('https://archive.org/metadata/'+encodeURIComponent(item.identifier));if(!mr.ok)continue;const meta=await mr.json();
+    const files=(meta.files||[]).filter(x=>/^(mp3|ogg|oga|flac|wav)$/i.test(x.format||''));
+    const file=files.find(x=>/\.mp3$/i.test(x.name))||files[0];if(!file||!item.licenseurl)continue;
+    const audioUrl='https://archive.org/download/'+encodeURIComponent(item.identifier)+'/'+file.name.split('/').map(encodeURIComponent).join('/');
+    found.push({name:item.title||item.identifier,artist_name:item.creator||'فنان غير محدد',audio:audioUrl,license:item.licenseurl,itemUrl:'https://archive.org/details/'+encodeURIComponent(item.identifier)});
+   }catch(e){}
+  }
+  ALL=found;idx=0;
+  if(!found.length){box.innerText='لم نعثر على تسجيلات صوتية ببيانات ترخيص لهذا البحث. جرّب بحث جوجل أو اختر ملفًا من هاتفك. لا تتوفر كل الأغاني التجارية للتنزيل المجاني.';return;}
+  box.innerHTML=found.map((x,i)=>'<div class="card"><b>'+escapeHTML(x.name)+'</b><br><small>'+escapeHTML(x.artist_name)+'</small><br><button onclick="playByIndex('+i+')">▶️ تشغيل الملف كاملًا</button> <a href="'+x.audio+'" download style="color:#fff">⬇️ تنزيل الملف</a> · <a href="'+x.itemUrl+'" target="_blank" rel="noopener" style="color:#9cf">المصدر والترخيص</a><p class="small">تحقق من شروط الترخيص قبل إعادة النشر أو الاستخدام التجاري.</p></div>').join('');
+ }catch(e){box.innerText='تعذر البحث الآن. استخدم بحث جوجل أو حاول مرة أخرى.';}
+}
 function showPhoneLogin(){ document.getElementById('phoneLogin').style.display='block'; document.getElementById('phoneLogin').scrollIntoView({behavior:'smooth'}); }
 function sendOTP(){ let code=document.getElementById('countryCode').value; let num=document.getElementById('phoneNum').value.trim(); if(num.length<9) return alert('اكتب رقم هاتفك صح'); document.getElementById('otpBox').style.display='block'; alert('📩 اتبعت كود التأكيد لرقم: '+code+num+'\nالكود التجريبي: 1234'); }
 function verifyOTP(){ let c=document.getElementById('otpCode').value.trim(); if(c=='1234'){ let num=document.getElementById('phoneNum').value; loginSuccess('رقم الهاتف 📱 ('+num.slice(0,3)+'***'+num.slice(-2)+') - رقمك مخفي'); } else alert('الكود غلط - جرب 1234'); }
