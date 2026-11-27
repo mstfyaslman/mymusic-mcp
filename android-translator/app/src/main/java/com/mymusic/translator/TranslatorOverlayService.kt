@@ -275,7 +275,7 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
                 if (!ensureTesseract()) throw IllegalStateException("تعذر تشغيل محرك قراءة النص")
                 val engine = tessBase ?: throw IllegalStateException("OCR engine unavailable")
                 engine.setImage(bitmap)
-                val text = engine.utF8Text.orEmpty().trim()
+                val text = engine.getUTF8Text().orEmpty().trim()
                 engine.clear()
                 bitmap.recycle()
                 if (text.isNotBlank() && text != lastOcrText) {
@@ -301,11 +301,11 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
             override fun onBeginningOfSpeech() {}
             override fun onRmsChanged(rmsdB: Float) {}
             override fun onBufferReceived(buffer: ByteArray?) {}
-            override fun onEndOfSpeech() { if (listening) restartSpeechSoon() }
+            override fun onEndOfSpeech() {}
             override fun onError(error: Int) { if (listening) restartSpeechSoon() }
             override fun onResults(results: android.os.Bundle?) {
                 val heard = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull().orEmpty()
-                if (heard.isNotBlank()) translateAndShow(heard, "🎙️ الكلام المسموع")
+                if (heard.isNotBlank()) translateAndShow(heard, "🎙️ الكلام المسموع", speechLanguage.substringBefore("-"))
                 if (listening) restartSpeechSoon()
             }
             override fun onPartialResults(partialResults: android.os.Bundle?) {}
@@ -336,10 +336,10 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
         statusView?.text = "تم إيقاف الاستماع."
     }
 
-    private fun translateAndShow(text: String, label: String) {
+    private fun translateAndShow(text: String, label: String, sourceOverride: String? = null) {
         worker.execute {
             try {
-                val source = if (text.any { it in '\u0600'..'\u06FF' }) "ar" else "en"
+                val source = sourceOverride ?: if (text.any { it in '\u0600'..'\u06FF' }) "ar" else "en"
                 val encoded = URLEncoder.encode(text.take(500), "UTF-8")
                 val url = URL("https://api.mymemory.translated.net/get?q=$encoded&langpair=$source%7Car")
                 val connection = (url.openConnection() as HttpURLConnection).apply {
