@@ -390,7 +390,8 @@ async function transcribeLocalMedia(index){
     if(!original)throw new Error('لم يتم التعرف على كلام واضح في الملف');
     output.innerText='📝 النص الأصلي:\n'+original+'\n\n⏳ جارٍ ترجمة النص...';
     const target=document.getElementById('speechTarget')?.value||'ar';
-    const reportedLanguage=String(data.language||'').toLowerCase();\n    const sourceLanguage=/^[a-z]{2,3}$/.test(reportedLanguage)?reportedLanguage:(selectedLanguage==='auto'?detectTranscriptLanguage(original):selectedLanguage.split('-')[0]);
+    const reportedLanguage=String(data.language||'').toLowerCase();
+    const sourceLanguage=/^[a-z]{2,3}$/.test(reportedLanguage)?reportedLanguage:(selectedLanguage==='auto'?detectTranscriptLanguage(original):selectedLanguage.split('-')[0]);
     const translated=await translateTranscriptText(original,target,sourceLanguage);
     output.innerText='📝 النص الأصلي:\n'+original+'\n\n🌐 الترجمة:\n'+translated;
     lastLiveTranslation=translated;
