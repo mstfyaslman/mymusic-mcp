@@ -8,13 +8,14 @@ export async function onRequest({ request, env }) {
   if (!apiKey) return json({ error: "ميزة البحث عن فيديوهات VEVO تحتاج إضافة YOUTUBE_API_KEY كـ Secret في Cloudflare Pages → Settings → Variables and Secrets. تشغيل الفيديوهات المضمّنة والترجمة الحالية لا يحتاجان وضع المفتاح في المتصفح." }, 503);
   const url = new URL(request.url);
   const q = (url.searchParams.get("q") || "").trim().slice(0, 120);
+  const vevoOnly = url.searchParams.get("mode") === "vevo";
   if (!q) return json({ error: "اكتب اسم أغنية أو فنان للبحث." }, 400);
   try {
     const endpoint = new URL("https://www.googleapis.com/youtube/v3/search");
     endpoint.search = new URLSearchParams({
       part: "snippet", type: "video", videoEmbeddable: "true",
       safeSearch: "moderate", maxResults: "25",
-      q: q + " VEVO", key: apiKey
+      q: vevoOnly ? q + " VEVO" : q, key: apiKey
     }).toString();
     const response = await fetch(endpoint.toString(), { headers: { "Accept": "application/json" } });
     const data = await response.json().catch(() => ({}));
@@ -22,7 +23,7 @@ export async function onRequest({ request, env }) {
     const items = (data.items || [])
       .filter(item => {
         const channel = String(item?.snippet?.channelTitle || "");
-        return /vevo/i.test(channel) && /^[A-Za-z0-9_-]{11}$/.test(item?.id?.videoId || "");
+        return (!vevoOnly || /vevo/i.test(channel)) && /^[A-Za-z0-9_-]{11}$/.test(item?.id?.videoId || "");
       })
       .slice(0, 12)
       .map(item => ({
@@ -33,7 +34,7 @@ export async function onRequest({ request, env }) {
       }));
     return json({
       items,
-      message: items.length ? undefined : "لم تظهر نتائج من قنوات VEVO الرسمية لهذا البحث. جرّب اسم الفنان باللغة الإنجليزية."
+      message: items.length ? undefined : (vevoOnly ? "لم تظهر نتائج من قنوات VEVO الرسمية لهذا البحث. جرّب اسم الفنان باللغة الإنجليزية." : "لم تظهر نتائج متاحة للتضمين. جرّب عبارة بحث أخرى.")
     });
   } catch (error) {
     return json({ error: String(error?.message || "حدث خطأ أثناء البحث.").slice(0, 300) }, 502);
