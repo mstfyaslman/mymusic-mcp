@@ -45,7 +45,7 @@ export async function onRequest({ request, env }) {
       ? "Transcribe all audible speech and sung lyrics in the original language. Return valid SubRip SRT subtitles with timestamps for every cue (HH:MM:SS,mmm --> HH:MM:SS,mmm). Preserve speaker labels when clear. Include clearly readable on-screen text only when relevant, marked [ON-SCREEN]. Do not translate, summarize, or invent words. If no speech is audible, say so clearly."
       : "Transcribe all audible speech and sung lyrics in the original language. Return valid SubRip SRT subtitles with timestamps for every cue (HH:MM:SS,mmm --> HH:MM:SS,mmm). Preserve speaker labels when clear. Do not translate, summarize, or invent words. If no speech is audible, say so clearly.";
     let generated, result = {};
-    for (const model of ["gemini-3.1-flash-lite", "gemini-3.8-flash"]) {
+    for (const model of ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.5-flash"]) {
       for (let attempt = 0; attempt < 2; attempt++) {
         generated = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent", {
           method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
@@ -56,7 +56,9 @@ export async function onRequest({ request, env }) {
         if (![429, 500, 502, 503, 504].includes(generated.status)) break;
         if (attempt === 0) await sleep(900);
       }
-      if (generated.ok || ![429, 500, 502, 503, 504].includes(generated.status)) break;
+      if (generated.ok) break;
+      if ([400, 404].includes(generated.status)) continue;
+      if (![429, 500, 502, 503, 504].includes(generated.status)) break;
     }
     const text = (result.candidates?.[0]?.content?.parts || []).map(part => part.text || "").join("").trim();
     if (!text) throw new Error("لم يُرجع Gemini نصًا من الملف.");
