@@ -245,7 +245,23 @@ let ALL=[], idx=0, audio=document.getElementById('audio'), currentUrl='', floatH
 function toggleNight(){ let b=document.body; if(b.style.background.includes('fef3c7')){b.style.background='#0a0a0a';b.style.color='#fff'}else{b.style.background='linear-gradient(180deg,#fef3c7,#fff)';b.style.color='#000'} }
 function tick(){ let d=new Date(); document.getElementById('clock').innerText=d.toLocaleTimeString('ar-EG'); document.getElementById('date').innerText=d.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
 setInterval(tick,1000); tick();
-async function fetchWeather(lat,lon,name){ try{ let r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,weather_code&timezone=auto'); let j=await r.json(); document.getElementById('weatherTemp').innerText=Math.round(j.current.temperature_2m)+'°'; document.getElementById('weatherCity').innerText=name; document.getElementById('weatherDesc').innerText='الطقس شغال ✅'; }catch(e){} }
+async function fetchWeather(lat,lon,name){
+  const desc=document.getElementById('weatherDesc');
+  try{
+    desc.innerText='جارٍ تحميل الطقس...';
+    const params=new URLSearchParams({latitude:String(lat),longitude:String(lon)});
+    const r=await fetch('/api/weather?'+params.toString(),{headers:{'Accept':'application/json'}});
+    if(!r.ok) throw new Error('Weather proxy returned '+r.status);
+    const j=await r.json();
+    if(!j.current || typeof j.current.temperature_2m!=='number') throw new Error('Invalid weather response');
+    document.getElementById('weatherTemp').innerText=Math.round(j.current.temperature_2m)+'°';
+    document.getElementById('weatherCity').innerText=name;
+    desc.innerText='الطقس شغال ✅';
+  }catch(e){
+    desc.innerText='تعذر تحميل الطقس حالياً';
+    console.warn('MyMusic weather:',e);
+  }
+}
 function getWeatherCairo(){ fetchWeather(30.0444,31.2357,'القاهرة'); }
 getWeatherCairo();
 function openSearch(type){ let q=document.getElementById('gSearch').value.trim()||document.getElementById('search').value.trim(); if(!q) return alert('اكتب كلمة بحث الأول'); if(type=='google') window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank'); if(type=='youtube') window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(q),'_blank'); if(type=='manus') window.open('https://manus.im/?q='+encodeURIComponent(q),'_blank'); if(type=='mp3'){ document.getElementById('search').value=q; searchMusic(); } document.getElementById('gRes').innerHTML='<div class="card">🔍 <b>'+q+'</b> - اتفتح في تاب جديد - <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/2991/2991148.png\'" style="width:28px;border-radius:50%"> الأيقونة الافتراضية</div>'; }
