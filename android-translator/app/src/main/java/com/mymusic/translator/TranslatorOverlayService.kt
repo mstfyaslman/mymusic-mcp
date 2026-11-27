@@ -29,6 +29,8 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
+import android.widget.Spinner
+import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.vision.common.InputImage
@@ -58,6 +60,7 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
     private var speechRecognizer: SpeechRecognizer? = null
     private var listening = false
+    private var speechLanguage = "en-US"
     private var lastOcrText = ""
     private var lastOcrAt = 0L
     private var bubble: Button? = null
@@ -156,6 +159,15 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
         }
         val scroll = ScrollView(this).apply { addView(resultView) }
         content.addView(scroll, LinearLayout.LayoutParams(-1, 260))
+        content.addView(TextView(this).apply { text = "لغة الصوت الأصلية:"; setTextColor(0xFFFFFFFF.toInt()) })
+        content.addView(Spinner(this).apply {
+            val labels = listOf("English" to "en-US", "العربية" to "ar-EG", "Français" to "fr-FR", "Deutsch" to "de-DE", "Español" to "es-ES", "Türkçe" to "tr-TR", "Italiano" to "it-IT", "Русский" to "ru-RU")
+            adapter = ArrayAdapter(this@TranslatorOverlayService, android.R.layout.simple_spinner_dropdown_item, labels.map { it.first })
+            onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+                override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) { speechLanguage = labels[position].second }
+            }
+        })
         content.addView(Button(this).apply {
             text = "🎙️ ابدأ ترجمة الكلام من الميكروفون"
             setOnClickListener { startSpeechRecognition() }
@@ -232,7 +244,9 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
             val paddedWidth = rowStride / pixelStride
             val padded = Bitmap.createBitmap(paddedWidth, image.height, Bitmap.Config.ARGB_8888)
             padded.copyPixelsFromBuffer(plane.buffer)
-            Bitmap.createBitmap(padded, 0, 0, image.width, image.height).also { padded.recycle() }
+            val cropped = Bitmap.createBitmap(padded, 0, 0, image.width, image.height)
+            if (cropped !== padded) padded.recycle()
+            cropped
         } catch (_: Exception) { null }
     }
 
@@ -284,7 +298,7 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
         if (!listening) return
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US")
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, speechLanguage)
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
         }
         try { speechRecognizer?.startListening(intent) } catch (_: Exception) { restartSpeechSoon() }
