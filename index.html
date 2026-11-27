@@ -1,87 +1,239 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>MyMusic AI 🎧</title><meta name="description" content="MyMusic AI - موسيقى أفلام ذكاء اصطناعي ثقافة سوشيال"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#ff2d55"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MyMusic AI"><link rel="apple-touch-icon" href="icon.png"><link rel="icon" type="image/png" href="icon.png"><style>
-*{box-sizing:border-box}body{margin:0;font-family:sans-serif;background:#000;color:#fff;text-align:center;padding-bottom:240px}
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:13px;gap:6px;flex-wrap:wrap}.topbar a{color:#fff;text-decoration:none;background:#222;padding:7px 12px;border-radius:99px}
-.hero{background:linear-gradient(180deg,#1a0033,#0b001a 55%,#000);padding:18px 15px 26px;border-bottom-left-radius:35px;border-bottom-right-radius:35px}.logo{font-size:44px;font-weight:900}.logo span{color:#ff2d55}.headphones{font-size:78px}.badge{background:#22c55e;color:#000;font-size:12px;padding:5px 12px;border-radius:20px;font-weight:bold}
-.banner{margin:10px 12px;border-radius:22px;overflow:hidden;position:relative}.banner img{width:100%;height:165px;object-fit:cover;display:block}.banner .txt{position:absolute;bottom:0;left:0;right:0;padding:28px 14px 14px;background:linear-gradient(transparent,#000)}
-.tabs{display:flex;gap:8px;justify-content:center;margin:12px;flex-wrap:wrap}.tabs button{padding:10px 14px;border-radius:20px;border:none;background:#222;color:#fff;cursor:pointer}.tabs button.active{background:#ff2d55}
-.box{margin:10px 15px;background:#1a1a1a;padding:14px;border-radius:20px;border:1px solid #333}input,select,textarea{width:100%;padding:12px;border-radius:20px;border:none;outline:none;text-align:center;background:#000;color:#fff;font-size:15px;margin:4px 0}.btn{width:100%;padding:12px;border:none;border-radius:25px;background:#ff2d55;color:#fff;font-weight:bold;margin-top:8px;cursor:pointer}
-.artist{display:inline-block;width:88px;margin:6px;cursor:pointer;vertical-align:top;position:relative}.artist div{width:64px;height:64px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-size:28px;margin:auto}.artist span{font-size:12px;display:block;margin-top:4px}.artist .del{position:absolute;top:-5px;left:5px;background:#ff2d55;color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer}
-.card{background:#1a1a1a;border:1px solid #2a2a2a;padding:12px;border-radius:18px;margin:10px 15px;text-align:right}.card img{width:60px;height:60px;border-radius:12px;float:left;object-fit:cover}.small{padding:9px 12px;border-radius:15px;border:none;margin:4px;cursor:pointer;color:#fff;font-size:14px}.filterBtn{padding:8px 14px;border-radius:20px;border:none;background:#333;color:#fff;margin:3px;cursor:pointer}.filterBtn.active{background:#ff2d55}
-.chip{display:flex;flex-wrap:wrap;gap:8px;padding:0 12px 12px;justify-content:center}.chip a,.chip button{background:#1c1c1c;border:1px solid #2b2b2b;color:#fff;text-decoration:none;font-size:13px;padding:8px 13px;border-radius:99px;cursor:pointer}
-#player{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:2px solid #ff2d55;padding:10px 12px;z-index:99;display:none;max-height:85vh;overflow:auto}#player .row{display:flex;align-items:center;gap:10px;text-align:right}#player img{width:55px;height:55px;border-radius:10px;object-fit:cover}#player .info{flex:1;overflow:hidden}#player .info b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#player .info small{color:#aaa}#player .controls{display:flex;justify-content:center;gap:10px;margin-top:8px;align-items:center}#player .controls button{width:48px;height:48px;border-radius:50%;border:none;background:#ff2d55;color:#fff;font-size:20px;cursor:pointer}#player .controls button.mini{width:38px;height:38px;background:#333;font-size:16px}#player .tools{display:flex;justify-content:center;gap:8px;margin-top:8px;flex-wrap:wrap}#player .tools button{padding:9px 14px;border-radius:20px;border:none;background:#222;color:#fff;cursor:pointer;font-size:13px}#player .tools button.on{background:#ff2d55}#progress{width:100%;accent-color:#ff2d55;margin-top:6px}#time{font-size:11px;color:#aaa;display:flex;justify-content:space-between}#syncLyrics{margin-top:10px;background:#000;border-radius:15px;padding:12px;max-height:160px;overflow:auto;text-align:center;display:none}#syncLyrics .line{padding:6px 4px;font-size:15px;line-height:1.6;color:#888}#syncLyrics .line.active{background:#ff2d55;color:#fff;font-weight:bold;font-size:17px}#syncLyrics .line.trans{font-size:13px;color:#ffb300}#ytInPlayer{width:100%;height:180px;border:none;border-radius:12px;margin-top:8px;display:none}.playlistCard{background:#222;border:1px solid #333;padding:12px;border-radius:15px;margin:10px 0;text-align:right}.shareBox{background:linear-gradient(90deg,#25D366,#128C7E);padding:15px;border-radius:20px;margin:10px 15px}
-#ball{position:fixed;bottom:240px;left:20px;width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ff2d55);display:flex;align-items:center;justify-content:center;font-size:34px;z-index:100;border:3px solid #fff;box-shadow:0 0 30px rgba(255,45,85,.7);cursor:pointer}
-#menu{position:fixed;inset:0;background:#070013;z-index:1000;display:none;padding:18px;overflow:auto;text-align:right}#menu.show{display:block}.cat{margin:18px 0 4px;font-weight:800;color:#ff2d55;font-size:16px}.m-item{display:flex;gap:12px;align-items:center;background:#171717;border:1px solid #2a2a2a;padding:12px;border-radius:16px;margin:10px 0;text-decoration:none;color:#fff}.m-item img{width:50px;height:50px;border-radius:12px;object-fit:cover;background:#fff}.m-item small{display:block;opacity:.6;font-size:12px}
-#ytBox{position:fixed;inset:0;background:#000;z-index:1001;display:none;flex-direction:column}#ytBox.show{display:flex}#ytBox iframe{flex:1;width:100%;border:0}.ytBtn{padding:10px 14px;border-radius:99px;border:0;font-weight:800;cursor:pointer}
-.footer{background:linear-gradient(180deg,#0b001a,#000);border-top:2px solid #ff2d55;padding:28px 16px 20px;text-align:center}.footer .f-logo{font-size:34px;font-weight:900}.footer .f-logo span{color:#ff2d55}.footer .f-desc{font-size:13px;opacity:.7;line-height:1.8;margin:10px 0}.footer h4{color:#ff2d55;font-size:15px;margin:20px 0 10px}.footer .f-links{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}.footer .f-links a{background:#1c1c1c;border:1px solid #2b2b2b;color:#fff;text-decoration:none;font-size:13px;padding:8px 14px;border-radius:99px}.footer .f-box{background:#111;border:1px solid #222;border-radius:20px;padding:16px;margin:18px 0;text-align:right}.footer .f-box h3{margin:0 0 8px;color:#ff2d55}.footer .f-box p{font-size:13px;line-height:1.8;opacity:.75}.footer .f-input{width:100%;padding:12px;border-radius:99px;border:0;background:#000;color:#fff;text-align:center;margin-top:10px;outline:none}.footer .f-btn{display:inline-block;background:#ff2d55;color:#fff;text-decoration:none;padding:11px 22px;border-radius:99px;font-weight:800;margin-top:12px;border:0;cursor:pointer}.footer .f-btn.green{background:#25D366}.footer .f-btn.white{background:#fff;color:#000}.footer .f-bottom{margin-top:20px;padding-top:14px;border-top:1px solid #222;font-size:12px;opacity:.6;line-height:1.9}
-.ai-box{background:#111;border:1px solid #ff2d55;border-radius:20px;padding:16px;margin:18px 0;text-align:center}.ai-box h3{margin:0 0 8px;color:#ff2d55}.ai-box p{font-size:13px;opacity:.75;line-height:1.8}.ai-input{width:100%;padding:12px;border-radius:15px;border:0;background:#000;color:#fff;margin-top:8px;outline:none;text-align:center}.ai-btn{background:#ff2d55;color:#fff;border:0;padding:12px 22px;border-radius:99px;font-weight:800;margin-top:10px;cursor:pointer;width:100%}.ai-chat{background:#000;border-radius:15px;padding:12px;margin-top:12px;text-align:right;display:none;max-height:260px;overflow:auto}.ai-msg{background:#1c1c1c;padding:10px;border-radius:12px;margin:8px 0;font-size:13px;line-height:1.7}.ad-box{background:#111;border:1px dashed #444;border-radius:14px;padding:12px;margin:12px 15px;font-size:12px;opacity:.75}
-</style></head><body>
-<div class="topbar"><a href="#" onclick="openMenu();return false">🎵 كل المواقع</a><a href="#" onclick="showTab('search');window.scrollTo({top:0,behavior:'smooth'});return false">🔍 بحث</a><a href="#" onclick="showTab('artists');window.scrollTo({top:0,behavior:'smooth'});return false">🌍 الفنانين</a><a href="#" onclick="showTab('ai');window.scrollTo({top:0,behavior:'smooth'});return false">🤖 ذكاء اصطناعي</a><a href="#" onclick="document.getElementById('contactBox').scrollIntoView({behavior:'smooth'});return false">📩 تواصل</a></div>
-<div class="hero"><div class="headphones">🎧</div><div class="logo">My<span>Music</span> AI</div><div>أغاني كاملة • فنانين • كلمات • ترجمة • مزامنة • قوائم • أفلام • ذكاء اصطناعي</div><br><span class="badge">✅ كل حاجة في ملف واحد - رمز واحد 🎵</span><br><br><button class="btn" style="width:auto;padding:11px 26px" onclick="openMenu()">🎵 افتح كل المواقع</button> <button class="btn" style="width:auto;padding:11px 26px;background:#fff;color:#000" onclick="showTab('search');window.scrollTo({top:0,behavior:'smooth'})">🔍 ابحث عن أغنية</button></div>
-<div id="installBox" style="display:none;margin:10px 15px;background:#ff2d55;padding:14px;border-radius:20px"><b>📱 ثبّت تطبيق MyMusic AI</b><br><button onclick="installApp()" style="background:#fff;color:#000;border:0;padding:11px 22px;border-radius:99px;font-weight:800;margin-top:8px;cursor:pointer">📲 ثبّت التطبيق الآن</button></div>
-<div class="banner"><img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=900&q=70" onerror="this.style.display='none'"><div class="txt"><b>🎧 اسمع الموسيقى بلا حدود</b><p>Free Music • Vevo • Warner • مزيكا - دوس على الكرة 🎵 وشاهد داخل الموقع</p></div></div>
-<div class="tabs"><button id="tab-search" class="active" onclick="showTab('search')">🔍 بحث</button><button id="tab-artists" onclick="showTab('artists')">🌍 الفنانين <span id="artistCount"></span></button><button id="tab-playlists" onclick="showTab('playlists')">🎼 قوائمي</button><button id="tab-fav" onclick="showTab('fav')">❤️ المفضلة <span id="favCount"></span></button><button id="tab-icons" onclick="showTab('icons')">🎵 كل المواقع</button><button id="tab-ai" onclick="showTab('ai')">🤖 ذكاء اصطناعي</button></div>
-<div id="view-search"><div class="box"><input id="search" placeholder="ابحث... مثال: عمرو دياب - Dua Lipa"><select id="searchType"><option value="all">🔍 بحث شامل</option><option value="mp3">🎵 MP3 مجاني فقط</option><option value="video">▶️ فيديو YouTube فقط</option></select><button class="btn" onclick="searchMusic()">🔍 بحث الآن</button><button class="btn" style="background:#222" onclick="searchOnGoogle()">🌐 ابحث على Google</button></div><div id="results"><p style="color:#aaa">اكتب اسم أغنية ودوس بحث</p></div></div>
-<div id="view-artists" style="display:none"><div class="box" style="border:2px solid #ff2d55"><h3 style="margin:0">➕ ضيف فنان جديد</h3><input id="newArtistName" placeholder="اسم الفنان..."><select id="newArtistCat"><option value="eg">🇪🇬 مصر</option><option value="arab">🌍 عرب</option><option value="world">🌎 أجانب</option><option value="rap">🎤 راب</option><option value="latin">💃 لاتيني</option></select><button class="btn" onclick="addArtist()">➕ إضافة الفنان وحفظه</button></div><div class="box"><input id="artistSearch" placeholder="🔍 دور على فنان..." oninput="renderArtistList()"><br><br><button class="filterBtn active" onclick="filterCat('all',this)">الكل</button><button class="filterBtn" onclick="filterCat('eg',this)">🇪🇬 مصر</button><button class="filterBtn" onclick="filterCat('arab',this)">🌍 عرب</button><button class="filterBtn" onclick="filterCat('world',this)">🌎 أجانب</button><button class="filterBtn" onclick="filterCat('rap',this)">🎤 راب</button><button class="filterBtn" onclick="filterCat('latin',this)">💃 لاتيني</button><button class="filterBtn" onclick="filterCat('my',this)">⭐ لستتي</button></div><div id="artistList"></div><div id="artistResults"></div></div>
-<div id="view-playlists" style="display:none"><div class="box"><h3>🎼 إنشاء قائمة تشغيل</h3><input id="newPlaylistName" placeholder="اسم القايمة..."><button class="btn" onclick="createPlaylist()">➕ إنشاء قايمة</button></div><div id="playlistsList" style="padding:0 15px"></div></div>
-<div id="view-fav" style="display:none"><div id="favList"></div></div>
-<div id="view-ai" style="display:none"><div class="box"><h3>🤖 اسأل الذكاء الاصطناعي</h3><input id="aiAskInput" placeholder="اسأل أي حاجة..."><button class="btn" onclick="askAI()">🤖 اسأل</button><div id="aiAnswer" style="text-align:right;font-size:14px;line-height:1.8;margin-top:10px"></div></div><div class="box"><h3>🤖 أدوات ذكاء اصطناعي</h3><div class="chip" id="aiTools"></div></div><div class="box"><h3>🎵 اعمل أغنية / صورة / فيديو</h3><div class="chip"><a href="https://suno.com" target="_blank" rel="noopener">🎵 Suno</a><a href="https://www.udio.com" target="_blank" rel="noopener">🎵 Udio</a><a href="https://www.midjourney.com" target="_blank" rel="noopener">🎨 Midjourney</a><a href="https://ideogram.ai" target="_blank" rel="noopener">🎨 Ideogram</a><a href="https://leonardo.ai" target="_blank" rel="noopener">🎨 Leonardo</a><a href="https://runwayml.com" target="_blank" rel="noopener">🎬 Runway</a><a href="https://www.elevenlabs.io" target="_blank" rel="noopener">🎙️ ElevenLabs</a><a href="https://gamma.app" target="_blank" rel="noopener">📊 Gamma</a><a href="https://www.canva.com" target="_blank" rel="noopener">🎨 Canva AI</a><a href="https://www.capcut.com" target="_blank" rel="noopener">✂️ CapCut</a></div></div></div>
-<div id="view-icons" style="display:none"><div id="iconsGrid"></div></div>
-<div class="ad-box">📢 مساحة إعلانية - إعلانات مرخصة لدعم استمرار الموقع مجاناً. جميع الحقوق محفوظة لأصحابها.</div>
-<div class="shareBox"><h3 style="margin:0">📣 شير الموقع لصحابك</h3><button class="small" style="background:#fff;color:#000;font-weight:bold;width:100%" onclick="shareSite()">💬 شير على واتساب</button><button class="small" style="background:#000;width:100%" onclick="navigator.clipboard.writeText(location.href);alert('اتنسخ اللينك ✅')">🔗 انسخ اللينك</button></div>
-<footer class="footer" id="contactBox"><div class="f-logo">🎵 My<span>Music</span> AI</div><p class="f-desc">موسيقى • أفلام • ذكاء اصطناعي • ثقافة • سوشيال - كلهم في رمز واحد 🎵</p><div class="f-box"><h3>ℹ️ عن MyMusic AI</h3><p>دليل ومركز ترفيهي يجمع روابط مرخصة لخدمات الموسيقى والأفلام والذكاء الاصطناعي والثقافة. لا نستضيف أي محتوى محمي على خوادمنا. المحتوى يُعرض من منصاته الرسمية المرخصة، وحقوق النشر تعود لأصحابها.</p></div><h4>⚡ روابط سريعة</h4><div class="f-links"><a href="#" onclick="showTab('search');window.scrollTo({top:0,behavior:'smooth'});return false">🔍 بحث</a><a href="#" onclick="showTab('artists');window.scrollTo({top:0,behavior:'smooth'});return false">🌍 الفنانين</a><a href="#" onclick="showTab('playlists');window.scrollTo({top:0,behavior:'smooth'});return false">🎼 قوائمي</a><a href="#" onclick="showTab('fav');window.scrollTo({top:0,behavior:'smooth'});return false">❤️ المفضلة</a><a href="#" onclick="showTab('ai');window.scrollTo({top:0,behavior:'smooth'});return false">🤖 ذكاء اصطناعي</a><a href="#" onclick="showTab('icons');window.scrollTo({top:0,behavior:'smooth'});return false">🎵 كل المواقع</a></div><div id="footerLinks"></div>
-<div class="ai-box"><h3>🤖 مساعد MyMusic AI - تواصل / بلّغ عن خطأ</h3><p>اكتب رسالتك، والمساعد هيرد عليك فوراً</p><input class="ai-input" id="aiName" placeholder="اسمك..."><select class="ai-input" id="aiType"><option value="اقتراح">💡 اقتراح</option><option value="بلاغ عن خطأ">🐛 بلاغ عن خطأ</option><option value="طلب أغنية">🎵 طلب أغنية</option><option value="طلب موقع">🌐 طلب موقع</option><option value="أخرى">💬 أخرى</option></select><textarea class="ai-input" id="aiMsg" placeholder="اكتب رسالتك هنا..." rows="2"></textarea><button class="ai-btn" onclick="sendWithAI()">🤖 ابعت رسالتك</button><div id="aiChat" class="ai-chat"></div></div>
-<div class="f-box"><h3>🔔 اشترك عشان يوصلك الجديد</h3><input class="f-input" id="footerEmail" placeholder="اكتب ايميلك هنا..."><button class="f-btn" onclick="let e=document.getElementById('footerEmail').value;if(!e)alert('اكتب ايميلك الأول');else{alert('شكراً! اشتركت ✅');document.getElementById('footerEmail').value=''}">✅ اشترك الآن</button></div><h4>📜 سياسة الخصوصية والتراخيص</h4><div class="f-links"><a href="#" onclick="alert('سياسة الخصوصية: لا نجمع بيانات حساسة. رسائل التواصل للرد فقط.');return false">🔒 سياسة الخصوصية</a><a href="#" onclick="alert('التراخيص: الموقع دليل روابط فقط. المحتوى من منصاته الرسمية المرخصة.');return false">📄 التراخيص</a><a href="#" onclick="alert('حقوق النشر لأصحابها. للشكاوى استخدم نموذج التواصل.');return false">© حقوق النشر</a></div><button class="f-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆️ ارجع فوق</button><div class="f-bottom">© 2026 MyMusic AI - جميع الحقوق محفوظة<br>Free Music • Mazzika • Warner • Vevo • Vevo Arabia</div></footer>
-<div id="player"><div class="row"><img id="pImg" src="https://cdn-icons-png.flaticon.com/512/727/727269.png"><div class="info"><b id="pTitle">لا توجد أغنية</b><small id="pArtist">اختر أغنية كاملة</small></div><button class="small" style="background:#333" onclick="closePlayer()">✖️</button></div><input type="range" id="progress" value="0" min="0" max="100" oninput="seek(this.value)"><div id="time"><span id="curTime">0:00</span><span id="durTime">0:00</span></div><div class="controls"><button class="mini" onclick="prevSong()">⏮️</button><button onclick="togglePlay()" id="playBtn">▶️</button><button class="mini" onclick="nextSong()">⏭️</button><button class="mini" onclick="toggleLoop()" id="loopBtn">🔁</button></div><div class="tools"><button id="btnLyrics" onclick="togglePlayerLyrics()">📝 كلمات</button><button id="btnTrans" onclick="togglePlayerTranslate()">🌐 ترجمة</button><button id="btnSync" onclick="toggleSync()">🎯 مزامنة: إيقاف</button></div><div id="syncLyrics"></div><iframe id="ytInPlayer" allow="autoplay; encrypted-media" allowfullscreen></iframe><audio id="mainAudio" preload="auto"></audio></div>
-<div id="ball" onclick="openMenu()">🎵</div>
-<div id="menu"><div style="display:flex;justify-content:space-between"><h2>🎵 كل المواقع</h2><div style="font-size:26px;cursor:pointer" onclick="closeMenu()">✖</div></div><input id="menuSearch" placeholder="🔍 دور على أي موقع..." oninput="filterMenu()" style="background:#1c1c1c"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="small" style="background:#ff2d55" onclick="openYT('https://www.youtube.com/embed?listType=search&list=Free+Music&autoplay=1')">▶️ شاهد Free Music داخل الموقع</button><button class="small" style="background:#222" onclick="openYT('https://www.youtube.com/embed?listType=search&list=Vevo&autoplay=1')">▶️ شاهد Vevo داخل الموقع</button><button class="small" style="background:#222" onclick="openYT('https://www.youtube.com/embed?listType=search&list=Mazzika&autoplay=1')">▶️ شاهد مزيكا داخل الموقع</button></div><div id="menuList"></div></div>
-<div id="ytBox"><div style="padding:12px;display:flex;justify-content:space-between;background:#0b001a"><b>▶️ مشاهدة داخل MyMusic</b><button class="ytBtn" onclick="closeYT()" style="background:#fff;color:#000">✖ اقفل</button></div><iframe id="ytPlayer" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div style="padding:12px;background:#0b001a;display:flex;gap:8px"><button class="ytBtn" id="transBtn" onclick="toggleTrans()" style="background:#ff2d55;color:#fff;flex:1">🌐 شغل الترجمة عربي</button><button class="ytBtn" onclick="window.open('https://www.youtube.com','_blank')" style="background:#fff;color:#000">↗ يوتيوب كامل</button></div></dv><script>
-let ALL=[],Q=[],QI=0,CS=null,favs=[],pls=[],myA=[];
-try{favs=JSON.parse(localStorage.getItem('mymusic_fav')||'[]')}catch(e){}try{pls=JSON.parse(localStorage.getItem('mymusic_playlists')||'[]')}catch(e){}try{myA=JSON.parse(localStorage.getItem('mymusic_artists')||'[]')}catch(e){}
-let DEF=[["Amr Diab","عمرو دياب","🇪🇬","eg"],["Umm Kulthum","أم كلثوم","👑","eg"],["Tamer Hosny","تامر حسني","🎙️","eg"],["Sherine","شيرين","🎵","eg"],["Mohamed Hamaki","محمد حماقي","🔥","eg"],["Wegz","ويجز","🎧","rap"],["Ahmed Saad","أحمد سعد","🎶","eg"],["Elissa","إليسا","💎","arab"],["Nancy Ajram","نانسي عجرم","🌹","arab"],["Wael Kfoury","وائل كفوري","🎸","arab"],["Kadim Al Sahir","كاظم الساهر","🎼","arab"],["Hussain Al Jassmi","حسين الجسمي","🎵","arab"],["Assala","أصالة","💜","arab"],["Dua Lipa","دوا ليبا","💃","world"],["Shakira","شاكيرا","💃","latin"],["Taylor Swift","تايلور سويفت","⭐","world"],["Ed Sheeran","إد شيران","🎸","world"],["Adele","أديل","💜","world"],["BTS","بي تي اس","💜","world"],["Billie Eilish","بيلي إيليش","🌙","world"],["The Weeknd","ذا ويكند","🌃","world"],["Eminem","إمينيم","🎤","rap"],["Drake","دريك","🔥","rap"],["Bad Bunny","باد باني","🐰","latin"],["Ariana Grande","أريانا جراندي","✨","world"]];
-function getA(){return DEF.map(a=>({n:a[0],ar:a[1],e:a[2],c:a[3]})).concat(myA)}function sA(){localStorage.setItem('mymusic_artists',JSON.stringify(myA))}function sF(){localStorage.setItem('mymusic_fav',JSON.stringify(favs))}function sP(){localStorage.setItem('mymusic_playlists',JSON.stringify(pls))}
-let curCat='all',audio=document.getElementById('mainAudio'),ytF=document.getElementById('ytInPlayer'),isLoop=false,lines=[],trans=[],showL=false,showT=false,syncOn=false,curLine=-1;
-function upd(){document.getElementById('favCount').innerText=favs.length?'('+favs.length+')':'';document.getElementById('artistCount').innerText='('+getA().length+')'}upd();
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function favIcon(d){return 'https://www.google.com/s2/favicons?domain='+d+'&sz=128'}
-const SITES=[["🤖 ذكاء اصطناعي","ChatGPT","chat.openai.com","https://chat.openai.com","","شات جي بي تي","link"],["🤖 ذكاء اصطناعي","Manus","manus.im","https://manus.im","","مانوس","link"],["🤖 ذكاء اصطناعي","Gemini","gemini.google.com","https://gemini.google.com","","جيميني","link"],["🤖 ذكاء اصطناعي","Claude","claude.ai","https://claude.ai","","كلود","link"],["🤖 ذكاء اصطناعي","Copilot","copilot.microsoft.com","https://copilot.microsoft.com","","كوبايلوت","link"],["🤖 ذكاء اصطناعي","Perplexity","perplexity.ai","https://www.perplexity.ai","","بحث ذكي","link"],["🤖 ذكاء اصطناعي","Meta AI","meta.ai","https://www.meta.ai","","ميتا","link"],["🤖 ذكاء اصطناعي","Grok","grok.com","https://grok.com","","جروك","link"],["🤖 ذكاء اصطناعي","DeepSeek","deepseek.com","https://chat.deepseek.com","","ديب سيك","link"],["🤖 ذكاء اصطناعي","Mistral","mistral.ai","https://chat.mistral.ai","","ميسترال","link"],["🤖 ذكاء اصطناعي","Poe","poe.com","https://poe.com","","كل النماذج","link"],["🤖 ذكاء اصطناعي","Suno - اعمل أغنية","suno.com","https://suno.com","","أغنية بالذكاء","link"],["🤖 ذكاء اصطناعي","Udio","udio.com","https://www.udio.com","","أغنية بالذكاء","link"],["🤖 ذكاء اصطناعي","Midjourney","midjourney.com","https://www.midjourney.com","","رسم بالذكاء","link"],["🤖 ذكاء اصطناعي","Ideogram","ideogram.ai","https://ideogram.ai","","صور","link"],["🤖 ذكاء اصطناعي","Leonardo","leonardo.ai","https://leonardo.ai","","صور","link"],["🤖 ذكاء اصطناعي","ElevenLabs","elevenlabs.io","https://www.elevenlabs.io","","صوت","link"],["🤖 ذكاء اصطناعي","Gamma","gamma.app","https://gamma.app","","عروض","link"],["🤖 ذكاء اصطناعي","Canva AI","canva.com","https://www.canva.com","","تصميم","link"],["🤖 ذكاء اصطناعي","CapCut","capcut.com","https://www.capcut.com","","مونتاج","link"],["🎵 موسيقى","Free Music - داخل الموقع","youtube.com","","Free Music","موسيقى مجانية - داخل الموقع","watch"],["🎵 موسيقى","مزيكا Vevo - داخل الموقع","youtube.com","","Mazzika","عربي - داخل الموقع","watch"],["🎵 موسيقى","Warner - داخل الموقع","youtube.com","","Warner Music","وارنر - داخل الموقع","watch"],["🎵 موسيقى","Vevo - داخل الموقع","vevo.com","","Vevo","رسمية - داخل الموقع","watch"],["🎵 موسيقى","Vevo Arabia - داخل الموقع","vevo.com","","Vevo Arabia","فيفو عربي","watch"],["🎵 موسيقى","Spotify","spotify.com","https://open.spotify.com","","مجاني / مدفوع","link"],["🎵 موسيقى","SoundCloud","soundcloud.com","https://soundcloud.com","","مستقلة","link"],["🎵 موسيقى","أنغامي","anghami.com","https://www.anghami.com","","عربي","link"],["🎵 موسيقى","YouTube Music","music.youtube.com","https://music.youtube.com","","يوتيوب","link"],["🎵 موسيقى","Deezer","deezer.com","https://www.deezer.com","","مجاني / مدفوع","link"],["🎵 موسيقى","Apple Music","music.apple.com","https://music.apple.com","","مدفوع","link"],["🎵 موسيقى","Tidal","tidal.com","https://tidal.com","","جودة عالية","link"],["🎵 موسيقى","Amazon Music","music.amazon.com","https://music.amazon.com","","مجاني / مدفوع","link"],["🎵 موسيقى","Audiomack MP3","audiomack.com","https://www.audiomack.com","","MP3","link"],["🎵 موسيقى","Jamendo MP3","jamendo.com","https://www.jamendo.com","","MP3","link"],["🎵 موسيقى","Free Music Archive","freemusicarchive.org","https://freemusicarchive.org","","MP3 مجاني","link"],["📱 سوشيال","Facebook","facebook.com","https://www.facebook.com","","فيسبوك","link"],["📱 سوشيال","Messenger","messenger.com","https://www.messenger.com","","ماسنجر","link"],["📱 سوشيال","Instagram","instagram.com","https://www.instagram.com","","انستجرام","link"],["📱 سوشيال","TikTok","tiktok.com","https://www.tiktok.com","","تيك توك","link"],["📱 سوشيال","Bigo Live","bigo.tv","https://www.bigo.tv","","بيجو لايف","link"],["📱 سوشيال","Likee","likee.video","https://www.likee.video","","لايكي","link"],["📱 سوشيال","WhatsApp","whatsapp.com","https://web.whatsapp.com","","واتساب","link"],["📱 سوشيال","Telegram","telegram.org","https://web.telegram.org","","تليجرام","link"],["📱 سوشيال","Snapchat","snapchat.com","https://www.snapchat.com","","سناب","link"],["📱 سوشيال","X","x.com","https://x.com","","تويتر","link"],["📱 سوشيال","YouTube","youtube.com","https://www.youtube.com","","يوتيوب","link"],["📱 سوشيال","LinkedIn","linkedin.com","https://www.linkedin.com","","لينكدإن","link"],["📱 سوشيال","Discord","discord.com","https://discord.com","","ديسكورد","link"],["📱 سوشيال","Twitch","twitch.tv","https://www.twitch.tv","","تويتش","link"],["📱 سوشيال","Threads","threads.net","https://www.threads.net","","ثريدز","link"],["🔍 بحث","Google","google.com","https://www.google.com","","بحث","link"],["🔍 بحث","Bing","bing.com","https://www.bing.com","","بحث","link"],["🔍 بحث","Yahoo","yahoo.com","https://search.yahoo.com","","بحث","link"],["🔍 بحث","DuckDuckGo","duckduckgo.com","https://duckduckgo.com","","خصوصية","link"],["🔍 بحث","Yandex","yandex.com","https://www.yandex.com","","بحث","link"],["🔍 بحث","Ecosia","ecosia.org","https://www.ecosia.org","","بحث","link"],["🔍 بحث","ترجمة Google","translate.google.com","https://translate.google.com","","ترجمة","link"],["🔍 بحث","DeepL","deepl.com","https://www.deepl.com/translator","","ترجمة","link"],["🎬 أفلام","Netflix - مدفوع","netflix.com","https://www.netflix.com","","نتفليكس","link"],["🎬 أفلام","Shahid - مجاني / VIP","shahid.mbc.net","https://shahid.mbc.net","","شاهد","link"],["🎬 أفلام","Disney+","disneyplus.com","https://www.disneyplus.com","","ديزني","link"],["🎬 أفلام","Prime Video","primevideo.com","https://www.primevideo.com","","أمازون","link"],["🎬 أفلام","HBO Max","max.com","https://www.max.com","","ماكس","link"],["🎬 أفلام","Apple TV+","tv.apple.com","https://tv.apple.com","","أبل","link"],["🎬 أفلام","Watch It","watchit.com","https://www.watchit.com","","واتش ات","link"],["🎬 أفلام","YouTube Movies مجاني","youtube.com","https://www.youtube.com/@YouTubeMovies","","أفلام مجانية","link"],["🎬 أفلام","Tubi مجاني","tubi.tv","https://www.tubi.tv","","أفلام مجانية","link"],["🎬 أفلام","Plex مجاني","plex.tv","https://www.plex.tv","","أفلام مجانية","link"],["🎬 أفلام","IMDb","imdb.com","https://www.imdb.com","","تقييم","link"],["📚 ثقافة","ويكيبيديا","wikipedia.org","https://ar.wikipedia.org","","موسوعة","link"],["📚 ثقافة","Wikipedia EN","wikipedia.org","https://en.wikipedia.org","","موسوعة","link"],["📚 ثقافة","Britannica","britannica.com","https://www.britannica.com","","موسوعة","link"],["📚 ثقافة","Khan Academy","khanacademy.org","https://www.khanacademy.org","","تعليم","link"],["📚 ثقافة","Coursera","coursera.org","https://www.coursera.org","","تعليم","link"],["📚 ثقافة","NASA","nasa.gov","https://www.nasa.gov","","فضاء","link"],["📚 ثقافة","BBC عربي","bbc.com","https://www.bbc.com/arabic","","أخبار","link"],["📚 ثقافة","الجزيرة","aljazeera.net","https://www.aljazeera.net","","أخبار","link"],["📚 ثقافة","Gutenberg","gutenberg.org","https://www.gutenberg.org","","كتب","link"],["📚 ثقافة","Archive.org","archive.org","https://archive.org","","كتب مجانية","link"],["🎮 ترفيه","Roblox","roblox.com","https://www.roblox.com","","ألعاب","link"],["🎮 ترفيه","PUBG","pubg.com","https://www.pubg.com","","ألعاب","link"],["🎮 ترفيه","Fortnite","epicgames.com","https://www.epicgames.com/fortnite","","ألعاب","link"],["🎮 ترفيه","Minecraft","minecraft.net","https://www.minecraft.net","","ألعاب","link"],["🎮 ترفيه","Steam","steampowered.com","https://store.steampowered.com","","ألعاب","link"],["🎮 ترفيه","يلا كورة","yallakora.com","https://www.yallakora.com","","رياضة","link"],["🛒 تسوق","Amazon","amazon.eg","https://www.amazon.eg","","تسوق","link"],["🛒 تسوق","Noon","noon.com","https://www.noon.com/egypt-ar/","","تسوق","link"],["🛒 تسوق","Jumia","jumia.com.eg","https://www.jumia.com.eg","","تسوق","link"],["🛒 تسوق","AliExpress","aliexpress.com","https://www.aliexpress.com","","تسوق","link"]];
-function renderSites(){let cats={};SITES.forEach(s=>{if(!cats[s[0]])cats[s[0]]=[];cats[s[0]].push(s)});let m='',ic='',f='';for(let c in cats){m+='<div class="cat">'+c+'</div>';ic+='<h3>'+c+'</h3><div class="chip">';f+='<h4>'+c+'</h4><div class="f-links">';cats[c].forEach(s=>{let icon=favIcon(s[2]);let act=s[6]==='watch'?'href="javascript:void(0)" onclick="openYT(\'https://www.youtube.com/embed?listType=search&list='+encodeURIComponent(s[4])+'&autoplay=1\')"':'href="'+s[3]+'" target="_blank" rel="noopener"';m+='<a class="m-item" '+act+'><img src="'+icon+'" onerror="this.src=\'https://www.google.com/s2/favicons?domain=google.com&sz=128\'"><div><b>'+s[1]+'</b><small>'+s[5]+'</small></div></a>';ic+='<a '+act+'>'+s[1]+'</a>';f+='<a '+act+'>'+s[1]+'</a>';});ic+='</div>';f+='</div>';}document.getElementById('menuList').innerHTML=m;document.getElementById('iconsGrid').innerHTML=ic;document.getElementById('footerLinks').innerHTML=f;let ah='';SITES.filter(s=>s[0].includes('ذكاء')).forEach(s=>{ah+='<a href="'+s[3]+'" target="_blank" rel="noopener">'+s[1]+'</a>'});document.getElementById('aiTools').innerHTML=ah}renderSites();
-function filterMenu(){let q=(document.getElementById('menuSearch').value||'').toLowerCase();document.querySelectorAll('#menuList .m-item').forEach(el=>{el.style.display=el.innerText.toLowerCase().includes(q)?'flex':'none'})}
-function askAI(){let q=document.getElementById('aiAskInput').value.trim();if(!q)return alert('اكتب سؤالك الأول');let b=document.getElementById('aiAnswer');b.innerHTML='⏳ المساعد بيفكر...';setTimeout(()=>{let l=q.toLowerCase(),a='';if(l.includes('حزين'))a='🎧 رشحلك: أم كلثوم - ألف ليلة وليلة، وشيرين - كلام عينيه، وأديل - Someone Like You.';else if(l.includes('فرح')||l.includes('حماس'))a='🔥 رشحلك: عمرو دياب - ليالي، وتامر حسني - عيش بشوقك، وDua Lipa - Levitating.';else if(l.includes('راب'))a='🎤 رشحلك: ويجز - البخت، وإمينيم - Lose Yourself.';else a='🤖 أهلاً بيك في MyMusic AI! ابحث عن أي أغنية فوق، وضيف فنانين، واعمل قوائم، وافتح كل المواقع من الكرة 🎵.';b.innerHTML='<div style="background:#222;padding:12px;border-radius:12px">🤖 <b>مساعد MyMusic:</b><br>'+a+'</div>'},600)}
-function searchOnGoogle(){let q=document.getElementById('search').value.trim();if(!q)return alert('اكتب اللي عايز تبحث عنه');window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank')}
-function addArtist(){let n=document.getElementById('newArtistName').value.trim();if(!n)return alert('اكتب اسم الفنان الأول');let c=document.getElementById('newArtistCat').value;if(getA().some(a=>a.ar==n||a.n.toLowerCase()==n.toLowerCase()))return alert('موجود أصلاً');myA.push({n:n,ar:n,e:c=='eg'?'🇪🇬':c=='arab'?'🌍':c=='rap'?'🎤':c=='latin'?'💃':'⭐',c:c,custom:true});sA();upd();document.getElementById('newArtistName').value='';renderArtistList();alert('اتضاف '+n+' ✅')}
-function addArtistFromSong(i){let s=ALL[i];if(!s)return;if(getA().some(a=>a.n.toLowerCase()==s.artist_name.toLowerCase()))return alert('موجود أصلاً');myA.push({n:s.artist_name,ar:s.artist_name,e:'⭐',c:'world',custom:true});sA();upd();renderArtistList();alert('اتضاف '+s.artist_name+' ✅')}
-function addArtistByName(n){if(getA().some(a=>a.n.toLowerCase()==n.toLowerCase()))return alert('موجود أصلاً');myA.push({n:n,ar:n,e:'⭐',c:'world',custom:true});sA();upd();renderArtistList();alert('اتضاف '+n+' ✅')}
-function deleteMyArtist(n){if(!confirm('تحذف '+n+'؟'))return;myA=myA.filter(a=>a.ar!=n&&a.n!=n);sA();upd();renderArtistList()}
-function renderArtistList(){let q=(document.getElementById('artistSearch').value||'').toLowerCase(),all=getA(),list=all.filter(a=>{if(curCat=='my')return a.custom;if(curCat!='all'&&a.c!=curCat)return false;return a.ar.includes(q)||a.n.toLowerCase().includes(q)||q==''});let h='<p style="color:#aaa">عرض '+list.length+' من '+all.length+'</p>';list.forEach(a=>{let d=a.custom?'<button class="del" onclick="event.stopPropagation();deleteMyArtist(\''+a.ar.replace(/'/g,"")+'\')">✖️</button>':'';h+='<div class="artist" onclick="loadArtist(\''+a.n.replace(/'/g,"")+'\')">'+d+'<div>'+a.e+'</div><span>'+esc(a.ar)+'</span></div>'});document.getElementById('artistList').innerHTML=h}
-function filterCat(c,b){curCat=c;document.querySelectorAll('.filterBtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderArtistList()}renderArtistList();
-function showTab(t){['search','artists','playlists','fav','icons','ai'].forEach(x=>{let e=document.getElementById('view-'+x);if(e)e.style.display=x==t?'block':'none';let tb=document.getElementById('tab-'+x);if(tb)tb.classList.toggle('active',x==t)});if(t=='fav')renderFav();if(t=='playlists')renderPlaylists();if(t=='artists')renderArtistList()}
-function shareSite(){window.open('https://wa.me/?text='+encodeURIComponent('اسمع أغاني كاملة مجاناً 🎧 MyMusic 👇 '+location.href),'_blank')}
-function openMenu(){document.getElementById('menu').classList.add('show')}function closeMenu(){document.getElementById('menu').classList.remove('show')}
-function openYT(u){closeMenu();document.getElementById('ytPlayer').src=u;document.getElementById('ytBox').classList.add('show')}function closeYT(){document.getElementById('ytBox').classList.remove('show');document.getElementById('ytPlayer').src=''}
-function toggleTrans(){let b=document.getElementById('transBtn'),on=b.innerText.includes('شغل');b.innerText=on?'✅ الترجمة شغالة - عربي':'🌐 شغل الترجمة عربي';alert(on?'الترجمة اشتغلت ✅':'الترجمة اتقفلت')}
-function _c(){return {wa:'https://wa.me/'+'20114'+'4502264',em:'mstfyaslman5022'+'@gmail.com'}}
-function sendWithAI(){let n=document.getElementById('aiName').value.trim()||'صديقنا العزيز',ty=document.getElementById('aiType').value,msg=document.getElementById('aiMsg').value.trim();if(!msg)return alert('اكتب رسالتك الأول');let ch=document.getElementById('aiChat');ch.style.display='block';ch.innerHTML='<div class="ai-msg">🎧 <b>أهلاً بيك يا '+esc(n)+' في MyMusic AI - بيت الموسيقى والذكاء الاصطناعي!</b><br><br>رسالتك وصلتنا، وشكراً من القلب إنك اخترت تكلمنا ❤️<br>نوع رسالتك: <b>'+esc(ty)+'</b><br>رسالتك: "'+esc(msg)+'"<br><br>✅ <b>وعدنا ليك:</b> فريق MyMusic هيقرأ رسالتك باهتمام، ولو بلاغ عن خطأ هنصلحه فوراً، ولو طلب أغنية أو موقع هنضيفه في أسرع وقت.<br><br>🎵 استمتع بالموسيقى، وافتح كل مواقعك من الكرة 🎵.<br><br>💜 <b>شكراً لكونك جزء من عائلة MyMusic AI - وجودك هو نجاحنا الحقيقي.</b><br><br><span style="color:#22c55e">✅ تم الارسال للإدارة بنجاح</span></div>';document.getElementById('aiMsg').value='';let c=_c(),wl=c.wa+'?text='+encodeURIComponent('رسالة MyMusic AI\nالاسم: '+n+'\nالنوع: '+ty+'\nالرسالة: '+msg);fetch('https://formsubmit.co/ajax/'+c.em,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({name:n,type:ty,message:msg,_subject:'رسالة جديدة - '+ty,_template:'table'})}).then(()=>{ch.innerHTML+='<div class="ai-msg" style="border:1px solid #22c55e">✅ تم تأكيد الاستلام - هنرد عليك قريب 🙏</div>'}).catch(()=>{});setTimeout(()=>{window.open(wl,'_blank')},2500)}
-function playByIndex(i,queue){if(!queue)queue=ALL;Q=queue;QI=i;let s=queue[i];if(!s)return;CS=s;audio.pause();try{audio.src=''}catch(e){}ytF.src='';ytF.style.display='none';document.getElementById('player').style.display='block';document.getElementById('pImg').src=s.image||'https://cdn-icons-png.flaticon.com/512/727/727269.png';document.getElementById('pTitle').innerText=s.name;document.getElementById('pArtist').innerText=s.artist_name+(s.type=='youtube'?' • كاملة من YouTube':' • كاملة من Audius');if(s.type=='youtube'){ytF.style.display='block';ytF.src='https://www.youtube.com/embed?listType=search&list='+encodeURIComponent(s.artist_name+' '+s.name)+'&autoplay=1';document.getElementById('playBtn').innerText='⏸️';document.getElementById('curTime').innerText='تشغيل كامل';document.getElementById('durTime').innerText='YouTube'}else{audio.src=s.audio;audio.play().catch(()=>{});document.getElementById('playBtn').innerText='⏸️'}lines=[];trans=[];curLine=-1;showL=false;showT=false;document.getElementById('btnLyrics').classList.remove('on');document.getElementById('btnTrans').classList.remove('on');document.getElementById('syncLyrics').style.display='none';if(syncOn)loadLyrics()}
-function togglePlay(){if(!CS)return alert('اختر أغنية الأول');if(CS.type=='youtube')return alert('التحكم من جوة فيديو YouTube');if(audio.paused){audio.play();document.getElementById('playBtn').innerText='⏸️'}else{audio.pause();document.getElementById('playBtn').innerText='▶️'}}
-function nextSong(){if(Q.length)playByIndex((QI+1)%Q.length,Q)}function prevSong(){if(Q.length)playByIndex((QI-1+Q.length)%Q.length,Q)}
-function toggleLoop(){isLoop=!isLoop;audio.loop=isLoop;document.getElementById('loopBtn').style.background=isLoop?'#ff2d55':'#333'}
-function closePlayer(){audio.pause();try{audio.src=''}catch(e){}ytF.src='';ytF.style.display='none';document.getElementById('player').style.display='none'}
-function seek(v){if(audio.duration)audio.currentTime=(v/100)*audio.duration}function fmt(s){if(!s||isNaN(s))return '0:00';let m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+String(sec).padStart(2,'0')}
-audio.addEventListener('timeupdate',()=>{if(audio.duration){document.getElementById('progress').value=(audio.currentTime/audio.duration)*100;document.getElementById('curTime').innerText=fmt(audio.currentTime);document.getElementById('durTime').innerText=fmt(audio.duration)}updSync()});
-audio.addEventListener('ended',()=>{if(!isLoop)nextSong()});
-async function loadLyrics(){if(!CS)return;let b=document.getElementById('syncLyrics');b.innerHTML='⏳ جاري جلب الكلمات...';b.style.display='block';try{let r=await fetch('https://api.lyrics.ovh/v1/'+encodeURIComponent(CS.artist_name)+'/'+encodeURIComponent(CS.name));let d=await r.json();if(!d.lyrics){b.innerHTML='الكلمات مش متاحة';lines=[];return}lines=d.lyrics.split('\n').filter(l=>l.trim()!='').slice(0,100);renderL()}catch(e){b.innerHTML='مش قادر أجيب الكلمات دلوقتي'}}
-function renderL(){let b=document.getElementById('syncLyrics');if(!lines.length)return;let h='';for(let i=0;i<lines.length;i++){h+='<div class="line" id="line-'+i+'">'+esc(lines[i])+'</div>';if(showT&&trans[i])h+='<div class="line trans">'+esc(trans[i])+'</div>'}b.innerHTML=h;updSync()}
-function togglePlayerLyrics(){if(!CS)return alert('شغل أغنية الأول');showL=!showL;document.getElementById('btnLyrics').classList.toggle('on',showL);if(showL){if(!lines.length)loadLyrics();else{document.getElementById('syncLyrics').style.display='block';renderL()}}else document.getElementById('syncLyrics').style.display='none'}
-async function togglePlayerTranslate(){if(!CS)return alert('شغل أغنية الأول');if(!lines.length)return alert('دوس 📝 كلمات الأول');showT=!showT;document.getElementById('btnTrans').classList.toggle('on',showT);if(showT&&!trans.length){document.getElementById('syncLyrics').innerHTML='⏳ جاري الترجمة...';for(let i=0;i<Math.min(lines.length,15);i++){try{let r=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(lines[i])+'&langpair=en|ar');let d=await r.json();trans[i]=d.responseData.translatedText}catch(e){trans[i]=''}}}renderL()}
-function toggleSync(){syncOn=!syncOn;document.getElementById('btnSync').innerText=syncOn?'🎯 مزامنة: شغالة':'🎯 مزامنة: إيقاف';document.getElementById('btnSync').classList.toggle('on',syncOn);if(syncOn){if(!CS)return alert('شغل أغنية الأول');if(!lines.length)loadLyrics();else{document.getElementById('syncLyrics').style.display='block';showL=true;document.getElementById('btnLyrics').classList.add('on')}}}
-function updSync(){if(!syncOn||!lines.length||!audio.duration)return;let idx=Math.floor((audio.currentTime/audio.duration)*lines.length);if(idx>=lines.length)idx=lines.length-1;if(idx!==curLine){curLine=idx;document.querySelectorAll('#syncLyrics .line').forEach(e=>e.classList.remove('active'));let el=document.getElementById('line-'+idx);if(el){el.classList.add('active');el.scrollIntoView({block:'center',behavior:'smooth'})}}}    <script>
-function openMenu(){document.getElementById('menu').classList.add('show')}
-function closeMenu(){document.getElementById('menu').classList.remove('show')}
-function showTab(t){['search','artists','playlists','fav','icons','ai'].forEach(x=>{let e=document.getElementById('view-'+x);if(e)e.style.display=x==t?'block':'none'})}
-function openYT(u){closeMenu();document.getElementById('ytPlayer').src=u;document.getElementById('ytBox').classList.add('show')}
-function closeYT(){document.getElementById('ytBox').classList.remove('show');document.getElementById('ytPlayer').src=''}
-function searchOnGoogle(){let q=document.getElementById('search').value;window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank')}
-async function searchMusic(){let q=document.getElementById('search').value.trim();if(!q)return alert('اكتب اسم أغنية');document.getElementById('results').innerHTML='⏳ جاري البحث...';try{let r=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=20&country=EG');let d=await r.json();let h='';d.results.forEach((s,i)=>{h+='<div class="card"><img src="'+s.artworkUrl100+'"><b>'+s.trackName+'</b><br><small>'+s.artistName+'</small><div style="clear:both"></div><button class="small" style="background:#ff2d55;width:100%" onclick="openYT(\'https://www.youtube.com/embed?listType=search&list='+encodeURIComponent(s.artistName+' '+s.trackName)+'&autoplay=1\')">▶️ تشغيل كامل داخل الموقع</button></div>'});document.getElementById('results').innerHTML=h||'مفيش نتائج'}catch(e){document.getElementById('results').innerHTML='في مشكلة في النت، جرب تاني'}}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MyMusic AI 🎧</title>
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#ff0000">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:sans-serif;background:#0a0a0a;color:#fff;padding-bottom:240px}
+.top{background:linear-gradient(135deg,#ff0000,#7c3aed);padding:16px;text-align:center;border-radius:0 0 25px 25px}
+.box{background:rgba(255,255,255,.08);margin:12px;padding:15px;border-radius:20px;border:1px solid rgba(255,255,255,.12)}
+h2{margin:5px 0 10px;font-size:18px}
+input,select{width:95%;padding:12px;border-radius:25px;border:none;text-align:center;font-size:15px;margin:6px 0;color:#000}
+button{padding:11px 14px;border-radius:20px;border:none;background:#ff0000;color:#fff;font-weight:bold;margin:4px;cursor:pointer}
+.btn-green{background:#22c55e}.btn-white{background:#fff;color:#000}.btn-dark{background:#333}.btn-gold{background:#f59e0b}.btn-blue{background:#2563eb}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ai-btn{display:block;text-align:center;padding:13px;border-radius:15px;color:#fff;text-decoration:none;font-weight:bold;font-size:14px;background:#222}
+.card{background:#222;margin:9px;padding:11px;border-radius:14px}
+#clock{font-size:44px;font-weight:bold;text-align:center}
+#player{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:2px solid red;padding:11px;text-align:center;z-index:99}
+audio,video{width:100%}
+.progress{height:8px;background:#333;border-radius:10px;overflow:hidden;margin:8px 0}
+#progressBar{height:100%;background:linear-gradient(90deg,#ff0000,#f59e0b);width:0%}
+#floatBtn{position:fixed;bottom:175px;left:12px;z-index:999;width:62px;height:62px;border-radius:50%;background:#ff0000;font-size:28px;box-shadow:0 0 20px #ff0000}
+#floatMenu{position:fixed;bottom:245px;left:12px;z-index:999;background:#111;border:1px solid #444;border-radius:18px;padding:10px;display:none;width:220px}
+#floatMenu button{display:block;width:100%;margin:5px 0}
+#ytBox iframe{width:100%;height:220px;border-radius:14px}
+.small{font-size:12px;color:#ccc}
+</style>
+</head>
+<body>
+
+<div style="text-align:center">
+<img src="cover.jpg" onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1200&q=80'" style="width:100%;height:260px;object-fit:cover;display:block" alt="MyMusic AI">
+</div>
+
+<div class="top">
+<h1 style="margin:0">🎧 MyMusic AI</h1>
+<p style="margin:5px">اسمع - اتفرج - ترجم - اشتغل على الذكاء الاصطناعي<br>كل حاجة جوه الموقع</p>
+<button class="btn-green" onclick="alert('الأزرار شغالة ✅')">✅ جرب الزرار</button>
+<button class="btn-white" onclick="toggleNight()">🌙 وضع ليلي</button>
+<button class="btn-gold" onclick="toggleFloat()">👁️ إخفاء / إظهار الزر العائم</button>
+</div>
+
+<div class="box" style="text-align:center">
+<div id="clock">00:00:00</div>
+<div id="date">--</div>
+<div>🌤️ <span id="weatherDesc">الطقس</span> | <b id="weatherTemp">--°</b> | <span id="weatherCity">القاهرة</span></div>
+<button class="btn-white" onclick="getWeatherCairo()">🔄 تحديث الطقس</button>
+</div>
+
+<div class="box">
+<h2>🔍 محركات البحث - جوجل و Manus والذكاء الاصطناعي</h2>
+<input id="gSearch" placeholder="اكتب أي حاجة... أغنية، فيديو، موقع">
+<button class="btn-blue" onclick="openSearch('google')">بحث جوجل</button>
+<button class="btn-gold" onclick="openSearch('youtube')">بحث يوتيوب</button>
+<button class="btn-green" onclick="openSearch('manus')">بحث Manus</button>
+<button class="btn-dark" onclick="openSearch('mp3')">بحث MP3</button>
+<div id="gRes"></div>
+</div>
+
+<div class="box">
+<h2>▶️ يوتيوب جوه الموقع - تشغيل وترجمة</h2>
+<input id="ytInput" placeholder="الصق لينك يوتيوب أو اكتب اسم فيديو">
+<button class="btn-green" onclick="playYoutube()">▶️ تشغيل جوه الموقع</button>
+<button class="btn-gold" onclick="translateYT()">🌐 ترجمة الفيديو</button>
+<button class="btn-blue" onclick="openYTApp()">فتح في تطبيق يوتيوب</button>
+<div id="ytBox" style="margin-top:10px"></div>
+<div id="ytTrans"></div>
+</div>
+
+<div class="box">
+<h2>📂 ملفات الهاتف - فيديو / صوت / صور / أغاني</h2>
+<input type="file" id="myFiles" accept="audio/*,video/*,image/*" multiple onchange="saveMyFiles(this)">
+<div id="myFilesList"></div>
+<p class="small">الملفات بتتحفظ في متصفحك بس، ومش بتتبعت لأي حد.</p>
+</div>
+
+<div class="box">
+<h2>🎵 مشغل MP3 - بحث وتحميل وتشغيل</h2>
+<input id="search" placeholder="اكتب اسم أغنية...">
+<button class="btn-green" onclick="searchMusic()">بحث MP3</button>
+<button class="btn-gold" onclick="playTest()">▶️ أغنية تجريبية</button>
+<div id="results"></div>
+</div>
+
+<div class="box">
+<h2>🌐 ترجمة شاملة - جوجل + Manus + داخل وخارج الكرة العائمة</h2>
+<input id="trText" placeholder="اكتب نص أو اسم فيديو أو أغنية للترجمة">
+<button class="btn-white" onclick="doTranslate('google')">ترجمة جوجل</button>
+<button class="btn-white" onclick="doTranslate('manus')">ترجمة Manus</button>
+<button class="btn-white" onclick="doTranslate('bing')">ترجمة Bing</button>
+<div id="trRes" class="small"></div>
+<p class="small">الترجمة بتشتغل جوه الموقع من الزر العائم، وبره الموقع لما تفتح جوجل أو مانوس في تاب جديد، وانت بتسمع أو بتتفرج.</p>
+</div>
+
+<div class="box">
+<h2>🤖 أدوات الذكاء الاصطناعي والموارد</h2>
+<div class="ai-grid">
+<a class="ai-btn" style="background:#10a37f" href="https://chatgpt.com" target="_blank">💬 ChatGPT</a>
+<a class="ai-btn" style="background:#1a73e8" href="https://gemini.google.com" target="_blank">✨ Gemini</a>
+<a class="ai-btn" style="background:#ff5c00" href="https://manus.im" target="_blank">🚀 Manus</a>
+<a class="ai-btn" style="background:#d97757" href="https://claude.ai" target="_blank">🧠 Claude</a>
+<a class="ai-btn" style="background:#20b8cd" href="https://www.perplexity.ai" target="_blank">🔍 Perplexity</a>
+<a class="ai-btn" style="background:#0078d4" href="https://copilot.microsoft.com" target="_blank">🪟 Copilot</a>
+<a class="ai-btn" style="background:#8b3dff" href="https://www.canva.com" target="_blank">🎨 Canva</a>
+<a class="ai-btn" style="background:#000;border:1px solid #fff" href="https://cursor.com" target="_blank">💻 Cursor</a>
+<a class="ai-btn" style="background:#ff2d55" href="https://suno.com" target="_blank">🎵 Suno</a>
+<a class="ai-btn" style="background:#00c2a8" href="https://elevenlabs.io" target="_blank">🎙️ ElevenLabs</a>
+<a class="ai-btn" style="background:#000;border:1px solid #fff" href="https://www.capcut.com" target="_blank">✂️ CapCut</a>
+<a class="ai-btn" style="background:#111;border:1px solid #fff" href="https://www.midjourney.com" target="_blank">🖼️ Midjourney</a>
+</div>
+</div>
+
+<div class="box">
+<h2>📱 مواقع التواصل الاجتماعي</h2>
+<div class="ai-grid">
+<a class="ai-btn" style="background:#1877f2" href="https://facebook.com" target="_blank">📘 فيسبوك</a>
+<a class="ai-btn" style="background:#000" href="https://instagram.com" target="_blank">📸 انستجرام</a>
+<a class="ai-btn" style="background:#25d366" href="https://whatsapp.com" target="_blank">💬 واتساب</a>
+<a class="ai-btn" style="background:#000" href="https://tiktok.com" target="_blank">🎬 تيك توك</a>
+<a class="ai-btn" style="background:#ff0000" href="https://youtube.com" target="_blank">▶️ يوتيوب</a>
+<a class="ai-btn" style="background:#1da1f2" href="https://x.com" target="_blank">𝕏 تويتر</a>
+<a class="ai-btn" style="background:#0088cc" href="https://telegram.org" target="_blank">✈️ تليجرام</a>
+<a class="ai-btn" style="background:#0a66c2" href="https://linkedin.com" target="_blank">💼 لينكد إن</a>
+</div>
+</div>
+
+<div class="box" id="loginBox">
+<h2>👤 تسجيل دخول / إنشاء حساب</h2>
+<div style="text-align:center">
+<button class="btn-blue" onclick="loginWith('Google')">🔍 دخول بـ Google</button><br>
+<button class="btn-blue" onclick="loginWith('Facebook')">📘 دخول بـ Facebook</button><br>
+<button style="background:#000;border:1px solid #fff" onclick="loginWith('Apple')">🍎 دخول بـ Apple</button><br>
+<button class="btn-green" onclick="showPhoneLogin()">📱 دخول برقم الهاتف</button><br>
+<button class="btn-dark" onclick="loginWith('X / تويتر')">𝕏 دخول بـ X</button><br>
+<button class="btn-dark" onclick="loginWith('GitHub')">💻 دخول بـ GitHub</button><br>
+<button class="btn-gold" onclick="loginWith('Microsoft')">🪟 دخول بـ Microsoft</button><br>
+<button class="btn-white" onclick="loginWith('البريد الإلكتروني')">✉️ دخول بالبريد</button>
+</div>
+<div id="phoneLogin" style="display:none;text-align:center;margin-top:12px;background:#222;padding:14px;border-radius:16px">
+<h3 style="margin:0">📱 دخول برقم الهاتف</h3>
+<p class="small">هنبعتلك كود تأكيد - تجريبي دلوقتي</p>
+<select id="countryCode" style="width:30%;display:inline-block">
+<option value="+20">🇪🇬 +20 مصر</option>
+<option value="+966">🇸🇦 +966 السعودية</option>
+<option value="+971">🇦🇪 +971 الإمارات</option>
+<option value="+962">🇯🇴 +962 الأردن</option>
+<option value="+1">🇺🇸 +1 أمريكا</option>
+</select>
+<input id="phoneNum" placeholder="اكتب رقم هاتفك" style="width:60%;display:inline-block" inputmode="numeric">
+<button class="btn-green" onclick="sendOTP()">📩 ابعت كود التأكيد</button>
+<div id="otpBox" style="display:none">
+<input id="otpCode" placeholder="اكتب الكود - جرب 1234" inputmode="numeric">
+<button class="btn-gold" onclick="verifyOTP()">✅ تأكيد الكود ودخول</button>
+<p class="small">الكود التجريبي: <b>1234</b></p>
+</div>
+</div>
+<div id="loginStatus" style="text-align:center;margin-top:10px">مش مسجل دخول</div>
+<button id="logoutBtn" class="btn-dark" style="display:none;width:100%" onclick="logout()">🚪 تسجيل خروج</button>
+<p class="small" style="text-align:center">⚠️ بياناتك مش بتتبعت لأي حد، ولا رقمك ولا بريدك بيظهر لأي حد.</p>
+</div>
+
+<div class="box">
+<h2>💬 رسائل الموقع - رد آلي</h2>
+<input id="msgName" placeholder="اسمك">
+<input id="msgText" placeholder="اكتب رسالتك...">
+<button class="btn-green" onclick="sendMsg()">إرسال</button>
+<div id="msgReply"></div>
+</div>
+
+<div class="box" style="text-align:center">
+<h2>📱 ثبّت التطبيق</h2>
+<button class="btn-green" onclick="installApp()">⬇️ تثبيت التطبيق</button>
+<p class="small">أو دوس 3 نقط ⋮ → إضافة إلى الشاشة الرئيسية</p>
+</div>
+
+<button id="floatBtn" onclick="toggleFloatMenu()">🎧</button>
+<div id="floatMenu">
+<b>🎧 MyMusic AI</b><br>
+<button onclick="togglePlay()">⏯️ تشغيل / إيقاف</button>
+<button onclick="nextSong()">⏭️ التالي</button>
+<button onclick="playYoutube()">▶️ تشغيل يوتيوب</button>
+<button onclick="doTranslate('google')">🌐 ترجمة جوجل</button>
+<button onclick="doTranslate('manus')">🚀 ترجمة Manus</button>
+<button onclick="openSearch('google')">🔍 بحث جوجل</button>
+<button onclick="toggleFloat()">👁️ إخفاء الزر</button>
+<button onclick="toggleFloatMenu()">❌ إغلاق</button>
+</div>
+
+<div id="player">
+<b id="pTitle">MyMusic AI - اختار أغنية</b><br><small id="pArtist">جاهز للتشغيل</small>
+<div class="progress"><div id="progressBar"></div></div>
+<audio id="audio" controls></audio><br>
+<button onclick="prevSong()">⏮️</button>
+<button onclick="togglePlay()">⏯️ تشغيل / إيقاف</button>
+<button onclick="nextSong()">⏭️</button>
+<button class="btn-gold" onclick="downloadCurrent()">⬇️ تحميل MP3</button>
+</div>
+
+<script>
+let ALL=[], idx=0, audio=document.getElementById('audio'), currentUrl='', floatHidden=false;
+function toggleNight(){ let b=document.body; if(b.style.background.includes('fef3c7')){b.style.background='#0a0a0a';b.style.color='#fff'}else{b.style.background='linear-gradient(180deg,#fef3c7,#fff)';b.style.color='#000'} }
+function tick(){ let d=new Date(); document.getElementById('clock').innerText=d.toLocaleTimeString('ar-EG'); document.getElementById('date').innerText=d.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
+setInterval(tick,1000); tick();
+async function fetchWeather(lat,lon,name){ try{ let r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,weather_code&timezone=auto'); let j=await r.json(); document.getElementById('weatherTemp').innerText=Math.round(j.current.temperature_2m)+'°'; document.getElementById('weatherCity').innerText=name; document.getElementById('weatherDesc').innerText='الطقس شغال ✅'; }catch(e){} }
+function getWeatherCairo(){ fetchWeather(30.0444,31.2357,'القاهرة'); }
+getWeatherCairo();
+function openSearch(type){ let q=document.getElementById('gSearch').value.trim()||document.getElementById('search').value.trim(); if(!q) return alert('اكتب كلمة بحث الأول'); if(type=='google') window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank'); if(type=='youtube') window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(q),'_blank'); if(type=='manus') window.open('https://manus.im/?q='+encodeURIComponent(q),'_blank'); if(type=='mp3'){ document.getElementById('search').value=q; searchMusic(); } document.getElementById('gRes').innerHTML='<div class="card">🔍 <b>'+q+'</b> - اتفتح في تاب جديد - <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/2991/2991148.png\'" style="width:28px;border-radius:50%"> الأيقونة الافتراضية</div>'; }
+function playYoutube(){ let v=document.getElementById('ytInput').value.trim()||document.getElementById('gSearch').value.trim(); if(!v) return alert('اكتب اسم فيديو أو الصق لينك يوتيوب'); let m=v.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_-]{11})/); if(m){ document.getElementById('ytBox').innerHTML='<iframe src="https://www.youtube.com/embed/'+m[1]+'" allowfullscreen></iframe>'; } else { window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(v),'_blank'); document.getElementById('ytBox').innerHTML='<div class="card">▶️ فتحنا بحث يوتيوب لـ <b>'+v+'</b> في تاب جديد</div>'; } }
+function openYTApp(){ let v=document.getElementById('ytInput').value.trim(); window.open(v?('https://www.youtube.com/results?search_query='+encodeURIComponent(v)):'https://www.youtube.com','_blank'); }
+function translateYT(){ let v=document.getElementById('ytInput').value.trim()||'video'; document.getElementById('ytTrans').innerHTML='<div class="card">🌐 ترجمة: <b>'+v+'</b><br><a href="https://translate.google.com/?sl=auto&tl=ar&text='+encodeURIComponent(v)+'" target="_blank" style="color:#fff">فتح ترجمة جوجل</a> | <a href="https://manus.im" target="_blank" style="color:#fff">فتح Manus</a></div>'; window.open('https://translate.google.com/?sl=auto&tl=ar&text='+encodeURIComponent(v),'_blank'); }
+function doTranslate(where){ let t=document.getElementById('trText').value.trim()||document.getElementById('ytInput').value.trim()||'MyMusic AI'; if(where=='google') window.open('https://translate.google.com/?sl=auto&tl=ar&text='+encodeURIComponent(t),'_blank'); if(where=='manus') window.open('https://manus.im/?q='+encodeURIComponent('ترجم: '+t),'_blank'); if(where=='bing') window.open('https://www.bing.com/translator?text='+encodeURIComponent(t),'_blank'); document.getElementById('trRes').innerText='✅ اتفتحت ترجمة '+where+' لـ: '+t; }
+function saveMyFiles(inp){ let h=''; for(let f of inp.files){ let u=URL.createObjectURL(f); if(f.type.startsWith('audio')) h+='<div class="card">🎵 '+f.name+'<br><audio controls src="'+u+'"></audio></div>'; else if(f.type.startsWith('video')) h+='<div class="card">🎬 '+f.name+'<br><video controls src="'+u+'"></video><br><button onclick="doTranslate(\'google\')">🌐 ترجم الفيديو</button></div>'; else h+='<div class="card">🖼️ '+f.name+'<br><img src="'+u+'" style="width:100%;border-radius:12px"></div>'; } document.getElementById('myFilesList').innerHTML=h; }
+function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; currentUrl=s.audio; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
+function togglePlay(){ if(audio.paused) audio.play(); else audio.pause(); }
+function nextSong(){ if(!ALL.length) return; playByIndex((idx+1)%ALL.length); }
+function prevSong(){ if(!ALL.length) return; playByIndex((idx-1+ALL.length)%ALL.length); }
+function downloadCurrent(){ if(!currentUrl) return alert('شغل أغنية الأول'); let a=document.createElement('a'); a.href=currentUrl; a.download='MyMusic.mp3'; a.click(); }
+function playTest(){ ALL=[{name:'أغنية تجريبية',artist_name:'Test',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'}]; playByIndex(0); }
+async function searchMusic(){ let q=document.getElementById('search').value.trim(); if(!q) return alert('اكتب اسم أغنية الأول'); document.getElementById('results').innerHTML='⏳ جاري البحث...'; try{ let r=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&media=music&limit=10&country=EG'); let d=await r.json(); ALL=d.results.map(s=>({name:s.trackName,artist_name:s.artistName,audio:s.previewUrl})); let h=''; for(let i=0;i<ALL.length;i++){ h+='<div class="card"><b>'+ALL[i].name+'</b><br><small>'+ALL[i].artist_name+'</small><br><button onclick="playByIndex('+i+')">▶️ تشغيل</button> <a href="'+ALL[i].audio+'" download style="color:#fff">⬇️ تحميل MP3</a></div>'; } document.getElementById('results').innerHTML=h; }catch(e){ document.getElementById('results').innerHTML='مشكلة في النت - جرب تاني'; } }
+function showPhoneLogin(){ document.getElementById('phoneLogin').style.display='block'; document.getElementById('phoneLogin').scrollIntoView({behavior:'smooth'}); }
+function sendOTP(){ let code=document.getElementById('countryCode').value; let num=document.getElementById('phoneNum').value.trim(); if(num.length<9) return alert('اكتب رقم هاتفك صح'); document.getElementById('otpBox').style.display='block'; alert('📩 اتبعت كود التأكيد لرقم: '+code+num+'\nالكود التجريبي: 1234'); }
+function verifyOTP(){ let c=document.getElementById('otpCode').value.trim(); if(c=='1234'){ let num=document.getElementById('phoneNum').value; loginSuccess('رقم الهاتف 📱 ('+num.slice(0,3)+'***'+num.slice(-2)+') - رقمك مخفي'); } else alert('الكود غلط - جرب 1234'); }
+function loginWith(t){ loginSuccess(t); }
+function loginSuccess(type){ document.getElementById('loginStatus').innerHTML='✅ أهلاً بيك!<br>تم الدخول بـ <b>'+type+'</b><br>في MyMusic AI 🎧'; document.getElementById('logoutBtn').style.display='block'; try{ localStorage.setItem('mymusic_user',type); }catch(e){} alert('✅ تم تسجيل الدخول بـ '+type); }
+function logout(){ document.getElementById('loginStatus').innerText='مش مسجل دخول'; document.getElementById('logoutBtn').style.display='none'; document.getElementById('phoneLogin').style.display='none'; try{ localStorage.removeItem('mymusic_user'); }catch(e){} alert('تم تسجيل الخروج 👋'); }
+function sendMsg(){ let n=document.getElementById('msgName').value||'صديقنا'; document.getElementById('msgReply').innerHTML='<div class="card">🤖 <b>MyMusic AI</b><br>أهلاً بيك يا '+n+'، شكراً لرسالتك ❤️<br>سنتواصل معك في أقرب فرصة.<br><small>- فريق MyMusic AI</small></div>'; }
+function toggleFloat(){ floatHidden=!floatHidden; document.getElementById('floatBtn').style.display=floatHidden?'none':'block'; document.getElementById('floatMenu').style.display='none'; if(floatHidden) alert('الزر العائم اتخفى - دوس على زرار إخفاء / إظهار الزر العائم فوق عشان يرجع'); }
+function toggleFloatMenu(){ let m=document.getElementById('floatMenu'); m.style.display=(m.style.display=='block')?'none':'block'; }
+function installApp(){ alert('عشان تثبته كتطبيق:\n1- دوس 3 نقط ⋮ فوق\n2- إضافة إلى الشاشة الرئيسية\n3- إضافة'); }
+audio.addEventListener('timeupdate',()=>{ if(audio.duration) document.getElementById('progressBar').style.width=(audio.currentTime/audio.duration*100)+'%'; });
 </script>
-function createPlaylist(){let n=document.getElementById('newPlaylistName').value.trim();if(!n)return alert('اكتب اسم القايمة');pls.push({name:n,songs:[]});sP();document.getElementById('newPlaylistName').value='';renderPlaylists();alert('اتعملت ✅')}
-function renderPlaylists(){let b=document.getElementById('playlistsList');if(!pls.length){b.innerHTML='<p style="color:#aaa">لسه مفيش قوائم</p>';return}let h='';pls.forEach((p,i
+</body>
+  </html>
