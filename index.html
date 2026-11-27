@@ -485,7 +485,7 @@ function startLiveTranslation(){
       document.getElementById('liveStatus').innerText='تم إيقاف الاستماع.';
     }
   };
-  try{if(liveInputTrack&&liveInputTrack.readyState==='live')liveRecognition.start(liveInputTrack);else liveRecognition.start();}catch(error){document.getElementById('liveStatus').innerText='تعذر بدء الاستماع؛ جرّب الميكروفون إذا لم يدعم المتصفح مسار الصوت.';}
+  try{if(liveInputTrack&&liveInputTrack.readyState==='live'){try{liveRecognition.start(liveInputTrack);}catch(trackError){liveInputTrack=null;document.getElementById('liveStatus').innerText='مسار الصوت المباشر غير مدعوم؛ جاري استخدام الميكروفون.';liveRecognition.start();}}else liveRecognition.start();}catch(error){document.getElementById('liveStatus').innerText='تعذر بدء الاستماع. تحقق من إذن الميكروفون.';}
 }
 function stopLiveTranslation(){
   liveRestartAllowed=false;
