@@ -100,7 +100,7 @@ audio,video{width:100%}
 </div>
 <div class="card" style="background:#101010">
 <b>🎬 ترجمة الفيديو والأغاني بالذكاء الاصطناعي</b>
-<p class="small">اختر ملف MP4 أو MP3 من هاتفك. سيحوّل Whisper الصوت إلى نص، ثم يترجمه Gemini إلى اللغة المختارة. الحد الحالي 25 ميجابايت للملف.</p>
+<p class="small">اختر ملف MP4 أو MP3 من هاتفك. سيُرفع الملف مباشرة إلى Gemini من خلال خادم MyMusic، ليستخرج الكلام مع التوقيت، ثم يترجم النص إلى اللغة المختارة. الحد الحالي 25 ميجابايت للملف.</p>
 <label class="small" for="mediaSpeechTarget">لغة الترجمة</label>
 <select id="mediaSpeechTarget" aria-label="لغة الترجمة"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option></select>
 <label class="small" for="mediaSpeechSource">لغة الصوت الأصلي (اختياري)</label>
@@ -156,8 +156,8 @@ audio,video{width:100%}
 </div>
 
 <div class="box" id="mediaTranslationTools">
-<h2>🎬 ترجمة الفيديوهات والأغاني بالذكاء الاصطناعي – Whisper + Gemini</h2>
-<p class="small">ارفع ملف MP3 أو MP4 من قسم ملفات الهاتف: Whisper يستخرج الكلام والغناء أولاً، ثم Gemini يترجم النص إلى اللغة المحددة. لا يضيف هذا تلقائياً دبلجة صوتية أو ترجمة مكتوبة فوق كل فيديو أثناء البث المباشر.</p>
+<h2>🎬 رفع الفيديو والصوت إلى Gemini وترجمتهما</h2>
+<p class="small">ارفع ملف MP3 أو MP4 من قسم ملفات الهاتف: يرفع MyMusic الملف إلى Gemini Files API لتحليل الصوت والصورة واستخراج الكلام بتوقيتات ترجمة SRT، ثم يترجم النص داخل الموقع. لا يضيف هذا تلقائياً دبلجة صوتية أو ترجمة مكتوبة فوق كل فيديو أثناء البث المباشر.</p>
 <button class="btn-green" onclick="openLiveTranslationPanel()">فتح لوحة الترجمة</button>
 <button class="btn-blue" onclick="translateCurrentMedia()">محاولة ترجمة الميديا الحالية</button>
 <button class="btn-gold" onclick="startTabAudioTranslation()">ترجمة صوت تبويب أو موقع</button>
@@ -507,8 +507,8 @@ function saveMyFiles(inp){
   let markup='';
   myLocalMedia.forEach((item,i)=>{
     const name=escapeHTML(item.file.name), url=item.url;
-    if(item.file.type.startsWith('audio')) markup+='<div class="card">🎵 '+name+'<br><audio controls src="'+url+'"></audio><br><button class="btn-green" onclick="transcribeLocalMedia('+i+')">📝 حوّل الصوت إلى نص وترجمه</button><div id="transcriptOutput'+i+'" class="small" aria-live="polite"></div></div>';
-    else if(item.file.type.startsWith('video')) markup+='<div class="card">🎬 '+name+'<br><video id="localVideo'+i+'" controls playsinline src="'+url+'" style="width:100%"></video><br><button class="btn-green" onclick="transcribeLocalMedia('+i+')">📝 حوّل صوت الفيديو إلى نص وترجمه</button><button class="btn-gold" onclick="ocrLocalVideo('+i+')">🔎 اقرأ وترجم الكلام الظاهر في إطار الفيديو</button><div id="transcriptOutput'+i+'" class="small" aria-live="polite"></div></div>';
+    if(item.file.type.startsWith('audio')) markup+='<div class="card">🎵 '+name+'<br><audio controls src="'+url+'"></audio><br><button class="btn-green" onclick="transcribeLocalMedia('+i+')">✨ ارفع إلى Gemini واستخرج الترجمة</button><div id="transcriptOutput'+i+'" class="small" aria-live="polite"></div></div>';
+    else if(item.file.type.startsWith('video')) markup+='<div class="card">🎬 '+name+'<br><video id="localVideo'+i+'" controls playsinline src="'+url+'" style="width:100%"></video><br><button class="btn-green" onclick="transcribeLocalMedia('+i+')">✨ ارفع الفيديو إلى Gemini وترجمه</button><button class="btn-gold" onclick="ocrLocalVideo('+i+')">🔎 اقرأ وترجم الكلام الظاهر في إطار الفيديو</button><div id="transcriptOutput'+i+'" class="small" aria-live="polite"></div></div>';
     else if(item.file.type.startsWith('image')) markup+='<div class="card">🖼️ '+name+'<br><img id="localImage'+i+'" src="'+url+'" style="width:100%;border-radius:12px"><br><button class="btn-gold" onclick="ocrLocalImage('+i+')">🔎 اقرأ وترجم النص داخل الصورة</button></div>';
   });
   document.getElementById('myFilesList').innerHTML=markup||'لم يتم اختيار ملفات مدعومة.';
@@ -535,7 +535,7 @@ async function translateTranscriptText(text,target,source){
   const translated=[];
   const names={ar:'Arabic',en:'English',fr:'French',de:'German',es:'Spanish',hi:'Hindi',tr:'Turkish',it:'Italian',ru:'Russian',zh:'Chinese',ja:'Japanese'};
   for(let i=0;i<chunks.length;i++){
-    const prompt='Translate the following transcript from '+(sourceCode||'the detected source language')+' into '+(names[target]||target)+'. Preserve meaning, names, punctuation, song lines and speaker labels. Return ONLY the translated text, with no explanation or introduction.\\n\\n'+chunks[i];
+    const prompt='Translate the following subtitle transcript from '+(sourceCode||'the detected source language')+' into '+(names[target]||target)+'. Preserve SRT cue numbers and timestamps exactly; translate only subtitle text. Preserve meaning, names, song lines and speaker labels. Return ONLY valid translated SRT text, with no explanation or introduction.\\n\\n'+chunks[i];
     const response=await fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({prompt})});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw new Error(data.error||'تعذرت ترجمة Gemini ('+response.status+')');
@@ -543,6 +543,11 @@ async function translateTranscriptText(text,target,source){
     translated.push(String(data.text).trim());
   }
   return translated.join('\\n');
+}
+function downloadSubtitleFile(text, fileName){
+  const clean=String(text||'').replace(/^```(?:srt)?\s*/i,'').replace(/\s*```$/,'').trim();
+  const blob=new Blob(['\uFEFF'+clean],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fileName||'MyMusic-Subtitles.srt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 async function transcribeLocalMedia(index){
   const item=myLocalMedia[index];
@@ -569,6 +574,11 @@ async function transcribeLocalMedia(index){
     const sourceLanguage=/^[a-z]{2,3}$/.test(reportedLanguage)?reportedLanguage:(selectedLanguage==='auto'?detectTranscriptLanguage(original):selectedLanguage.split('-')[0]);
     const translated=await translateTranscriptText(original,target,sourceLanguage);
     output.innerText='📝 النص الأصلي:\n'+original+'\n\n🌐 الترجمة:\n'+translated;
+    const downloadButton=document.createElement('button');
+    downloadButton.className='btn-blue';
+    downloadButton.textContent='⬇️ تنزيل الترجمة بصيغة SRT';
+    downloadButton.onclick=()=>downloadSubtitleFile(translated,'MyMusic-'+(item.file.name||'subtitles').replace(/[^a-z0-9._-]/gi,'_')+'.srt');
+    output.appendChild(downloadButton);
     lastLiveTranslation=translated;
     document.getElementById('liveOriginal').innerText=original;
     document.getElementById('liveResult').innerText=translated;
@@ -576,7 +586,7 @@ async function transcribeLocalMedia(index){
     translationHistory=translationHistory.slice(0,100);
     try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}
   }catch(error){
-    output.innerText='⚠️ تعذرت المعالجة: '+error.message+'\nتأكد من تفعيل Workers AI في Cloudflare ثم أعد المحاولة.';
+    output.innerText='⚠️ تعذرت المعالجة: '+error.message+'\nتحقق من وجود GEMINI_API_KEY كـ Secret مشفّر في Cloudflare ثم أعد المحاولة.';
   }
 }
 function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; currentUrl=s.audio; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
