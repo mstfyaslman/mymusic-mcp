@@ -2,24 +2,18 @@
   "name": "MyMusic AI",
   "short_name": "MyMusic",
   "description": "اكتشف الأغاني والفنانين واستمع إلى المعاينات الموسيقية واستخدم أدوات MyMusic.",
-  "lang": "ar",
-  "dir": "rtl",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
   "orientation": "portrait",
-  "categories": [
-    "music",
-    "entertainment"
-  ],
   "icons": [
     {
       "src": "/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
