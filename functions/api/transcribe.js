@@ -62,7 +62,33 @@ export async function onRequest({ request, env }) {
     }
     const text = (result.candidates?.[0]?.content?.parts || []).map(part => part.text || "").join("").trim();
     if (!text) throw new Error("لم يُرجع Gemini نصًا من الملف.");
-    return json({ text, mimeType: mime, fileName: file.name || "", provider: "Gemini" });
+    const cleaned = text.replace(/```(?:srt)?/gi, "").trim().replace(/\\r/g, "");
+    const blocks = cleaned.split(/\\n\\s*\\n/).map(block => block.trim()).filter(Boolean);
+    const cues = [];
+    const stampMs = value => {
+      const match = /^(\\d{2,}):(\\d{2}):(\\d{2})[,\\.](\\d{3})$/.exec(value);
+      if (!match) return null;
+      const h=Number(match[1]), m=Number(match[2]), s=Number(match[3]), ms=Number(match[4]);
+      if (m>59 || s>59) return null;
+      return (((h*60)+m)*60+s)*1000+ms;
+    };
+    for (const block of blocks) {
+      const lines = block.split("\\n");
+      const timeIndex = lines.findIndex(line => /\\d{2,}:\\d{2}:\\d{2}[,\\.]\\d{3}\\s*-->\\s*\\d{2,}:\\d{2}:\\d{2}[,\\.]\\d{3}/.test(line));
+      if (timeIndex < 0) continue;
+      const match = /^(\\d{2,}:\\d{2}:\\d{2})[,\\.](\\d{3})\\s*-->\\s*(\\d{2,}:\\d{2}:\\d{2})[,\\.](\\d{3})/.exec(lines[timeIndex].trim());
+      if (!match) continue;
+      const start=match[1]+","+match[2], end=match[3]+","+match[4];
+      const startMs=stampMs(start), endMs=stampMs(end);
+      const subtitle=lines.slice(timeIndex+1).join("\\n").trim();
+      if (startMs===null || endMs===null || endMs<=startMs || !subtitle) continue;
+      cues.push({start,end,startMs,endMs,subtitle});
+    }
+    if (!cues.length) throw new Error("لم يُرجع Gemini مقاطع SRT بتوقيتات صالحة. لم يتم إنشاء ملف ترجمة.");
+    cues.sort((a,b)=>a.startMs-b.startMs);
+    for (let i=1;i<cues.length;i++) if (cues[i].startMs<cues[i-1].startMs) throw new Error("توقيتات SRT غير مرتبة.");
+    const normalizedSrt = cues.map((cue,i)=>(i+1)+"\\n"+cue.start+" --> "+cue.end+"\\n"+cue.subtitle).join("\\n\\n");
+    return json({ text: normalizedSrt, cueCount: cues.length, mimeType: mime, fileName: file.name || "", provider: "Gemini" });
   } catch (error) {
     return json({ error: String(error?.message || "حدث خطأ أثناء معالجة الملف.").slice(0, 700) }, 502);
   } finally {
