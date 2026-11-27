@@ -91,7 +91,7 @@ audio,video{width:100%}
 <h2 style="font-size:22px;color:#facc15">🤖 مركز الذكاء الاصطناعي والترجمة</h2>
 <p class="small">الأدوات هنا ظاهرة مباشرة في الصفحة، من غير الحاجة للبحث داخل الزر العائم.</p>
 <div class="ai-grid">
-<button class="btn-blue" onclick="document.getElementById('geminiPrompt').scrollIntoView({behavior:'smooth',block:'center'});openGeminiPanel()">✨ مساعد Gemini</button>
+<button class="btn-blue" onclick="openGeminiPanel()">✨ مساعد Gemini</button>
 <button class="btn-green" onclick="document.getElementById('mediaTranslationTools').scrollIntoView({behavior:'smooth'})">🎬 ترجمة الفيديو والصوت</button>
 <button class="btn-gold" onclick="document.getElementById('myFiles').click()">📂 اختر فيديو أو أغنية</button>
 <button class="btn-dark" onclick="document.getElementById('textTranslationHub').scrollIntoView({behavior:'smooth'})">🌐 ترجمة النصوص</button>
@@ -99,10 +99,10 @@ audio,video{width:100%}
 <div class="card" style="background:#101010">
 <b>🎬 ترجمة الفيديو والأغاني بالذكاء الاصطناعي</b>
 <p class="small">اختر ملف MP4 أو MP3 من هاتفك. سيحوّل Whisper الصوت إلى نص، ثم يترجمه Gemini إلى اللغة المختارة. الحد الحالي 25 ميجابايت للملف.</p>
-<label class="small" for="speechTarget">لغة الترجمة</label>
-<select id="speechTarget" aria-label="لغة الترجمة"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option></select>
-<label class="small" for="speechSource">لغة الصوت الأصلي (اختياري)</label>
-<select id="speechSource" aria-label="لغة الصوت الأصلي"><option value="auto">اكتشاف تلقائي</option><option value="en-US">English</option><option value="ar">العربية</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="tr">Türkçe</option></select>
+<label class="small" for="mediaSpeechTarget">لغة الترجمة</label>
+<select id="mediaSpeechTarget" aria-label="لغة الترجمة"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option></select>
+<label class="small" for="mediaSpeechSource">لغة الصوت الأصلي (اختياري)</label>
+<select id="mediaSpeechSource" aria-label="لغة الصوت الأصلي"><option value="auto">اكتشاف تلقائي</option><option value="en-US">English</option><option value="ar">العربية</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="tr">Türkçe</option></select>
 <button class="btn-green" onclick="document.getElementById('myFiles').click()">اختيار ملف للترجمة</button>
 </div>
 <div class="card">
@@ -548,7 +548,7 @@ async function transcribeLocalMedia(index){
   try{
     const form=new FormData();
     form.append('audio',item.file,item.file.name);
-    const selectedLanguage=document.getElementById('speechSource')?.value||'auto';
+    const selectedLanguage=document.getElementById('mediaSpeechSource')?.value||document.getElementById('speechSource')?.value||'auto';
     const language=selectedLanguage==='auto'?'':selectedLanguage.split('-')[0];
     form.append('language',language);
     const response=await fetch('/api/transcribe',{method:'POST',body:form});
@@ -557,7 +557,7 @@ async function transcribeLocalMedia(index){
     const original=String(data.text||'').trim();
     if(!original)throw new Error('لم يتم التعرف على كلام واضح في الملف');
     output.innerText='📝 النص الأصلي:\n'+original+'\n\n⏳ جارٍ ترجمة النص...';
-    const target=document.getElementById('speechTarget')?.value||'ar';
+    const target=document.getElementById('mediaSpeechTarget')?.value||document.getElementById('speechTarget')?.value||'ar';
     const reportedLanguage=String(data.language||'').toLowerCase();
     const sourceLanguage=/^[a-z]{2,3}$/.test(reportedLanguage)?reportedLanguage:(selectedLanguage==='auto'?detectTranscriptLanguage(original):selectedLanguage.split('-')[0]);
     const translated=await translateTranscriptText(original,target,sourceLanguage);
