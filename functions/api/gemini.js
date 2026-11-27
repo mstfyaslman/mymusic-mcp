@@ -26,7 +26,8 @@ async function generateWithFallback(apiKey, prompt) {
             body: JSON.stringify({
               systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
               contents: [{ role: "user", parts: [{ text: prompt }] }],
-              generationConfig: { temperature: 0.6, maxOutputTokens: 1200 }
+              generationConfig: { temperature: 0.6, maxOutputTokens: 1200 },
+              ...(prompt && prompt.length <= 5000 && enableSearch ? { tools: [{ google_search: {} }] } : {})
             })
           }
         );
@@ -107,6 +108,7 @@ export async function onRequest(context) {
   }
 
   const prompt = typeof body?.prompt === "string" ? body.prompt.trim() : "";
+  const enableSearch = body?.enableSearch === true;
   if (!prompt || prompt.length > 5000) {
     return new Response(JSON.stringify({ error: "اكتب سؤالًا لا يتجاوز 5000 حرف." }), {
       status: 400,
