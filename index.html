@@ -232,7 +232,7 @@ body.light-theme input,body.light-theme select,body.light-theme textarea{backgro
     <h3>🤖 مساعد VEVO الذكي</h3>
     <p id="vevoAiChatHint">اسأل عن الفنان، الأغنية، معنى الكلمات، الألبوم، خلفية الفيديو أو أي سؤال آخر. ستظل المشاهدة مستمرة أثناء المحادثة.</p>
     <div id="vevoAiChatMessages" role="log" aria-live="polite"><div class="vevo-chat-msg vevo-chat-ai">أهلًا بك! اختر فيديو ثم اسألني عنه. أستطيع استخدام عنوان الفيديو والقناة والنص المستخرج إن توفر.</div></div>
-    <textarea id="vevoAiChatInput" class="vevo-field" maxlength="1800" placeholder="اكتب سؤالك عن الفيديو أو الفنان..."></textarea>
+    <textarea id="vevoAiChatInput" class="vevo-field" maxlength="1000" placeholder="اكتب سؤالك عن الفيديو أو الفنان..."></textarea>
     <div class="vevo-chat-actions">
       <button class="btn-gold" id="vevoAiChatSend" type="button" onclick="sendVevoAiQuestion()">إرسال السؤال</button>
       <button class="btn-dark" type="button" onclick="clearVevoAiChat()">مسح المحادثة</button>
@@ -1284,13 +1284,13 @@ function clearVevoAiChat(){myMusicVevoChatHistory=[];renderVevoAiChatWelcome();}
 async function sendVevoAiQuestion(){
   const input=document.getElementById("vevoAiChatInput"),button=document.getElementById("vevoAiChatSend");
   const question=(input?.value||"").trim();if(!question){input?.focus();return;}
-  if(question.length>1800){addVevoAiChatMessage("اختصر السؤال إلى 1800 حرف من فضلك.","ai");return;}
+  if(question.length>1000){addVevoAiChatMessage("اختصر السؤال إلى 1000 حرف من فضلك.","ai");return;}
   if(!myMusicVevoCurrentId){addVevoAiChatMessage("اختَر فيديو من نتائج VEVO أو YouTube أولاً حتى أربط السؤال بالمحتوى الصحيح.","ai");return;}
   input.value="";addVevoAiChatMessage(question,"user");button.disabled=true;
   const list=document.getElementById("vevoAiChatMessages"),wait=document.createElement("div");
   wait.className="vevo-chat-msg vevo-chat-ai";wait.textContent="⏳ أفكر في إجابتك...";list.appendChild(wait);list.scrollTop=list.scrollHeight;
-  const transcript=(myMusicVevoOriginalSrt||"").slice(0,6500);
-  const history=myMusicVevoChatHistory.slice(-8).map(x=>(x.role==="user"?"المستخدم: ":"المساعد: ")+x.text).join("\n");
+  const transcript=(myMusicVevoOriginalSrt||"").slice(0,1300);
+  const history=myMusicVevoChatHistory.slice(-4).map(x=>(x.role==="user"?"المستخدم: ":"المساعد: ")+x.text).join("\n");
   const prompt=[
     "أنت مساعد محادثة ذكي داخل منصة MyMusic AI، متخصص في الموسيقى والفيديو والفنانين. أجب بالعربية الواضحة وبأسلوب مفيد وممتاز، ويمكنك الإجابة عن الأسئلة العامة أيضًا. لا تختلق حقائق أو كلمات أغنية أو تفاصيل مشهد لا تعرفها؛ وضح عندما تكون المعلومة غير مؤكدة. استخدم سياق الفيديو والنص المستخرج إن وجد. لا تدّع أنك تشاهد أو تسمع البث الحي مباشرة.",
     "بيانات الفيديو الحالي:",
@@ -1303,7 +1303,7 @@ async function sendVevoAiQuestion(){
     "أجب مباشرة، واذكر إن كانت إجابتك مبنية على بيانات الفيديو المتاحة أو على معرفة عامة."
   ].join("\n\n");
   try{
-    const response=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({prompt})});
+    const response=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({prompt,enableSearch:true})});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw new Error(data.error||"تعذر الاتصال بمساعد الذكاء الاصطناعي.");
     const answer=String(data.text||"").trim();if(!answer)throw new Error("لم يصل رد من Gemini.");
