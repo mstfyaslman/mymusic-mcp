@@ -503,7 +503,7 @@ let myLocalMedia=[];
 let autoTranscribeOnSelect=false;
 function chooseMediaForTranslation(){autoTranscribeOnSelect=true;document.getElementById('myFiles').click();}
 function getMediaMime(file){
-  if(file.type&&/^(audio|video)\\//i.test(file.type))return file.type;
+  if(file.type&&/^(audio|video)\//i.test(file.type))return file.type;
   const ext=(file.name||'').split('.').pop().toLowerCase();
   const types={mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',wav:'audio/wav',ogg:'audio/ogg',flac:'audio/flac',mp4:'video/mp4',m4v:'video/mp4',mov:'video/quicktime',webm:'video/webm',3gp:'video/3gpp',avi:'video/x-msvideo',wmv:'video/x-ms-wmv'};
   return types[ext]||file.type||'';
@@ -599,7 +599,8 @@ async function transcribeLocalMedia(index){
     const reportedLanguage=String(data.language||'').toLowerCase();
     const sourceLanguage=/^[a-z]{2,3}$/.test(reportedLanguage)?reportedLanguage:(selectedLanguage==='auto'?detectTranscriptLanguage(original):selectedLanguage.split('-')[0]);
     const translated=await translateTranscriptText(original,target,sourceLanguage);
-    output.innerText='📝 النص الأصلي:\n'+original+'\n\n🌐 الترجمة:\n'+translated;\n    if(type.startsWith('video/'))showTranslatedSubtitles(index,translated,target);
+    output.innerText='📝 النص الأصلي:\n'+original+'\n\n🌐 الترجمة:\n'+translated;
+    if(type.startsWith('video/'))showTranslatedSubtitles(index,translated,target);
     const downloadButton=document.createElement('button');
     downloadButton.className='btn-blue';
     downloadButton.textContent='⬇️ تنزيل الترجمة بصيغة SRT';
