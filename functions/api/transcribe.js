@@ -41,7 +41,8 @@ export async function onRequestPost({ request, env }) {
   const validLanguage = /^[a-z]{2,3}$/i.test(language) ? language : undefined;
 
   try {
-    const audio = new Uint8Array(await file.arrayBuffer());
+    const audioBytes = new Uint8Array(await file.arrayBuffer());
+    const audio = toBase64(audioBytes);
     const result = await env.AI.run(MODEL, {
       audio,
       task: "transcribe",
@@ -84,4 +85,13 @@ function json(data, status = 200, extraHeaders = {}) {
       ...extraHeaders
     }
   });
+}
+
+function toBase64(bytes) {
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  return btoa(binary);
 }
