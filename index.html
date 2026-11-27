@@ -56,6 +56,9 @@ audio,video{width:100%}
 #floatMenu button{display:block;width:100%;margin:5px 0}
 #floatMenu{width:min(320px,calc(100vw - 24px));max-height:70vh;overflow:auto}
 #liveTranslate{background:#202020;border:1px solid #555;border-radius:12px;padding:10px;margin:8px 0;text-align:right}
+#liveTranslatePanel{position:fixed;right:12px;left:12px;bottom:155px;z-index:1001;background:#111;border:1px solid #777;border-radius:16px;padding:12px;max-height:55vh;overflow:auto;box-shadow:0 8px 28px #000b;text-align:right}
+#liveTranslatePanel button{max-width:100%}
+#liveTranslatePanel select{width:100%;margin:4px 0;padding:9px;border-radius:10px}
 #liveTranslate select{width:100%;margin:4px 0;padding:9px;border-radius:10px}
 #liveOriginal,#liveResult{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:7px 0;color:#fff}
 #liveResult{color:#86efac}
@@ -129,6 +132,20 @@ audio,video{width:100%}
 <button class="btn-white" onclick="doTranslate('bing')">ترجمة Bing</button>
 <div id="trRes" class="small"></div>
 <p class="small">الترجمة بتشتغل جوه الموقع من الزر العائم، وبره الموقع لما تفتح جوجل أو مانوس في تاب جديد، وانت بتسمع أو بتتفرج.</p>
+</div>
+
+<div class="box" id="hindiDictionaryBox">
+<h2>📖 قاموس هندي – عربي | हिन्दी ↔ العربية</h2>
+<p class="small">ابحث عن معنى كلمة أو عبارة بالهندية أو العربية، واعرض ترجمتها واستمع إلى نطقها. يعتمد البحث على خدمة ترجمة عبر الإنترنت وليس قاموسًا لغويًا تحريريًا مستقلًا.</p>
+<select id="dictionaryDirection" aria-label="اتجاه القاموس">
+<option value="hi|ar">هندي ← إلى العربية</option>
+<option value="ar|hi">عربي ← إلى الهندية</option>
+</select>
+<input id="dictionaryWord" placeholder="اكتب كلمة أو عبارة..." autocomplete="off">
+<button class="btn-green" onclick="lookupHindiDictionary()">🔎 ابحث في القاموس</button>
+<button class="btn-blue" onclick="speakDictionaryWord()">🔊 نطق الكلمة الأصلية</button>
+<button class="btn-gold" onclick="speakDictionaryResult()">🔊 نطق الترجمة</button>
+<div id="dictionaryResult" class="card" aria-live="polite">نتيجة القاموس ستظهر هنا.</div>
 </div>
 
 <div class="box">
@@ -220,16 +237,22 @@ audio,video{width:100%}
 <button onclick="playYoutube()">▶️ تشغيل يوتيوب</button>
 <button onclick="doTranslate('google')">🌐 ترجمة جوجل</button>
 <button onclick="doTranslate('manus')">🚀 ترجمة Manus</button>
-<div id="liveTranslate">
-  <b>🎙️ ترجمة الكلام أثناء المشاهدة</b>
-  <p class="small">شغّل الفيديو بصوت مسموع، واسمح للميكروفون. الأداة تلتقط الكلام من الميكروفون ثم تترجمه؛ لا تلتقط صوت التبويب مباشرة.</p>
+
+<button onclick="openSearch('google')">🔍 بحث جوجل</button>
+<button onclick="toggleFloat()">👁️ إخفاء الزر</button>
+<button onclick="toggleFloatMenu()">❌ إغلاق</button>
+</div>
+
+<div id="liveTranslatePanel" role="region" aria-label="لوحة الترجمة المباشرة" style="display:none">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>🎙️ الترجمة المباشرة</b><button class="btn-dark" type="button" onclick="closeLiveTranslationPanel()" aria-label="إغلاق لوحة الترجمة">✕ إغلاق</button></div>
+  <p class="small">شغّل الفيديو بصوت مسموع، واسمح للميكروفون. الأداة تلتقط الكلام من الميكروفون ثم تترجمه؛ لا تلتقط صوت التبويب مباشرة؛ يلزم الميكروفون وسماع الصوت في المكان.</p>
   <label class="small" for="speechSource">لغة الكلام</label>
   <select id="speechSource">
-    <option value="en-US">English</option><option value="ar-EG">العربية</option><option value="fr-FR">Français</option><option value="de-DE">Deutsch</option><option value="es-ES">Español</option><option value="tr-TR">Türkçe</option><option value="it-IT">Italiano</option><option value="ru-RU">Русский</option>
+    <option value="en-US">English</option><option value="ar-EG">العربية</option><option value="fr-FR">Français</option><option value="de-DE">Deutsch</option><option value="es-ES">Español</option><option value="tr-TR">Türkçe</option><option value="it-IT">Italiano</option><option value="ru-RU">Русский</option><option value="zh-CN">中文</option><option value="ja-JP">日本語</option><option value="ko-KR">한국어</option><option value="pt-BR">Português</option><option value="hi-IN">हिन्दी</option><option value="ur-PK">اردو</option><option value="fa-IR">فارسی</option><option value="bn-BD">বাংলা</option><option value="nl-NL">Nederlands</option><option value="el-GR">Ελληνικά</option><option value="he-IL">עברית</option><option value="id-ID">Bahasa Indonesia</option><option value="zh-CN">中文</option><option value="ja-JP">日本語</option><option value="ko-KR">한국어</option><option value="pt-BR">Português</option><option value="hi-IN">हिन्दी</option><option value="ur-PK">اردو</option><option value="fa-IR">فارسی</option><option value="bn-BD">বাংলা</option><option value="nl-NL">Nederlands</option><option value="el-GR">Ελληνικά</option><option value="he-IL">עברית</option><option value="id-ID">Bahasa Indonesia</option>
   </select>
   <label class="small" for="speechTarget">ترجمة إلى</label>
   <select id="speechTarget">
-    <option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option>
+    <option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="pt">Português</option><option value="hi">हिन्दी</option><option value="ur">اردو</option><option value="fa">فارسی</option><option value="bn">বাংলা</option><option value="nl">Nederlands</option><option value="el">Ελληνικά</option><option value="he">עברית</option><option value="id">Bahasa Indonesia</option><option value="zh">中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="pt">Português</option><option value="hi">हिन्दी</option><option value="ur">اردو</option><option value="fa">فارسی</option><option value="bn">বাংলা</option><option value="nl">Nederlands</option><option value="el">Ελληνικά</option><option value="he">עברית</option><option value="id">Bahasa Indonesia</option>
   </select>
   <button class="btn-green" id="startSpeechBtn" onclick="startLiveTranslation()">🎙️ ابدأ الاستماع والترجمة</button>
   <button class="btn-dark" onclick="stopLiveTranslation()">⏹️ إيقاف الترجمة</button>
@@ -240,10 +263,6 @@ audio,video{width:100%}
   <span id="liveStatus" class="small" aria-live="polite">جاهز - لم يبدأ الاستماع</span>
   <span id="liveOriginal"></span>
   <span id="liveResult"></span>
-</div>
-<button onclick="openSearch('google')">🔍 بحث جوجل</button>
-<button onclick="toggleFloat()">👁️ إخفاء الزر</button>
-<button onclick="toggleFloatMenu()">❌ إغلاق</button>
 </div>
 
 <div class="box" style="text-align:center">
@@ -343,7 +362,42 @@ async function translateLiveSpeech(text){
   if(!translated) throw new Error('No translated text returned');
   return translated;
 }
+
+let lastDictionarySource='',lastDictionaryTarget='',lastDictionaryOriginal='',lastDictionaryTranslation='';
+async function lookupHindiDictionary(){
+  const input=document.getElementById('dictionaryWord');
+  const output=document.getElementById('dictionaryResult');
+  const word=input.value.trim();
+  if(!word){output.innerText='اكتب كلمة أو عبارة أولاً.';return;}
+  const pair=document.getElementById('dictionaryDirection').value.split('|');
+  const source=pair[0],target=pair[1];
+  output.innerText='⏳ جارٍ البحث عن المعنى...';
+  try{
+    const endpoint='https://api.mymemory.translated.net/get?'+new URLSearchParams({q:word.slice(0,500),langpair:source+'|'+target});
+    const response=await fetch(endpoint,{headers:{'Accept':'application/json'}});
+    if(!response.ok) throw new Error('خدمة القاموس غير متاحة الآن');
+    const data=await response.json();
+    const translated=data&&data.responseData&&data.responseData.translatedText;
+    if(!translated) throw new Error('لم يتم العثور على معنى مناسب');
+    lastDictionaryOriginal=word;lastDictionaryTranslation=translated;
+    lastDictionarySource=source;lastDictionaryTarget=target;
+    output.innerHTML='<b>الكلمة:</b> '+escapeHTML(word)+'<br><b>المعنى:</b> '+escapeHTML(translated)+'<br><span class="small">اتجاه الترجمة: '+(source==='hi'?'الهندية':'العربية')+' → '+(target==='hi'?'الهندية':'العربية')+'</span>';
+  }catch(error){output.innerText='تعذر جلب المعنى: '+error.message+' — تحقق من الإنترنت وحاول مجددًا.';}
+}
+function speakDictionaryText(text,lang){
+  if(!text)return alert('ابحث عن كلمة أولاً.');
+  if(!('speechSynthesis' in window))return alert('النطق الصوتي غير مدعوم في هذا المتصفح.');
+  const utterance=new SpeechSynthesisUtterance(text);
+  utterance.lang=lang==='hi'?'hi-IN':'ar';
+  window.speechSynthesis.cancel();window.speechSynthesis.speak(utterance);
+}
+function speakDictionaryWord(){speakDictionaryText(lastDictionaryOriginal,lastDictionarySource);}
+function speakDictionaryResult(){speakDictionaryText(lastDictionaryTranslation,lastDictionaryTarget);}
+function closeLiveTranslationPanel(){stopLiveTranslation();document.getElementById('liveTranslatePanel').style.display='none';}
+
 function startLiveTranslation(){
+  document.getElementById('floatMenu').style.display='none';
+  document.getElementById('liveTranslatePanel').style.display='block';
   const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SpeechRecognition){
     document.getElementById('liveStatus').innerText='المتصفح لا يدعم التعرف على الكلام. جرّب Chrome المحدّث.';
@@ -420,7 +474,7 @@ async function getOcrWorker(){
       document.head.appendChild(script);
     });
   }
-  if(!ocrWorkerPromise) ocrWorkerPromise=window.Tesseract.createWorker('eng+ara');
+  if(!ocrWorkerPromise) ocrWorkerPromise=window.Tesseract.createWorker('eng+ara+hin');
   return ocrWorkerPromise;
 }
 async function ocrCanvasAndTranslate(canvas){
@@ -433,7 +487,7 @@ async function ocrCanvasAndTranslate(canvas){
     if(!recognized){output.innerText='لم يتم العثور على نص واضح في هذه الصورة أو اللقطة.';return;}
     output.innerText='النص الأصلي: '+recognized+'\\n⏳ جارٍ الترجمة...';
     const target=document.getElementById('speechTarget').value;
-    const source=/[\\u0600-\\u06FF]/.test(recognized)?'ar':'en';
+    const source=/[\\u0600-\\u06FF]/.test(recognized)?'ar':(/[\\u0900-\\u097F]/.test(recognized)?'hi':'en');
     const response=await fetch('https://api.mymemory.translated.net/get?'+new URLSearchParams({q:recognized.slice(0,500),langpair:source+'|'+target}),{headers:{'Accept':'application/json'}});
     if(!response.ok) throw new Error('Translation service unavailable');
     const data=await response.json();
