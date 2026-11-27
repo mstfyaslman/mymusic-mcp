@@ -116,6 +116,15 @@ audio,video{width:100%}
 <p class="small">الملفات بتتحفظ في متصفحك بس، ومش بتتبعت لأي حد.</p>
 </div>
 
+<div class="box" id="mediaTranslationTools">
+<h2>🎙️ ترجمة الفيديوهات وملفات MP3 - داخل وخارج القائمة العائمة</h2>
+<p class="small">شغّل ملف الصوت أو الفيديو أولاً، ثم اضغط ترجمة المشغل. يمكن حفظ النص المترجم على جهازك وتنزيل سجل الترجمات كملف TXT.</p>
+<button class="btn-green" onclick="openLiveTranslationPanel()">فتح لوحة الترجمة</button>
+<button class="btn-blue" onclick="translateCurrentMedia()">ترجمة الصوت/الفيديو الجاري</button>
+<button class="btn-gold" onclick="startTabAudioTranslation()">ترجمة صوت تبويب أو موقع</button>
+<button class="btn-dark" onclick="exportTranslationHistory()">تنزيل الترجمات المحفوظة</button>
+</div>
+
 <div class="box">
 <h2>🎵 مشغل MP3 - بحث وتحميل وتشغيل</h2>
 <input id="search" placeholder="اكتب اسم أغنية...">
@@ -341,7 +350,7 @@ async function searchMusic(){
  if(!q)return alert('اكتب اسم أغنية أو فنان الأول');
  const box=document.getElementById('results');box.innerHTML='⏳ جاري البحث عن تسجيلات مرخصة...';
  try{
-  const query='mediatype:audio AND licenseurl:* AND '+q;
+  const query='mediatype:audio AND licenseurl:http* AND '+q;
   const api='https://archive.org/advancedsearch.php?'+new URLSearchParams({q:query,'fl[]':'identifier,title,creator,licenseurl',rows:'15',page:'1',output:'json'});
   const response=await fetch(api);if(!response.ok)throw new Error('تعذر الوصول لأرشيف الموسيقى');
   const data=await response.json();const docs=(data.response&&data.response.docs)||[];const found=[];
