@@ -118,9 +118,9 @@ audio,video{width:100%}
 
 <div class="box" id="mediaTranslationTools">
 <h2>🎙️ ترجمة الفيديوهات وملفات MP3 - داخل وخارج القائمة العائمة</h2>
-<p class="small">شغّل ملف الصوت أو الفيديو أولاً، ثم اضغط ترجمة المشغل. يمكن حفظ النص المترجم على جهازك وتنزيل سجل الترجمات كملف TXT.</p>
+<p class="small">شغّل الصوت أو الفيديو وارفع صوت الجهاز، ثم اسمح بالميكروفون للترجمة. لا يحتاج الموقع إلى التقاط صوت المشغل مباشرة.</p>
 <button class="btn-green" onclick="openLiveTranslationPanel()">فتح لوحة الترجمة</button>
-<button class="btn-blue" onclick="translateCurrentMedia()">ترجمة الصوت/الفيديو الجاري</button>
+<button class="btn-blue" onclick="translateCurrentMedia()">ترجمة صوت المشغل عبر الميكروفون</button>
 <button class="btn-gold" onclick="startTabAudioTranslation()">ترجمة صوت تبويب أو موقع</button>
 <button class="btn-dark" onclick="exportTranslationHistory()">تنزيل الترجمات المحفوظة</button>
 </div>
@@ -245,7 +245,7 @@ audio,video{width:100%}
 <button onclick="nextSong()">⏭️ التالي</button>
 <button onclick="playYoutube()">▶️ تشغيل يوتيوب</button>
 <button onclick="doTranslate('google')">🌐 ترجمة جوجل</button>
-<button onclick="doTranslate('manus')">🚀 ترجمة Manus</button><button class="btn-green" onclick="openLiveTranslationPanel()">🎙️ افتح الترجمة المباشرة</button><button class="btn-blue" onclick="translateCurrentMedia()">▶️ ترجم صوت/فيديو المشغل الحالي</button><button class="btn-gold" onclick="startTabAudioTranslation()">🌐 ترجم صوت الموقع/التبويب</button>
+<button onclick="doTranslate('manus')">🚀 ترجمة Manus</button><button class="btn-green" onclick="openLiveTranslationPanel()">🎙️ افتح الترجمة المباشرة</button><button class="btn-blue" onclick="translateCurrentMedia()">▶️ ترجم صوت المشغل عبر الميكروفون</button><button class="btn-gold" onclick="startTabAudioTranslation()">🌐 ترجم صوت الموقع/التبويب</button>
 
 <button onclick="openSearch('google')">🔍 بحث جوجل</button>
 <button onclick="toggleFloat()">👁️ إخفاء الزر</button>
@@ -380,7 +380,16 @@ function toggleFloatMenu(){ let m=document.getElementById('floatMenu'); m.style.
 function googleDiscover(kind){const q=document.getElementById('search').value.trim()||document.getElementById('gSearch').value.trim();if(!q)return alert('اكتب كلمة البحث أولاً');const term=kind==='music'?'أغنية كاملة '+q:kind==='video'?'فيديو '+q:q;window.open('https://www.google.com/search?q='+encodeURIComponent(term),'_blank','noopener');}
 function openLiveTranslationPanel(){document.getElementById('floatMenu').style.display='none';document.getElementById('liveTranslatePanel').style.display='block';}
 let liveCaptureStream=null,liveInputTrack=null,translationHistory=[];try{translationHistory=JSON.parse(localStorage.getItem('mymusic_translation_history')||'[]');}catch(e){translationHistory=[];}
-function translateCurrentMedia(){const media=Array.from(document.querySelectorAll('audio,video')).find(x=>!x.paused&&x.currentSrc);if(!media){openLiveTranslationPanel();startLiveTranslation();return;}const cap=media.captureStream||media.mozCaptureStream;if(!cap){openLiveTranslationPanel();startLiveTranslation();return;}try{liveCaptureStream=cap.call(media);liveInputTrack=liveCaptureStream.getAudioTracks()[0];if(!liveInputTrack)return alert('لا يوجد مسار صوت في الملف الجاري');openLiveTranslationPanel();startLiveTranslation();}catch(e){alert('تعذر التقاط صوت الملف: '+e.message);}}
+function translateCurrentMedia(){
+  // Cross-origin media cannot reliably be captured from an HTMLMediaElement.
+  // Avoid captureStream entirely and use the browser microphone recognition path.
+  liveInputTrack=null;
+  if(liveCaptureStream){liveCaptureStream.getTracks().forEach(t=>t.stop());liveCaptureStream=null;}
+  openLiveTranslationPanel();
+  const status=document.getElementById('liveStatus');
+  if(status) status.innerText='🎙️ الترجمة عبر الميكروفون: اسمح بالميكروفون وشغّل الصوت بمستوى مسموع.';
+  startLiveTranslation();
+}
 async function startTabAudioTranslation(){if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia)return alert('مشاركة صوت التبويب غير مدعومة في هذا المتصفح');try{const stream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});const track=stream.getAudioTracks()[0];if(!track){stream.getTracks().forEach(t=>t.stop());return alert('اختر مشاركة تبويب Chrome وفعّل مشاركة الصوت');}liveCaptureStream=stream;liveInputTrack=track;openLiveTranslationPanel();startLiveTranslation();}catch(e){alert('تعذرت مشاركة التبويب: '+e.message);}}
 function saveLiveTranslation(){const original=document.getElementById('liveOriginal').innerText;const translated=document.getElementById('liveResult').innerText;if(!translated)return alert('لا توجد ترجمة لحفظها');translationHistory.unshift({date:new Date().toLocaleString('ar-EG'),original:original,translated:translated});translationHistory=translationHistory.slice(0,100);try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}showTranslationHistory();}
 function showTranslationHistory(){const box=document.getElementById('translationHistory');if(!box)return;box.innerHTML=translationHistory.slice(0,10).map(x=>'<div class="card">'+escapeHTML(x.date)+'<br>'+escapeHTML(x.original)+'<br>'+escapeHTML(x.translated)+'</div>').join('')||'لا توجد ترجمات محفوظة';}
