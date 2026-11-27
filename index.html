@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MyMusic AI – اكتشف الموسيقى واستمع إلى المعاينات</title>
-<meta name="description" content="اكتشف الأغاني والفنانين عبر MyMusic AI، استمع إلى المعاينات الموسيقية، واستخدم أدوات البحث والترجمة ومشغل الموسيقى من هاتفك أو جهازك.">
+<meta name="description" content="MyMusic AI منصة للموسيقى والترجمة والبحث العلمي وتعليم الثانوية العامة المصرية: كتب الوزارة ودروس الفيديو وأدوات ترجمة الصوت والفيديو.">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <link rel="canonical" href="https://mymusic-3k6.pages.dev/">
 <link rel="icon" type="image/svg+xml" href="/icon.svg">
@@ -161,6 +161,35 @@ audio,video{width:100%}
 <button class="btn-blue" onclick="speakDictionaryWord()">🔊 نطق الكلمة الأصلية</button>
 <button class="btn-gold" onclick="speakDictionaryResult()">🔊 نطق الترجمة</button>
 <div id="dictionaryResult" class="card" aria-live="polite">نتيجة القاموس ستظهر هنا.</div>
+</div>
+
+<div class="box" id="egypt-secondary-learning">
+<h2>🎓 مركز تعليم الثانوية العامة المصرية</h2>
+<p class="small">بوابة واحدة للوصول إلى الكتب الرسمية والدروس والمراجعات والبحث العلمي. اختر الصف والمادة ثم افتح مصدر التعلم المناسب.</p>
+<label class="small" for="studyGrade">الصف الدراسي</label>
+<select id="studyGrade" style="width:100%">
+<option value="الصف الأول الثانوي">الأول الثانوي</option>
+<option value="الصف الثاني الثانوي">الثاني الثانوي</option>
+<option value="الصف الثالث الثانوي">الثالث الثانوي</option>
+<option value="البكالوريا المصرية">البكالوريا المصرية</option>
+</select>
+<label class="small" for="studySubject">المادة</label>
+<select id="studySubject" style="width:100%">
+<option>اللغة العربية</option><option>اللغة الإنجليزية</option><option>اللغة الأجنبية الثانية</option>
+<option>الرياضيات</option><option>الفيزياء</option><option>الكيمياء</option><option>الأحياء</option>
+<option>التاريخ</option><option>الجغرافيا</option><option>الفلسفة والمنطق</option><option>علم النفس والاجتماع</option>
+<option>البرمجة والذكاء الاصطناعي</option><option>اللغة الفرنسية</option><option>اللغة الألمانية</option>
+</select>
+<button class="btn-green" onclick="searchStudyLessons()">🔎 ابحث عن شرح ومراجعة للمادة</button>
+<div class="ai-grid" style="margin-top:8px">
+<a class="ai-btn" href="https://studentbooks.moe.gov.eg/Books" target="_blank" rel="noopener noreferrer">📚 كتب الوزارة الرسمية</a>
+<a class="ai-btn" href="https://moe.gov.eg/elearningenterypage/e-learning/" target="_blank" rel="noopener noreferrer">🏫 بوابة التعليم الإلكتروني</a>
+<a class="ai-btn" href="https://madrasetnaplus.eg/home" target="_blank" rel="noopener noreferrer">📺 مدرستنا بلس</a>
+<a class="ai-btn" href="https://www.youtube.com/@madrasetna3rd.sec" target="_blank" rel="noopener noreferrer">🎥 مدرستنا الثانوية</a>
+<a class="ai-btn" href="https://www.khanacademy.org/" target="_blank" rel="noopener noreferrer">🧮 Khan Academy</a>
+<a class="ai-btn" href="https://scholar.google.com/" target="_blank" rel="noopener noreferrer">🔬 Google Scholar</a>
+</div>
+<p class="small">ملاحظة: الروابط تفتح المصادر الأصلية؛ توافر الدروس والمواد يتغير حسب ما تنشره الجهات التعليمية.</p>
 </div>
 
 <div class="box">
@@ -495,6 +524,12 @@ function sendMsg(){ let n=document.getElementById('msgName').value||'صديقن�
 function toggleFloat(){ floatHidden=!floatHidden; document.getElementById('floatBtn').style.display=floatHidden?'none':'block'; document.getElementById('floatMenu').style.display='none'; if(floatHidden) alert('الزر العائم اتخفى - دوس على زرار إخفاء / إظهار الزر العائم فوق عشان يرجع'); }
 function toggleFloatMenu(){ let m=document.getElementById('floatMenu'); m.style.display=(m.style.display=='block')?'none':'block'; }
 
+function searchStudyLessons(){
+ const grade=document.getElementById('studyGrade').value;
+ const subject=document.getElementById('studySubject').value;
+ const q=grade+' '+subject+' شرح مراجعة حل أسئلة مصر';
+ window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(q),'_blank','noopener');
+}
 function googleDiscover(kind){const q=document.getElementById('search').value.trim()||document.getElementById('gSearch').value.trim();if(!q)return alert('اكتب كلمة البحث أولاً');const term=kind==='music'?'أغنية كاملة '+q:kind==='video'?'فيديو '+q:q;window.open('https://www.google.com/search?q='+encodeURIComponent(term),'_blank','noopener');}
 function openLiveTranslationPanel(){document.getElementById('floatMenu').style.display='none';document.getElementById('liveTranslatePanel').style.display='block';}
 let liveCaptureStream=null,liveInputTrack=null,translationHistory=[];try{translationHistory=JSON.parse(localStorage.getItem('mymusic_translation_history')||'[]');}catch(e){translationHistory=[];}
