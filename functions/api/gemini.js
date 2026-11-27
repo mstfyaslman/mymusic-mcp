@@ -8,7 +8,7 @@ const SYSTEM_PROMPT = "أنت مساعد MyMusic AI المدمج داخل الم
 async function generateWithFallback(apiKey, prompt) {
   // Flash-Lite is optimized for translation and low-latency text tasks.
   // Fall back to Flash if the primary model is temporarily overloaded.
-  const models = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.5-flash"];
+  const models = ["gemini-3.5-flash-lite", "gemini-3.8-flash"];
   let lastError = null;
 
   for (const model of models) {
