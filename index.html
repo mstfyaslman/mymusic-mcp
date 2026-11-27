@@ -481,7 +481,42 @@ getWeatherCairo();
 function openSearch(type){ let q=document.getElementById('gSearch').value.trim()||document.getElementById('search').value.trim(); if(!q) return alert('اكتب كلمة بحث الأول'); if(type=='google') openInAppBrowser('https://www.google.com/search?q='+encodeURIComponent(q)); if(type=='youtube') openInAppBrowser('https://www.youtube.com/results?search_query='+encodeURIComponent(q)); if(type=='manus') openInAppBrowser('https://manus.im/?q='+encodeURIComponent(q)); if(type=='mp3'){ document.getElementById('search').value=q; searchMusic(); } document.getElementById('gRes').innerHTML='<div class="card">🔍 <b>'+q+'</b> - اتفتح في تاب جديد - <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/2991/2991148.png\'" style="width:28px;border-radius:50%"> الأيقونة الافتراضية</div>'; }
 function playYoutube(){ let v=document.getElementById('ytInput').value.trim()||document.getElementById('gSearch').value.trim(); if(!v) return alert('اكتب اسم فيديو أو الصق لينك يوتيوب'); let m=v.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_-]{11})/); if(m){ document.getElementById('ytBox').innerHTML='<iframe src="https://www.youtube.com/embed/'+m[1]+'" allowfullscreen></iframe>'; } else { openInAppBrowser('https://www.youtube.com/results?search_query='+encodeURIComponent(v)); document.getElementById('ytBox').innerHTML='<div class="card">▶️ فتحنا بحث يوتيوب لـ <b>'+v+'</b> في تاب جديد</div>'; } }
 function openYTApp(){ let v=document.getElementById('ytInput').value.trim(); openInAppBrowser(v?('https://www.youtube.com/results?search_query='+encodeURIComponent(v)):'https://www.youtube.com'); }
-function translateYT(){ let v=document.getElementById('ytInput').value.trim()||'video'; document.getElementById('ytTrans').innerHTML='<div class="card">🌐 ترجمة: <b>'+v+'</b><br><a href="https://translate.google.com/?sl=auto&tl=ar&text='+encodeURIComponent(v)+'" target="_blank" style="color:#fff">فتح ترجمة جوجل</a> | <a href="https://manus.im" target="_blank" style="color:#fff">فتح Manus</a></div>'; openInAppBrowser('https://translate.google.com/?sl=auto&tl=ar&text='+encodeURIComponent(v)); }
+async function translateYT(){
+ const input=document.getElementById('ytInput');
+ const output=document.getElementById('ytTrans');
+ const raw=input.value.trim();
+ if(!raw)return alert('الصق رابط فيديو YouTube أولاً.');
+ const match=raw.match(/(?:v=|youtu\\.be\\/|shorts\\/|embed\\/|live\\/)([A-Za-z0-9_-]{11})/);
+ if(!match)return alert('الرابط غير صالح. استخدم رابط YouTube لفيديو عام أو غير مدرج.');
+ const videoUrl='https://www.youtube.com/watch?v='+match[1];
+ const target=document.getElementById('mediaSpeechTarget')?.value||'ar';
+ output.innerHTML='<div class="card" aria-live="polite">⏳ جارٍ إرسال رابط الفيديو إلى Gemini لتحليل الصوت واستخراج التوقيتات. قد تستغرق العملية بعض الوقت...</div>';
+ if(!document.getElementById('ytBox').querySelector('iframe'))playYoutube();
+ try{
+  const response=await fetch('/api/transcribe-youtube',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({url:videoUrl})});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||('تعذر تحليل الفيديو ('+response.status+')'));
+  const original=String(data.text||'').trim();
+  if(!original||original==='NO_SPEECH')throw new Error('لم يتم العثور على كلام أو كلمات أغنية مسموعة في الفيديو.');
+  output.innerHTML='<div class="card"><b>📝 النص الأصلي</b><pre id="ytOriginalText" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre><p>⏳ جارٍ ترجمة التوقيتات إلى اللغة المختارة...</p><pre id="ytTranslatedText" style="white-space:pre-wrap;overflow-wrap:anywhere;color:#86efac"></pre><div id="ytDownloadArea"></div></div>';
+  document.getElementById('ytOriginalText').textContent=original;
+  const source=detectTranscriptLanguage(original);
+  const translated=await translateTranscriptText(original,target,source);
+  document.getElementById('ytTranslatedText').textContent=translated;
+  const download=document.createElement('button');
+  download.className='btn-blue';
+  download.textContent='⬇️ تنزيل الترجمة SRT';
+  download.onclick=()=>downloadSubtitleFile(translated,'MyMusic-YouTube-'+match[1]+'.srt');
+  document.getElementById('ytDownloadArea').appendChild(download);
+  const note=document.createElement('p');
+  note.className='small';
+  note.textContent='تم استخراج الترجمة مع التوقيتات. يمكنك عرضها هنا أو تنزيل ملف SRT وإضافته إلى الفيديو. تشغيل YouTube داخل الإطار لا يسمح للموقع بفرض مسار ترجمة مخصص فوق مشغل YouTube نفسه.';
+  document.getElementById('ytDownloadArea').appendChild(note);
+ }catch(error){
+  output.innerHTML='<div class="card" style="color:#fca5a5" aria-live="polite"></div>';
+  output.querySelector('.card').textContent='⚠️ تعذرت ترجمة فيديو YouTube: '+error.message;
+ }
+}
 async function doTranslate(where){
  const input=document.getElementById('trText'), output=document.getElementById('trRes');
  const t=input.value.trim();
