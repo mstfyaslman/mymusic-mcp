@@ -91,6 +91,56 @@ body.light-theme input,body.light-theme select,body.light-theme textarea{backgro
 body.light-theme #geminiPanel,body.light-theme #liveTranslatePanel{background:#fff;color:#18243a;border-color:#c6d2e4}
 body.light-theme #geminiReply,body.light-theme #liveTranslate,body.light-theme #ocrOutput{background:#f1f5fb;color:#18243a}
 @media(max-width:480px){.box{margin:10px;padding:13px}.ai-grid{gap:7px}.ai-btn{font-size:12px;padding:11px}}
+
+/* MyMusic AI premium black & gold theme */
+:root{
+ color-scheme:dark;
+ --bg:#050505;--surface:#101010;--surface-2:#181818;--line:#8a681d;
+ --text:#f7f4eb;--muted:#c9c1ad;--purple:#d4af37;--cyan:#e5bd50;--gold:#d4af37;
+}
+html,body{background:#050505!important;color:#f7f4eb!important}
+body{background:radial-gradient(ellipse at top,#201909 0%,#080808 42%,#030303 100%)!important}
+.top{background:linear-gradient(135deg,#050505 0%,#17120a 55%,#050505 100%)!important;border:1px solid #8a681d;border-top:0;box-shadow:0 8px 28px #d4af3722}
+.top h1,h1,h2{color:#f3d477}
+.box,.card,#geminiPanel,#liveTranslatePanel,#floatMenu,#liveTranslate,#geminiReply,#ocrOutput{
+ background:linear-gradient(145deg,#151515,#090909)!important;
+ border-color:#76591c!important;color:#f7f4eb;
+ box-shadow:0 8px 24px #0009,0 0 12px #d4af3710;
+}
+#aiTranslationHub{background:linear-gradient(145deg,#15120b,#080808)!important;border-color:#d4af37!important}
+input,select,textarea,#geminiPanel textarea{
+ background:#101010!important;color:#fff!important;border:1px solid #8a681d!important;
+}
+input::placeholder,textarea::placeholder{color:#b9ad91!important}
+button,.btn-green,.btn-white,.btn-dark,.btn-gold,.btn-blue{
+ background:linear-gradient(135deg,#f5d778 0%,#d4af37 48%,#a87917 100%)!important;
+ color:#100d06!important;border:1px solid #f4d77b!important;
+ font-weight:800;box-shadow:0 3px 12px #d4af3728;
+}
+button:hover,.ai-btn:hover{filter:brightness(1.12);box-shadow:0 4px 18px #d4af3750}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #f5d778!important;outline-offset:3px}
+.ai-btn,#floatMenu .floatLink{
+ background:linear-gradient(145deg,#17130a,#090909)!important;color:#f4d36d!important;
+ border:1px solid #bd922e!important;
+}
+#floatBtn{background:linear-gradient(135deg,#f5d778,#b88620)!important;color:#100d06!important;border:1px solid #f5d778!important}
+#clock{color:#f3d477!important}
+.small{color:#c9c1ad!important}
+#progressBar{background:linear-gradient(90deg,#a87917,#f5d778)!important}
+.progress{background:#292216!important}
+#liveResult{color:#f3d477!important}
+#inAppBrowser{background:#050505!important}
+#inAppBrowser .browserBar{background:#111!important;border-color:#76591c!important}
+body.light-theme{color-scheme:dark!important;background:#050505!important;color:#f7f4eb!important}
+body.light-theme .box,body.light-theme .card,body.light-theme #geminiPanel,body.light-theme #liveTranslatePanel,
+body.light-theme #geminiReply,body.light-theme #liveTranslate,body.light-theme #ocrOutput{
+ background:linear-gradient(145deg,#151515,#090909)!important;color:#f7f4eb!important;border-color:#76591c!important
+}
+body.light-theme h2{color:#f3d477!important}
+body.light-theme .small{color:#c9c1ad!important}
+body.light-theme input,body.light-theme select,body.light-theme textarea{background:#101010!important;color:#fff!important;border-color:#8a681d!important}
+@media(max-width:480px){.top{padding:20px 12px}.box{border-radius:16px}}
+
 </style>
 </head>
 <body>
