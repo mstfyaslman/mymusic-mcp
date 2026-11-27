@@ -60,6 +60,7 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
     private var speechLanguage = "en-US"
     private var lastOcrText = ""
     private var lastOcrAt = 0L
+    private var ocrBusy = false
     private var bubble: Button? = null
     private var panel: LinearLayout? = null
     private var statusView: TextView? = null
@@ -277,6 +278,8 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
     }
 
     private fun recognizeScreen(bitmap: Bitmap) {
+        if (ocrBusy) { bitmap.recycle(); return }
+        ocrBusy = true
         worker.execute {
             try {
                 if (!ensureTesseract()) throw IllegalStateException("تعذر تشغيل محرك قراءة النص")
@@ -292,6 +295,8 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
             } catch (error: Exception) {
                 bitmap.recycle()
                 mainHandler.post { statusView?.text = "تعذر قراءة الشاشة: ${error.message}" }
+            } finally {
+                mainHandler.post { ocrBusy = false }
             }
         }
     }
