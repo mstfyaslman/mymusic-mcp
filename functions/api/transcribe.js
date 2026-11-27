@@ -14,7 +14,7 @@ export async function onRequest({ request, env }) {
   if (!file.size) return json({ error: "الملف فارغ." }, 400);
   if (file.size > 25 * 1024 * 1024) return json({ error: "الحد الحالي 25 ميجابايت للملف." }, 413);
   const mime = (file.type || "").toLowerCase();
-  const supported = /^(audio\/(mpeg|mp3|wav|x-wav|ogg|flac|mp4|webm|aac|3gpp)|video\/(mp4|mpeg|quicktime|webm|x-msvideo|x-ms-wmv|x-flv|3gpp))$/;
+  const supported = /^(audio\/(mpeg|mp3|wav|x-wav|ogg|flac|mp4|webm|aac|3gpp|x-m4a)|video\/(mp4|mpeg|quicktime|webm|x-msvideo|x-ms-wmv|x-flv|3gpp|x-m4v))$/;
   if (!supported.test(mime)) return json({ error: "صيغة غير مدعومة. استخدم MP4 أو MOV أو WebM أو MP3 أو WAV." }, 415);
   let uploadedName = "";
   try {
@@ -27,7 +27,7 @@ export async function onRequest({ request, env }) {
     if (!start.ok) throw new Error("Gemini رفض بدء رفع الملف: " + (await start.text()).slice(0, 400));
     const uploadUrl = start.headers.get("x-goog-upload-url");
     if (!uploadUrl) throw new Error("لم يُرجع Gemini رابط رفع الملف.");
-    const uploaded = await fetch(uploadUrl, { method: "POST", headers: { "Content-Length": String(file.size), "X-Goog-Upload-Offset": "0", "X-Goog-Upload-Command": "upload, finalize" }, body: bytes });
+    const uploaded = await fetch(uploadUrl, { method: "POST", headers: { "X-Goog-Upload-Offset": "0", "X-Goog-Upload-Command": "upload, finalize" }, body: bytes });
     const uploadData = await uploaded.json().catch(() => ({}));
     if (!uploaded.ok || !uploadData.file?.name || !uploadData.file?.uri) throw new Error(uploadData.error?.message || "فشل رفع الملف إلى Gemini.");
     uploadedName = uploadData.file.name;
@@ -56,6 +56,6 @@ export async function onRequest({ request, env }) {
   } catch (error) {
     return json({ error: String(error?.message || "حدث خطأ أثناء معالجة الملف.").slice(0, 700) }, 502);
   } finally {
-    if (uploadedName) fetch("https://generativelanguage.googleapis.com/v1beta/" + uploadedName + "?key=" + encodeURIComponent(apiKey), { method: "DELETE" }).catch(() => {});
+    if (uploadedName) await fetch("https://generativelanguage.googleapis.com/v1beta/" + uploadedName + "?key=" + encodeURIComponent(apiKey), { method: "DELETE" }).catch(() => {});
   }
 }
