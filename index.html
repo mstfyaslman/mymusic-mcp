@@ -594,11 +594,11 @@ async function translateTranscriptText(text,target,source){
   const sourceCode=source||detectTranscriptLanguage(text);
   if(sourceCode===target)return text;
   // Keep complete SRT cues together so chunking never separates a timestamp from its subtitle.
-  const raw=String(text||'').replace(/\\r/g,'').trim();
-  const blocks=raw.includes('-->')?raw.split(/\\n\\s*\\n/).filter(Boolean):raw.split(/(?<=[.!?؟。])\\s+/).filter(Boolean);
+  const raw=String(text||'').replace(/\r/g,'').trim();
+  const blocks=raw.includes('-->')?raw.split(/\n\s*\n/).filter(Boolean):raw.split(/(?<=[.!?؟。])\s+/).filter(Boolean);
   const chunks=[];let current='';
   for(const block of blocks){
-    const next=(current+'\\n\\n'+block).trim();
+    const next=(current+'\n\n'+block).trim();
     if(next.length>2800&&current){chunks.push(current);current=block;}
     else current=next;
   }
@@ -606,7 +606,7 @@ async function translateTranscriptText(text,target,source){
   const translated=[];
   const names={ar:'Arabic',en:'English',fr:'French',de:'German',es:'Spanish',hi:'Hindi',tr:'Turkish',it:'Italian',ru:'Russian',zh:'Chinese',ja:'Japanese'};
   for(let i=0;i<chunks.length;i++){
-    const prompt='Translate the following subtitle transcript from '+(sourceCode||'the detected source language')+' into '+(names[target]||target)+'. Preserve SRT cue numbers and timestamps exactly; translate only subtitle text. Preserve meaning, names, song lines and speaker labels. Return ONLY valid translated SRT text, with no explanation or introduction.\\n\\n'+chunks[i];
+    const prompt='Translate the following subtitle transcript from '+(sourceCode||'the detected source language')+' into '+(names[target]||target)+'. Preserve SRT cue numbers and timestamps exactly; translate only subtitle text. Preserve meaning, names, song lines and speaker labels. Return ONLY valid translated SRT text, with no explanation or introduction.\n\n'+chunks[i];
     const response=await fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({prompt})});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw new Error(data.error||'تعذرت ترجمة Gemini ('+response.status+')');
