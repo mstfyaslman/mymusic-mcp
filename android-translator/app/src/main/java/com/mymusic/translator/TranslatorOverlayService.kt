@@ -112,7 +112,7 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(this, CHANNEL_ID) else Notification.Builder(this)
         return builder.setContentTitle("MyMusic Translator")
             .setContentText("المترجم العائم يعمل. اضغط على الكرة لعرض الترجمة.")
-            .setSmallIcon(android.R.drawable.ic_menu_translate)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setOngoing(true)
             .build()
     }
