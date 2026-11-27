@@ -73,7 +73,7 @@ audio,video{width:100%;max-width:100%}
 #liveTranslatePanel select,#liveTranslate select{width:100%;margin:4px 0;padding:9px;border-radius:10px}
 #liveOriginal,#liveResult{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:7px 0;color:#fff}
 #liveResult{color:#75e0bd}
-#ocrOutput{display:block;white-space:pre-wrap;overflow-wrap:anywhere;background:#17243b;padding:8px;border-radius:8px;margin-top:8px;color:#fff;font-size:13px}
+#transcriptOutput textarea{direction:auto;text-align:start;unicode-bidi:plaintext;white-space:pre;overflow:auto}#transcriptOutput pre{direction:auto;text-align:start;unicode-bidi:plaintext}#ocrOutput{display:block;white-space:pre-wrap;overflow-wrap:anywhere;background:#17243b;padding:8px;border-radius:8px;margin-top:8px;color:#fff;font-size:13px}
 #liveTranslate .small{line-height:1.6}
 #ytBox iframe{width:100%;height:220px;border-radius:14px}
 .small{font-size:12px;color:var(--muted)}
@@ -636,46 +636,142 @@ function showTranslatedSubtitles(index,text,target){
   track.addEventListener('load',()=>{try{track.track.mode='showing';}catch(e){}});
   try{for(const t of video.textTracks)t.mode='showing';}catch(e){}
 }
+function createSrtEditor(output, originalSrt, translatedSrt, fileName, videoIndex, target) {
+  output.innerHTML = '';
+  const heading = document.createElement('b');
+  heading.textContent = '📝 النص الأصلي بتوقيتاته';
+  const original = document.createElement('pre');
+  original.dir = 'auto';
+  original.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow:auto;background:#17243b;padding:10px;border-radius:10px';
+  original.textContent = originalSrt;
+  const translatedHeading = document.createElement('b');
+  translatedHeading.textContent = '🌐 الترجمة - محرر SRT';
+  translatedHeading.style.display = 'block';
+  translatedHeading.style.marginTop = '12px';
+  const editor = document.createElement('textarea');
+  editor.id = 'srtEditor' + videoIndex;
+  editor.dir = 'auto';
+  editor.lang = target || 'ar';
+  editor.setAttribute('aria-label', 'محرر ترجمة SRT');
+  editor.style.cssText = 'display:block;width:100%;min-height:220px;text-align:start;direction:auto;white-space:pre;overflow:auto;font-family:ui-monospace,monospace;line-height:1.7';
+  editor.value = translatedSrt;
+  const preview = document.createElement('div');
+  preview.id = 'srtPreview' + videoIndex;
+  preview.dir = 'auto';
+  preview.style.cssText = 'display:none;white-space:pre-wrap;overflow-wrap:anywhere;text-align:start;background:#17243b;padding:12px;border-radius:10px;margin-top:8px;max-height:260px;overflow:auto';
+  const status = document.createElement('p');
+  status.className = 'small';
+  status.setAttribute('aria-live', 'polite');
+  status.textContent = 'تم التحقق من صيغة SRT والتوقيتات. يمكنك تعديل النص مع الحفاظ على أرقام المقاطع وأوقاتها.';
+  const controls = document.createElement('div');
+  controls.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-top:8px';
+  const makeButton = (label, cls, handler) => {
+    const button = document.createElement('button');
+    button.type = 'button'; button.className = cls; button.textContent = label;
+    button.addEventListener('click', handler); controls.appendChild(button); return button;
+  };
+  const validateEditor = () => {
+    const parsed = validateAndNormalizeSrt(editor.value);
+    if (!parsed.ok) throw new Error(parsed.error);
+    editor.value = parsed.text;
+    return parsed.text;
+  };
+  makeButton('👁️ معاينة SRT', 'btn-gold', () => {
+    try {
+      const clean = validateEditor();
+      preview.textContent = clean;
+      preview.style.display = preview.style.display === 'none' ? 'block' : 'none';
+      status.textContent = '✅ تمت معاينة ملف SRT صالح.';
+    } catch (error) { status.textContent = '⚠️ ' + error.message; }
+  });
+  makeButton('⬇️ إنشاء وتنزيل SRT', 'btn-blue', () => {
+    try {
+      const clean = validateEditor();
+      downloadSubtitleFile(clean, fileName);
+      status.textContent = '✅ تم إنشاء ملف SRT وتنزيله.';
+    } catch (error) { status.textContent = '⚠️ لم يتم إنشاء الملف: ' + error.message; }
+  });
+  makeButton('📋 نسخ النص', 'btn-dark', async () => {
+    try {
+      const clean = validateEditor();
+      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(clean);
+      else {
+        editor.focus(); editor.select();
+        if (!document.execCommand('copy')) throw new Error('النسخ غير مدعوم في هذا المتصفح.');
+      }
+      status.textContent = '✅ تم نسخ نص SRT.';
+    } catch (error) { status.textContent = '⚠️ تعذر النسخ: ' + error.message; }
+  });
+  makeButton('🧹 تنسيق والتحقق', 'btn-green', () => {
+    try { validateEditor(); status.textContent = '✅ صيغة SRT سليمة والتوقيتات مرتبة.'; }
+    catch (error) { status.textContent = '⚠️ ' + error.message; }
+  });
+  output.append(heading, original, translatedHeading, editor, controls, preview, status);
+  if (videoIndex !== null && videoIndex !== undefined) showTranslatedSubtitles(videoIndex, translatedSrt, target);
+}
+function validateAndNormalizeSrt(value) {
+  const raw = cleanSubtitleText(value).replace(/\\r/g, '').trim();
+  const blocks = raw.split(/\\n\\s*\\n/).map(block => block.trim()).filter(Boolean);
+  const cues = [];
+  const toMs = stamp => {
+    const match = /^(\\d{2,}):(\\d{2}):(\\d{2})[,\\.](\\d{3})$/.exec(stamp);
+    if (!match) return null;
+    const h=Number(match[1]), m=Number(match[2]), s=Number(match[3]), ms=Number(match[4]);
+    if (m>59 || s>59) return null;
+    return (((h*60)+m)*60+s)*1000+ms;
+  };
+  for (const block of blocks) {
+    const lines = block.split('\\n');
+    const timeIndex = lines.findIndex(line => /\\d{2,}:\\d{2}:\\d{2}[,\\.]\\d{3}\\s*-->\\s*\\d{2,}:\\d{2}:\\d{2}[,\\.]\\d{3}/.test(line));
+    if (timeIndex < 0) continue;
+    const match = /^(\\d{2,}:\\d{2}:\\d{2})[,\\.](\\d{3})\\s*-->\\s*(\\d{2,}:\\d{2}:\\d{2})[,\\.](\\d{3})(?:\\s+.*)?$/.exec(lines[timeIndex].trim());
+    if (!match) return {ok:false,error:'يوجد سطر توقيت غير صحيح في ملف SRT.'};
+    const start = match[1]+','+match[2], end = match[3]+','+match[4];
+    const startMs=toMs(start), endMs=toMs(end);
+    if (startMs===null || endMs===null || endMs<=startMs) return {ok:false,error:'توقيت أحد المقاطع غير صحيح أو وقت النهاية يسبق البداية.'};
+    const text = lines.slice(timeIndex+1).join('\\n').trim();
+    if (!text) return {ok:false,error:'يوجد مقطع ترجمة فارغ.'};
+    cues.push({start,end,startMs,endMs,text});
+  }
+  if (!cues.length) return {ok:false,error:'لم يتم العثور على مقاطع SRT بتوقيتات صحيحة. لن يتم تنزيل نص غير مؤقت.'};
+  cues.sort((a,b)=>a.startMs-b.startMs);
+  for (let i=1;i<cues.length;i++) if(cues[i].startMs<cues[i-1].startMs) return {ok:false,error:'ترتيب التوقيتات غير صحيح.'};
+  return {ok:true,text:cues.map((cue,i)=>(i+1)+'\\n'+cue.start+' --> '+cue.end+'\\n'+cue.text).join('\\n\\n')};
+}
 async function transcribeLocalMedia(index){
   const item=myLocalMedia[index];
   const output=document.getElementById('transcriptOutput'+index);
   if(!item||!output)return;
-  if(item.file.size>25*1024*1024){output.innerText='⚠️ حجم الملف '+(item.file.size/1024/1024).toFixed(1)+' ميجابايت، والحد الأقصى الحالي 25 ميجابايت. اختر مقطعًا أقصر أو اضغط الملف ثم أعد المحاولة.';return;}
+  if(item.file.size>25*1024*1024){output.innerText='⚠️ حجم الملف '+(item.file.size/1024/1024).toFixed(1)+' ميجابايت، والحد الأقصى الحالي 25 ميجابايت.';return;}
   const type=item.mime||getMediaMime(item.file)||'application/octet-stream';
   if(!type.startsWith('audio/')&&!type.startsWith('video/')){output.innerText='اختر ملف صوت أو فيديو.';return;}
-  output.innerText='⏳ جارٍ رفع الملف إلى Gemini وتحليل الصوت... لا تغلق الصفحة.';
+  output.innerText='⏳ جارٍ رفع الملف إلى Gemini وتحليل الكلام والتوقيتات... لا تغلق الصفحة.';
   try{
     const form=new FormData();
     const uploadFile=item.file.type===type?item.file:new File([item.file],item.file.name,{type});
     form.append('audio',uploadFile,item.file.name);
-    const selectedLanguage=document.getElementById('mediaSpeechSource')?.value||document.getElementById('speechSource')?.value||'auto';
-    const language=selectedLanguage==='auto'?'':selectedLanguage.split('-')[0];
-    form.append('language',language);
     const response=await fetch('/api/transcribe',{method:'POST',body:form});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw new Error(data.error||('خطأ من الخادم '+response.status));
-    const original=String(data.text||'').trim();
-    if(!original)throw new Error('لم يتم التعرف على كلام واضح في الملف');
-    output.innerText='📝 النص الأصلي:\n'+original+'\n\n⏳ جارٍ ترجمة النص...';
-    const target=document.getElementById('mediaSpeechTarget')?.value||document.getElementById('speechTarget')?.value||'ar';
-    const reportedLanguage=String(data.language||'').toLowerCase();
-    const sourceLanguage=/^[a-z]{2,3}$/.test(reportedLanguage)?reportedLanguage:(selectedLanguage==='auto'?detectTranscriptLanguage(original):selectedLanguage.split('-')[0]);
-    const translated=await translateTranscriptText(original,target,sourceLanguage);
-    output.innerText='📝 النص الأصلي:\n'+original+'\n\n🌐 الترجمة:\n'+translated;
-    if(type.startsWith('video/'))showTranslatedSubtitles(index,translated,target);
-    const downloadButton=document.createElement('button');
-    downloadButton.className='btn-blue';
-    downloadButton.textContent='⬇️ تنزيل الترجمة بصيغة SRT';
-    downloadButton.onclick=()=>downloadSubtitleFile(translated,'MyMusic-'+(item.file.name||'subtitles').replace(/[^a-z0-9._-]/gi,'_')+'.srt');
-    output.appendChild(downloadButton);
-    lastLiveTranslation=translated;
-    document.getElementById('liveOriginal').innerText=original;
-    document.getElementById('liveResult').innerText=translated;
-    translationHistory.unshift({date:new Date().toLocaleString('ar-EG'),original,translated});
+    const originalResult=validateAndNormalizeSrt(String(data.text||''));
+    if(!originalResult.ok)throw new Error('لم يُرجع Gemini ترجمة SRT صالحة: '+originalResult.error);
+    const originalSrt=originalResult.text;
+    output.innerText='📝 تم استخراج '+originalSrt.split('\\n\\n').length+' مقطعًا. ⏳ جارٍ ترجمة النص مع تثبيت التوقيتات...';
+    const selectedLanguage=document.getElementById('mediaSpeechSource')?.value||'auto';
+    const target=document.getElementById('mediaSpeechTarget')?.value||'ar';
+    const sourceLanguage=selectedLanguage==='auto'?detectTranscriptLanguage(originalSrt):selectedLanguage.split('-')[0];
+    const translatedRaw=await translateTranscriptText(originalSrt,target,sourceLanguage);
+    const translatedResult=validateAndNormalizeSrt(translatedRaw);
+    if(!translatedResult.ok)throw new Error('نتيجة الترجمة لم تجتز فحص SRT: '+translatedResult.error);
+    createSrtEditor(output,originalSrt,translatedResult.text,'MyMusic-'+(item.file.name||'subtitles').replace(/[^a-z0-9._-]/gi,'_')+'.srt',type.startsWith('video/')?index:null,target);
+    lastLiveTranslation=translatedResult.text;
+    document.getElementById('liveOriginal').innerText=originalSrt;
+    document.getElementById('liveResult').innerText=translatedResult.text;
+    translationHistory.unshift({date:new Date().toLocaleString('ar-EG'),original:originalSrt,translated:translatedResult.text});
     translationHistory=translationHistory.slice(0,100);
     try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}
   }catch(error){
-    output.innerText='⚠️ تعذرت معالجة الملف عبر Gemini: '+error.message+'\nتحقق من وجود GEMINI_API_KEY كـ Secret مشفّر في Cloudflare ثم أعد المحاولة.';
+    output.innerText='⚠️ تعذرت معالجة الملف عبر Gemini: '+error.message+'\\nلم يتم إنشاء ملف SRT غير صالح. تحقق من GEMINI_API_KEY في Cloudflare Pages Secrets.';
   }
 }
 function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; currentUrl=s.audio; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
