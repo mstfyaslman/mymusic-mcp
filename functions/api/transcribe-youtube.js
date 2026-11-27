@@ -39,7 +39,7 @@ export async function onRequest({ request, env }) {
   ].join(" ");
 
   let lastError = null;
-  for (const model of ["gemini-3.1-flash-lite", "gemini-3.8-flash"]) {
+  for (const model of ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.5-flash"]) {
     for (let attempt = 0; attempt < 2; attempt++) {
       let response, data = {};
       try {
