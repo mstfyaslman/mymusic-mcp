@@ -182,12 +182,13 @@ body.light-theme input,body.light-theme select,body.light-theme textarea{backgro
 
 <section class="box" id="vevoAiHub" aria-labelledby="vevoAiTitle">
   <h2 id="vevoAiTitle">🎬 MyMusic AI — الواجهة الرئيسية للموسيقى وVEVO</h2>
-  <p class="small">ابحث عن فيديوهات VEVO الرسمية وشغّل الفيديو هنا داخل الموقع، ثم ترجم الكلمات أو النصوص بالذكاء الاصطناعي. لا يسحب الموقع صوت YouTube من الرابط؛ يمكنك رفع ملف تملكه أو لصق النص. التشغيل يتم من مشغل YouTube المضمّن، وليس بفتح نافذة جديدة.</p>
+  <p class="small">ابحث عن فيديوهات YouTube العامة القابلة للتضمين أو قنوات VEVO، وشغّلها داخل الموقع. يمكن لـ Gemini محاولة استخراج الكلام والكلمات من الفيديوهات العامة المدعومة، ثم ترجمتها وإعداد ملف SRT. قد لا تتاح المعالجة لبعض الفيديوهات بحسب إمكانية الوصول والقيود.</p>
   <div>
-    <input id="vevoSearchInput" class="vevo-field" type="search" maxlength="120" placeholder="ابحث باسم الفنان أو الأغنية — مثال: Adele Hello">
-    <button class="btn-gold" type="button" onclick="searchVevoVideos()">🔎 ابحث عن VEVO</button>
+    <input id="vevoSearchInput" class="vevo-field" type="search" maxlength="120" placeholder="ابحث في YouTube — مثال: Adele Hello">
+    <select id="vevoSearchMode" class="vevo-field" aria-label="نطاق البحث"><option value="all">كل فيديوهات YouTube المتاحة</option><option value="vevo">قنوات VEVO فقط</option></select>
+    <button class="btn-gold" type="button" onclick="searchVevoVideos()">🔎 ابحث عن فيديو</button>
   </div>
-  <div id="vevoStatus" class="vevo-status" role="status" aria-live="polite">اكتب اسم الفنان أو الأغنية لبدء البحث. نتائج البحث تحتاج إعداد YOUTUBE_API_KEY كـ Secret في Cloudflare Pages.</div>
+  <div id="vevoStatus" class="vevo-status" role="status" aria-live="polite">ابحث في YouTube أو اختر قنوات VEVO فقط. البحث يحتاج YOUTUBE_API_KEY في Cloudflare، وتحليل الفيديو يحتاج GEMINI_API_KEY.</div>
   <div id="vevoResults" class="vevo-grid"></div>
   <div id="vevoNowPlaying" class="small" style="margin-top:10px;color:#e8bd55">لم يتم اختيار فيديو بعد.</div>
   <div id="vevoPlayer" class="vevo-player"><div style="position:absolute;inset:0;display:grid;place-items:center;color:#c8aa65">سيظهر الفيديو هنا داخل الموقع بعد اختياره</div></div>
@@ -1183,13 +1184,14 @@ async function searchVevoVideos(){
   const results=document.getElementById("vevoResults");
   if(!query){vevoSetStatus("اكتب اسم الفنان أو الأغنية أولاً.");input?.focus();return;}
   results.innerHTML="";
-  vevoSetStatus("⏳ جارٍ البحث عن فيديوهات VEVO الرسمية...");
+  const mode=document.getElementById("vevoSearchMode")?.value||"all";
+  vevoSetStatus("⏳ جارٍ البحث في "+(mode==="vevo"?"قنوات VEVO":"YouTube")+"...");
   try{
-    const response=await fetch("/api/vevo-search?q="+encodeURIComponent(query),{headers:{"Accept":"application/json"}});
+    const response=await fetch("/api/vevo-search?q="+encodeURIComponent(query)+"&mode="+encodeURIComponent(mode),{headers:{"Accept":"application/json"}});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw new Error(data.error||"تعذر البحث الآن.");
     if(!Array.isArray(data.items)||!data.items.length){vevoSetStatus(data.message||"لم نعثر على فيديوهات من قنوات تحمل اسم VEVO. جرّب اسم فنان أو أغنية آخر.");return;}
-    vevoSetStatus("✅ عُثر على "+data.items.length+" نتيجة من قنوات VEVO الرسمية. اختر فيديو لتشغيله هنا.");
+    vevoSetStatus("✅ عُثر على "+data.items.length+" فيديو. اختر فيديو لتشغيله داخل MyMusic AI.");
     results.innerHTML=data.items.map(item=>{
       const id=String(item.id||"");
       if(!/^[A-Za-z0-9_-]{11}$/.test(id))return "";
@@ -1211,17 +1213,21 @@ function playVevoVideo(id,title,channel){
   document.getElementById("vevoTranslatedOutput").textContent="ارفع ملفًا تملكه من أداة ترجمة الفيديو والصوت، أو الصق الكلمات أعلاه للترجمة.";
   vevoSetStatus("▶️ تم تحميل مشغل الفيديو داخل الصفحة. إذا منع صاحب الفيديو التضمين فلن يعمل المشغل لهذا الفيديو.");
 }
-function transcribeVevoVideo(){
-  if(!myMusicVevoCurrentId){vevoSetStatus("اختر فيديو أولاً، أو الصق الكلمات في مربع النص.");return;}
-  vevoSetStatus("ℹ️ لا يمكن لـ Gemini سحب صوت فيديو YouTube مباشرةً من رابطه. للحفاظ على حقوق النشر، لن نحاول تنزيل الفيديو. اختر ملف MP3/MP4 تملكه من أداة ترجمة الفيديو والصوت أسفل الصفحة، أو الصق النص/الكلمات هنا للترجمة.");
-  const fileInput=document.getElementById("myFiles");
-  const mediaSection=document.getElementById("mediaTranslationTools");
-  if(mediaSection)mediaSection.scrollIntoView({behavior:"smooth",block:"start"});
-  if(fileInput){
-    setTimeout(()=>fileInput.click(),450);
-  }else{
-    const lyrics=document.getElementById("vevoLyricsInput");
-    if(lyrics)lyrics.focus();
+async function transcribeVevoVideo(){
+  if(!myMusicVevoCurrentId){vevoSetStatus("اختر فيديو من نتائج البحث أولاً.");return;}
+  vevoSetStatus("⏳ يحاول Gemini تحليل الفيديو العام واستخراج الكلام والكلمات مع التوقيتات...");
+  try{
+    const response=await fetch("/api/transcribe-youtube",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:"https://www.youtube.com/watch?v="+myMusicVevoCurrentId})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||"تعذر تحليل هذا الفيديو. قد لا يكون متاحًا لـ Gemini.");
+    const srt=String(data.text||"").replace(/\r/g,"").trim();
+    if(!srt||srt==="NO_SPEECH")throw new Error("لم يتم العثور على كلام أو كلمات مسموعة في الفيديو.");
+    myMusicVevoOriginalSrt=srt;
+    document.getElementById("vevoOriginalOutput").textContent=srt;
+    vevoSetStatus("✅ تم استخراج النص. جارٍ ترجمته إلى اللغة المختارة...");
+    await translateVevoSrt(srt);
+  }catch(error){
+    vevoSetStatus("⚠️ "+error.message+" يمكنك لصق النص يدويًا أو رفع ملف تملكه من أداة ترجمة الفيديو والصوت.");
   }
 }
 async function translateVevoSrt(sourceText){
