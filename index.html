@@ -216,6 +216,18 @@ audio,video{width:100%}
 <button onclick="toggleFloatMenu()">❌ إغلاق</button>
 </div>
 
+<div class="box" style="text-align:center">
+<h2>🌍 شارك MyMusic مع أصدقائك</h2>
+<p class="small">ساعدنا في نشر MyMusic حول العالم.</p>
+<button class="btn-green" onclick="shareMyMusic()">مشاركة الموقع</button>
+<div class="ai-grid">
+<a class="ai-btn" style="background:#1877f2" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmymusic-3k6.pages.dev%2F" target="_blank" rel="noopener">Facebook</a>
+<a class="ai-btn" style="background:#25d366" href="https://wa.me/?text=اكتشف%20MyMusic%20https%3A%2F%2Fmymusic-3k6.pages.dev%2F" target="_blank" rel="noopener">WhatsApp</a>
+<a class="ai-btn" style="background:#0088cc" href="https://t.me/share/url?url=https%3A%2F%2Fmymusic-3k6.pages.dev%2F&text=اكتشف%20MyMusic" target="_blank" rel="noopener">Telegram</a>
+<a class="ai-btn" style="background:#111" href="https://twitter.com/intent/tweet?text=اكتشف%20MyMusic&url=https%3A%2F%2Fmymusic-3k6.pages.dev%2F" target="_blank" rel="noopener">X</a>
+</div>
+<p class="small"><a href="/about.html" style="color:#fff">عن MyMusic</a> · <a href="/privacy.html" style="color:#fff">سياسة الخصوصية</a></p>
+</div>
 <div id="player">
 <b id="pTitle">MyMusic AI - اختار أغنية</b><br><small id="pArtist">جاهز للتشغيل</small>
 <div class="progress"><div id="progressBar"></div></div>
@@ -256,6 +268,7 @@ function logout(){ document.getElementById('loginStatus').innerText='مش مسج
 function sendMsg(){ let n=document.getElementById('msgName').value||'صديقنا'; document.getElementById('msgReply').innerHTML='<div class="card">🤖 <b>MyMusic AI</b><br>أهلاً بيك يا '+n+'، شكراً لرسالتك ❤️<br>سنتواصل معك في أقرب فرصة.<br><small>- فريق MyMusic AI</small></div>'; }
 function toggleFloat(){ floatHidden=!floatHidden; document.getElementById('floatBtn').style.display=floatHidden?'none':'block'; document.getElementById('floatMenu').style.display='none'; if(floatHidden) alert('الزر العائم اتخفى - دوس على زرار إخفاء / إظهار الزر العائم فوق عشان يرجع'); }
 function toggleFloatMenu(){ let m=document.getElementById('floatMenu'); m.style.display=(m.style.display=='block')?'none':'block'; }
+async function shareMyMusic(){ const data={title:'MyMusic AI',text:'اكتشف MyMusic للبحث عن الأغاني والفنانين والاستماع إلى المعاينات الموسيقية.',url:'https://mymusic-3k6.pages.dev/'}; try{ if(navigator.share){await navigator.share(data);} else if(navigator.clipboard){await navigator.clipboard.writeText(data.url);alert('تم نسخ رابط MyMusic للمشاركة');} else {window.prompt('انسخ رابط MyMusic',data.url);} }catch(e){} }
 function installApp(){ alert('عشان تثبته كتطبيق:\n1- دوس 3 نقط ⋮ فوق\n2- إضافة إلى الشاشة الرئيسية\n3- إضافة'); }
 audio.addEventListener('timeupdate',()=>{ if(audio.duration) document.getElementById('progressBar').style.width=(audio.currentTime/audio.duration*100)+'%'; });
 </script>
