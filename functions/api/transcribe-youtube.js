@@ -39,7 +39,7 @@ export async function onRequest({ request, env }) {
   ].join(" ");
 
   let lastError = null;
-  for (const model of ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.5-flash"]) {
+  for (const model of ["gemini-3.5-flash-lite", "gemini-3.8-flash"]) {
     for (let attempt = 0; attempt < 2; attempt++) {
       let response, data = {};
       try {
@@ -50,7 +50,7 @@ export async function onRequest({ request, env }) {
             contents: [{
               role: "user",
               parts: [
-                { file_data: { mime_type: "video/mp4", file_uri: videoUrl } },
+                { fileData: { mimeType: "video/mp4", fileUri: videoUrl } },
                 { text: prompt }
               ]
             }],
