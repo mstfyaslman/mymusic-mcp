@@ -200,6 +200,13 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
         try {
             val manager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
             projection = manager.getMediaProjection(resultCode, data)
+            projection?.registerCallback(object : MediaProjection.Callback() {
+                override fun onStop() {
+                    virtualDisplay?.release()
+                    virtualDisplay = null
+                    stopSelf()
+                }
+            }, mainHandler)
             val metrics = DisplayMetrics()
             @Suppress("DEPRECATION")
             windowManager.defaultDisplay.getRealMetrics(metrics)
