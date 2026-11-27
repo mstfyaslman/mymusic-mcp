@@ -35,11 +35,11 @@
 }
 </script>
 <style>
-:root{color-scheme:dark;--bg:#0b1020;--surface:#151f35;--surface-2:#1b2944;--line:#2b3b5c;--text:#f4f7ff;--muted:#aebbd2;--purple:#7657e8;--cyan:#159bb5;--gold:#e9b949}
+:root{color-scheme:dark;--bg:#091522;--surface:#10263a;--surface-2:#17334a;--line:#28516a;--text:#f3f9ff;--muted:#b4c9d8;--purple:#7865e8;--cyan:#19a6ad;--gold:#f0bd58}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse at top,#172747 0%,var(--bg) 58%);color:var(--text);padding-bottom:0;line-height:1.55}
-.top{background:linear-gradient(120deg,#30246f 0%,#254c83 55%,#087f91 100%);padding:22px 16px;text-align:center;border-radius:0 0 25px 25px;box-shadow:0 8px 28px #0005}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse at top,#15394a 0%,var(--bg) 62%);color:var(--text);padding-bottom:0;line-height:1.6}
+.top{background:linear-gradient(120deg,#33266f 0%,#185477 55%,#087f91 100%);padding:22px 16px;text-align:center;border-radius:0 0 25px 25px;box-shadow:0 8px 28px #0005}
 .top h1{letter-spacing:.3px}
 .box{background:linear-gradient(145deg,rgba(24,37,62,.96),rgba(17,27,47,.96));margin:14px 12px;padding:16px;border-radius:18px;border:1px solid var(--line);box-shadow:0 8px 24px #0002}
 h2{margin:5px 0 12px;font-size:18px;color:#dce8ff}
@@ -58,7 +58,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 audio,video{width:100%;max-width:100%}
 .progress{height:7px;background:#30415f;border-radius:10px;overflow:hidden;margin:8px 0}
 #progressBar{height:100%;background:linear-gradient(90deg,#7657e8,#22b8c7);width:0%}
-#floatBtn{position:fixed;bottom:18px;left:12px;z-index:999;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#7657e8,#087f91);font-size:26px;box-shadow:0 5px 22px #0008}
+#floatBtn{display:none;position:fixed;bottom:18px;left:12px;z-index:999;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#7865e8,#087f91);font-size:26px;box-shadow:0 5px 22px #0008}
 #floatMenu{position:fixed;bottom:88px;left:12px;z-index:999;background:#111d32;border:1px solid var(--line);border-radius:16px;padding:10px;display:none;width:min(320px,calc(100vw - 24px));max-height:70vh;overflow:auto;box-shadow:0 10px 30px #0009}
 #floatMenu button{display:block;width:100%;margin:5px 0}
 #floatMenu .floatLink{display:block;background:#20314f;color:#edf5ff;text-decoration:none;padding:9px 10px;margin:5px 0;border-radius:11px;font-size:13px;line-height:1.5;border:1px solid #354a6e}
@@ -104,7 +104,7 @@ body.light-theme #geminiReply,body.light-theme #liveTranslate,body.light-theme #
 <p style="margin:5px">اسمع - اتفرج - ترجم - اشتغل على الذكاء الاصطناعي<br>كل حاجة جوه الموقع</p>
 <button class="btn-green" onclick="alert('الأزرار شغالة ✅')">✅ جرب الزرار</button>
 <button class="btn-white" onclick="toggleNight()">🌙 وضع ليلي</button>
-<button class="btn-gold" onclick="toggleFloat()">👁️ إخفاء / إظهار الزر العائم</button>
+<button class="btn-gold" onclick="toggleFloat()">👁️ إظهار / إخفاء الزر العائم</button>
 </div>
 
 <section class="box" id="aiTranslationHub" style="border:2px solid #7c3aed;background:linear-gradient(135deg,#17102c,#101827);margin-top:16px">
@@ -118,7 +118,7 @@ body.light-theme #geminiReply,body.light-theme #liveTranslate,body.light-theme #
 </div>
 <div class="card" style="background:#101010">
 <b>🎬 ترجمة الفيديو والأغاني بالذكاء الاصطناعي</b>
-<p class="small">اختر ملف MP4 أو MP3 من هاتفك. سيُرفع الملف مباشرة إلى Gemini من خلال خادم MyMusic، ليستخرج الكلام مع التوقيت، ثم يترجم النص إلى اللغة المختارة. الحد الحالي 25 ميجابايت للملف.</p>
+<p class="small">اختر ملف MP4 أو MP3 من هاتفك. سيُرفع الملف مباشرة إلى Gemini من خلال خادم MyMusic، ليستخرج الكلام مع التوقيت، ثم يترجم النص إلى اللغة المختارة. الحد الحالي 25 ميجابايت لكل ملف. الملفات الأكبر لن تُرفع؛ اختر مقطعًا أقصر أو اضغط الملف قبل الرفع.</p>
 <label class="small" for="mediaSpeechTarget">لغة الترجمة</label>
 <select id="mediaSpeechTarget" aria-label="لغة الترجمة"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option></select>
 <label class="small" for="mediaSpeechSource">لغة الصوت الأصلي (اختياري)</label>
@@ -473,7 +473,7 @@ body.light-theme #geminiReply,body.light-theme #liveTranslate,body.light-theme #
 </div>
 
 <script>
-let ALL=[], idx=0, audio=document.getElementById('audio'), currentUrl='', floatHidden=false;
+let ALL=[], idx=0, audio=document.getElementById('audio'), currentUrl='', floatHidden=true;
 function toggleNight(){ document.body.classList.toggle('light-theme'); }
 function tick(){ let d=new Date(); document.getElementById('clock').innerText=d.toLocaleTimeString('ar-EG'); document.getElementById('date').innerText=d.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
 setInterval(tick,1000); tick();
@@ -593,10 +593,14 @@ function detectTranscriptLanguage(text){
 async function translateTranscriptText(text,target,source){
   const sourceCode=source||detectTranscriptLanguage(text);
   if(sourceCode===target)return text;
+  // Keep complete SRT cues together so chunking never separates a timestamp from its subtitle.
+  const raw=String(text||'').replace(/\\r/g,'').trim();
+  const blocks=raw.includes('-->')?raw.split(/\\n\\s*\\n/).filter(Boolean):raw.split(/(?<=[.!?؟。])\\s+/).filter(Boolean);
   const chunks=[];let current='';
-  for(const sentence of String(text||'').split(/(?<=[.!?؟。])\\s+/)){
-    if((current+' '+sentence).trim().length>2800&&current){chunks.push(current);current=sentence;}
-    else current=(current+' '+sentence).trim();
+  for(const block of blocks){
+    const next=(current+'\\n\\n'+block).trim();
+    if(next.length>2800&&current){chunks.push(current);current=block;}
+    else current=next;
   }
   if(current)chunks.push(current);
   const translated=[];
@@ -636,7 +640,7 @@ async function transcribeLocalMedia(index){
   const item=myLocalMedia[index];
   const output=document.getElementById('transcriptOutput'+index);
   if(!item||!output)return;
-  if(item.file.size>25*1024*1024){output.innerText='حجم الملف أكبر من 25 ميجابايت. اختر ملفاً أصغر أو قصّ المقطع أولاً.';return;}
+  if(item.file.size>25*1024*1024){output.innerText='⚠️ حجم الملف '+(item.file.size/1024/1024).toFixed(1)+' ميجابايت، والحد الأقصى الحالي 25 ميجابايت. اختر مقطعًا أقصر أو اضغط الملف ثم أعد المحاولة.';return;}
   const type=item.mime||getMediaMime(item.file)||'application/octet-stream';
   if(!type.startsWith('audio/')&&!type.startsWith('video/')){output.innerText='اختر ملف صوت أو فيديو.';return;}
   output.innerText='⏳ جارٍ رفع الملف إلى Gemini وتحليل الصوت... لا تغلق الصفحة.';
@@ -709,7 +713,7 @@ function loginWith(t){ loginSuccess(t); }
 function loginSuccess(type){ document.getElementById('loginStatus').innerHTML='✅ أهلاً بيك!<br>تم الدخول بـ <b>'+type+'</b><br>في MyMusic AI 🎧'; document.getElementById('logoutBtn').style.display='block'; try{ localStorage.setItem('mymusic_user',type); }catch(e){} alert('✅ تم تسجيل الدخول بـ '+type); }
 function logout(){ document.getElementById('loginStatus').innerText='مش مسجل دخول'; document.getElementById('logoutBtn').style.display='none'; document.getElementById('phoneLogin').style.display='none'; try{ localStorage.removeItem('mymusic_user'); }catch(e){} alert('تم تسجيل الخروج 👋'); }
 function sendMsg(){ let n=document.getElementById('msgName').value||'صديقنا'; document.getElementById('msgReply').innerHTML='<div class="card">🤖 <b>MyMusic AI</b><br>أهلاً بيك يا '+n+'، شكراً لرسالتك ❤️<br>سنتواصل معك في أقرب فرصة.<br><small>- فريق MyMusic AI</small></div>'; }
-function toggleFloat(){ floatHidden=!floatHidden; document.getElementById('floatBtn').style.display=floatHidden?'none':'block'; document.getElementById('floatMenu').style.display='none'; if(floatHidden) alert('الزر العائم اتخفى - دوس على زرار إخفاء / إظهار الزر العائم فوق عشان يرجع'); }
+function toggleFloat(){ floatHidden=!floatHidden; document.getElementById('floatBtn').style.display=floatHidden?'none':'block'; document.getElementById('floatMenu').style.display='none'; }
 function toggleFloatMenu(){ let m=document.getElementById('floatMenu'); m.style.display=(m.style.display=='block')?'none':'block'; }
 
 let currentInAppUrl='';
