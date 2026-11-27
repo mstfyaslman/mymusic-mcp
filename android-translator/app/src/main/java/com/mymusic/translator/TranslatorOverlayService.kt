@@ -32,11 +32,9 @@ import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import com.google.android.gms.tasks.Tasks
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.arabic.ArabicTextRecognizerOptions
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.googlecode.tesseract.android.TessBaseAPI
+import java.io.File
+import java.io.FileOutputStream
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -55,8 +53,7 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
     private val mainHandler = Handler(Looper.getMainLooper())
     private val worker = Executors.newSingleThreadExecutor()
     private lateinit var windowManager: WindowManager
-    private lateinit var latinRecognizer: com.google.mlkit.vision.text.TextRecognizer
-    private lateinit var arabicRecognizer: com.google.mlkit.vision.text.TextRecognizer
+    private var tessBase: TessBaseAPI? = null
     private var tts: TextToSpeech? = null
     private var speechRecognizer: SpeechRecognizer? = null
     private var listening = false
@@ -76,8 +73,6 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
     override fun onCreate() {
         super.onCreate()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        latinRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        arabicRecognizer = TextRecognition.getClient(ArabicTextRecognizerOptions.Builder().build())
         tts = TextToSpeech(this, this)
         createNotificationChannel()
         showOverlay()
@@ -250,22 +245,48 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
         } catch (_: Exception) { null }
     }
 
-    private fun recognizeScreen(bitmap: Bitmap) {
-        val input = InputImage.fromBitmap(bitmap, 0)
-        latinRecognizer.process(input)
-            .addOnSuccessListener { latin ->
-                arabicRecognizer.process(input)
-                    .addOnSuccessListener { arabic ->
-                        val text = listOf(latin.text, arabic.text).filter { it.isNotBlank() }.distinct().joinToString("\n").trim()
-                        bitmap.recycle()
-                        if (text.isNotBlank() && text != lastOcrText) {
-                            lastOcrText = text
-                            translateAndShow(text, "🖼️ نص الشاشة")
-                        }
-                    }
-                    .addOnFailureListener { bitmap.recycle() }
+    private fun ensureTesseract(): Boolean {
+        if (tessBase != null) return true
+        val root = File(filesDir, "tesseract")
+        val data = File(root, "tessdata")
+        if (!data.exists()) data.mkdirs()
+        val languages = listOf("eng", "ara")
+        for (language in languages) {
+            val model = File(data, "$language.traineddata")
+            if (!model.exists()) {
+                val source = URL("https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/main/$language.traineddata")
+                source.openConnection().apply { connectTimeout = 20000; readTimeout = 30000 }.getInputStream().use { input ->
+                    FileOutputStream(model).use { output -> input.copyTo(output) }
+                }
             }
-            .addOnFailureListener { bitmap.recycle() }
+        }
+        val engine = TessBaseAPI()
+        if (!engine.init(root.absolutePath, "eng+ara")) {
+            engine.recycle()
+            return false
+        }
+        tessBase = engine
+        return true
+    }
+
+    private fun recognizeScreen(bitmap: Bitmap) {
+        worker.execute {
+            try {
+                if (!ensureTesseract()) throw IllegalStateException("تعذر تشغيل محرك قراءة النص")
+                val engine = tessBase ?: throw IllegalStateException("OCR engine unavailable")
+                engine.setImage(bitmap)
+                val text = engine.utF8Text.orEmpty().trim()
+                engine.clear()
+                bitmap.recycle()
+                if (text.isNotBlank() && text != lastOcrText) {
+                    lastOcrText = text
+                    translateAndShow(text, "🖼️ نص الشاشة")
+                }
+            } catch (error: Exception) {
+                bitmap.recycle()
+                mainHandler.post { statusView?.text = "تعذر قراءة الشاشة: ${error.message}" }
+            }
+        }
     }
 
     private fun startSpeechRecognition() {
@@ -356,8 +377,8 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
         virtualDisplay?.release()
         imageReader?.close()
         projection?.stop()
-        latinRecognizer.close()
-        arabicRecognizer.close()
+        tessBase?.recycle()
+        tessBase = null
         tts?.stop()
         tts?.shutdown()
         worker.shutdown()
