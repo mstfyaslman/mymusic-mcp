@@ -56,6 +56,7 @@ export async function onRequestPost({ request, env }) {
     return json({
       text,
       vtt: typeof result?.vtt === "string" ? result.vtt : "",
+      language: String(result?.transcription_info?.language || result?.language || validLanguage || ""),
       word_count: Number(result?.word_count || 0)
     }, 200);
   } catch (error) {
