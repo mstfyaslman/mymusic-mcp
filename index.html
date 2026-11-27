@@ -54,6 +54,12 @@ audio,video{width:100%}
 #floatBtn{position:fixed;bottom:175px;left:12px;z-index:999;width:62px;height:62px;border-radius:50%;background:#ff0000;font-size:28px;box-shadow:0 0 20px #ff0000}
 #floatMenu{position:fixed;bottom:245px;left:12px;z-index:999;background:#111;border:1px solid #444;border-radius:18px;padding:10px;display:none;width:220px}
 #floatMenu button{display:block;width:100%;margin:5px 0}
+#floatMenu{width:min(320px,calc(100vw - 24px));max-height:70vh;overflow:auto}
+#liveTranslate{background:#202020;border:1px solid #555;border-radius:12px;padding:10px;margin:8px 0;text-align:right}
+#liveTranslate select{width:100%;margin:4px 0;padding:9px;border-radius:10px}
+#liveOriginal,#liveResult{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:7px 0;color:#fff}
+#liveResult{color:#86efac}
+#liveTranslate .small{line-height:1.6}
 #ytBox iframe{width:100%;height:220px;border-radius:14px}
 .small{font-size:12px;color:#ccc}
 </style>
@@ -213,6 +219,24 @@ audio,video{width:100%}
 <button onclick="playYoutube()">▶️ تشغيل يوتيوب</button>
 <button onclick="doTranslate('google')">🌐 ترجمة جوجل</button>
 <button onclick="doTranslate('manus')">🚀 ترجمة Manus</button>
+<div id="liveTranslate">
+  <b>🎙️ ترجمة الكلام أثناء المشاهدة</b>
+  <p class="small">شغّل الفيديو بصوت مسموع، واسمح للميكروفون. الأداة تلتقط الكلام من الميكروفون ثم تترجمه؛ لا تلتقط صوت التبويب مباشرة.</p>
+  <label class="small" for="speechSource">لغة الكلام</label>
+  <select id="speechSource">
+    <option value="en-US">English</option><option value="ar-EG">العربية</option><option value="fr-FR">Français</option><option value="de-DE">Deutsch</option><option value="es-ES">Español</option><option value="tr-TR">Türkçe</option><option value="it-IT">Italiano</option><option value="ru-RU">Русский</option>
+  </select>
+  <label class="small" for="speechTarget">ترجمة إلى</label>
+  <select id="speechTarget">
+    <option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option>
+  </select>
+  <button class="btn-green" id="startSpeechBtn" onclick="startLiveTranslation()">🎙️ ابدأ الاستماع والترجمة</button>
+  <button class="btn-dark" onclick="stopLiveTranslation()">⏹️ إيقاف الترجمة</button>
+  <button class="btn-blue" onclick="speakLiveTranslation()">🔊 انطق آخر ترجمة</button>
+  <span id="liveStatus" class="small" aria-live="polite">جاهز - لم يبدأ الاستماع</span>
+  <span id="liveOriginal"></span>
+  <span id="liveResult"></span>
+</div>
 <button onclick="openSearch('google')">🔍 بحث جوجل</button>
 <button onclick="toggleFloat()">👁️ إخفاء الزر</button>
 <button onclick="toggleFloatMenu()">❌ إغلاق</button>
@@ -286,6 +310,85 @@ function logout(){ document.getElementById('loginStatus').innerText='مش مسج
 function sendMsg(){ let n=document.getElementById('msgName').value||'صديقنا'; document.getElementById('msgReply').innerHTML='<div class="card">🤖 <b>MyMusic AI</b><br>أهلاً بيك يا '+n+'، شكراً لرسالتك ❤️<br>سنتواصل معك في أقرب فرصة.<br><small>- فريق MyMusic AI</small></div>'; }
 function toggleFloat(){ floatHidden=!floatHidden; document.getElementById('floatBtn').style.display=floatHidden?'none':'block'; document.getElementById('floatMenu').style.display='none'; if(floatHidden) alert('الزر العائم اتخفى - دوس على زرار إخفاء / إظهار الزر العائم فوق عشان يرجع'); }
 function toggleFloatMenu(){ let m=document.getElementById('floatMenu'); m.style.display=(m.style.display=='block')?'none':'block'; }
+
+// Live speech translation: microphone-based (not direct tab/system-audio capture).
+let liveRecognition=null, liveListening=false, lastLiveTranslation='', liveRestartAllowed=false;
+function speechLanguageCode(tag){ return (tag||'en-US').split('-')[0].toLowerCase(); }
+async function translateLiveSpeech(text){
+  const source=speechLanguageCode(document.getElementById('speechSource').value);
+  const target=document.getElementById('speechTarget').value;
+  if(source===target) return text;
+  const endpoint='https://api.mymemory.translated.net/get?'+new URLSearchParams({q:text.slice(0,500),langpair:source+'|'+target});
+  const response=await fetch(endpoint,{headers:{'Accept':'application/json'}});
+  if(!response.ok) throw new Error('Translation service unavailable');
+  const data=await response.json();
+  const translated=data && data.responseData && data.responseData.translatedText;
+  if(!translated) throw new Error('No translated text returned');
+  return translated;
+}
+function startLiveTranslation(){
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    document.getElementById('liveStatus').innerText='المتصفح لا يدعم التعرف على الكلام. جرّب Chrome المحدّث.';
+    return;
+  }
+  if(liveListening) return;
+  liveRestartAllowed=true;
+  liveRecognition=new SpeechRecognition();
+  liveRecognition.lang=document.getElementById('speechSource').value;
+  liveRecognition.continuous=true;
+  liveRecognition.interimResults=false;
+  liveRecognition.maxAlternatives=1;
+  liveRecognition.onstart=()=>{liveListening=true;document.getElementById('liveStatus').innerText='🎙️ يستمع الآن... شغّل الفيديو وارفع صوت السماعة.';};
+  liveRecognition.onresult=async(event)=>{
+    for(let i=event.resultIndex;i<event.results.length;i++){
+      if(!event.results[i].isFinal) continue;
+      const heard=event.results[i][0].transcript.trim();
+      if(!heard) continue;
+      document.getElementById('liveOriginal').innerText='النص المسموع: '+heard;
+      document.getElementById('liveStatus').innerText='⏳ جارٍ ترجمة الكلام...';
+      try{
+        const translated=await translateLiveSpeech(heard);
+        lastLiveTranslation=translated;
+        document.getElementById('liveResult').innerText='الترجمة: '+translated;
+        document.getElementById('liveStatus').innerText='✅ تمت ترجمة المقطع الصوتي';
+      }catch(error){
+        document.getElementById('liveResult').innerText='تعذرت الترجمة الآن. تحقق من الاتصال وحاول مرة أخرى.';
+        document.getElementById('liveStatus').innerText='⚠️ خدمة الترجمة غير متاحة مؤقتًا';
+      }
+    }
+  };
+  liveRecognition.onerror=(event)=>{
+    document.getElementById('liveStatus').innerText=event.error==='not-allowed'?'اسمح باستخدام الميكروفون من إعدادات المتصفح.':'حدث خطأ في الاستماع: '+event.error;
+    if(event.error==='not-allowed'||event.error==='service-not-allowed') liveRestartAllowed=false;
+  };
+  liveRecognition.onend=()=>{
+    liveListening=false;
+    if(liveRestartAllowed){
+      document.getElementById('liveStatus').innerText='إعادة الاتصال بالميكروفون...';
+      setTimeout(()=>{if(liveRestartAllowed&&liveRecognition){try{liveRecognition.start();}catch(e){}}},500);
+    }else{
+      document.getElementById('liveStatus').innerText='تم إيقاف الاستماع.';
+    }
+  };
+  try{liveRecognition.start();}catch(error){document.getElementById('liveStatus').innerText='تعذر بدء الاستماع. أغلق الأداة وحاول مرة أخرى.';}
+}
+function stopLiveTranslation(){
+  liveRestartAllowed=false;
+  if(liveRecognition){try{liveRecognition.stop();}catch(e){}}
+  liveListening=false;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  document.getElementById('liveStatus').innerText='⏹️ تم إيقاف الاستماع.';
+}
+function speakLiveTranslation(){
+  if(!lastLiveTranslation) return alert('لا توجد ترجمة صوتية بعد. ابدأ الاستماع أولاً.');
+  if(!('speechSynthesis' in window)) return alert('النطق الصوتي غير مدعوم في هذا المتصفح.');
+  const utterance=new SpeechSynthesisUtterance(lastLiveTranslation);
+  utterance.lang=document.getElementById('speechTarget').value;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
+
 async function shareMyMusic(){ const data={title:'MyMusic AI',text:'اكتشف MyMusic للبحث عن الأغاني والفنانين والاستماع إلى المعاينات الموسيقية.',url:'https://mymusic-3k6.pages.dev/'}; try{ if(navigator.share){await navigator.share(data);} else if(navigator.clipboard){await navigator.clipboard.writeText(data.url);alert('تم نسخ رابط MyMusic للمشاركة');} else {window.prompt('انسخ رابط MyMusic',data.url);} }catch(e){} }
 let myMusicInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', event => {
