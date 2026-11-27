@@ -266,7 +266,7 @@ audio,video{width:100%}
   <button class="btn-green" id="startSpeechBtn" onclick="startLiveTranslation()">🎙️ ابدأ الاستماع والترجمة</button>
   <button class="btn-dark" onclick="stopLiveTranslation()">⏹️ إيقاف الترجمة</button>
   <button class="btn-blue" onclick="speakLiveTranslation()">🔊 انطق آخر ترجمة</button><button class="btn-gold" onclick="saveLiveTranslation()">💾 احفظ الترجمة</button><button class="btn-dark" onclick="exportTranslationHistory()">⬇️ تنزيل الترجمات TXT</button><button class="btn-white" onclick="showTranslationHistory()">📚 سجل الترجمات</button><div id="translationHistory" class="small"></div>
-  <label class="small"><input id="autoDub" type="checkbox" checked style="width:auto"> نطق الترجمة تلقائيًا بعد كل مقطع</label>
+  <label class="small"><input id="autoDub" type="checkbox" style="width:auto"> نطق الترجمة تلقائيًا بعد كل مقطع (اختياري؛ قد يخفض صوت الأغنية)</label>
   <div id="ocrOutput" aria-live="polite">ترجمة النصوص الظاهرة في الصور وإطارات الفيديو المحلي ستظهر هنا.</div>
   <p class="small">قراءة الإطارات متاحة للملفات المحلية المختارة هنا. استخدم سماعات لتجنب التقاط صوت النطق المترجم مرة أخرى بالميكروفون. لا يمكن للصفحة قراءة صورة أو صوت فيديو YouTube داخل إطار محمي أو موقع آخر.</p>
   <span id="liveStatus" class="small" aria-live="polite">جاهز - لم يبدأ الاستماع</span>
@@ -381,13 +381,39 @@ function googleDiscover(kind){const q=document.getElementById('search').value.tr
 function openLiveTranslationPanel(){document.getElementById('floatMenu').style.display='none';document.getElementById('liveTranslatePanel').style.display='block';}
 let liveCaptureStream=null,liveInputTrack=null,translationHistory=[];try{translationHistory=JSON.parse(localStorage.getItem('mymusic_translation_history')||'[]');}catch(e){translationHistory=[];}
 function translateCurrentMedia(){
-  // Cross-origin media cannot reliably be captured from an HTMLMediaElement.
-  // Avoid captureStream entirely and use the browser microphone recognition path.
-  liveInputTrack=null;
+  // Local phone files use blob: URLs. Capturing their audio track avoids
+  // opening the microphone, which may steal audio focus and pause playback.
   if(liveCaptureStream){liveCaptureStream.getTracks().forEach(t=>t.stop());liveCaptureStream=null;}
+  liveInputTrack=null;
+  const media=Array.from(document.querySelectorAll('audio,video')).find(x=>!x.paused&&x.currentSrc);
+  if(media){
+    const source=media.currentSrc||media.src||'';
+    let sameOrigin=false;
+    try{sameOrigin=new URL(source,location.href).origin===location.origin;}catch(e){}
+    const isLocalOrSameOrigin=source.startsWith('blob:')||source.startsWith('data:')||sameOrigin;
+    if(isLocalOrSameOrigin){
+      const capture=media.captureStream||media.mozCaptureStream;
+      if(capture){
+        try{
+          const stream=capture.call(media);
+          const track=stream.getAudioTracks()[0];
+          if(track&&track.readyState==='live'){
+            liveCaptureStream=stream;
+            liveInputTrack=track;
+            openLiveTranslationPanel();
+            const status=document.getElementById('liveStatus');
+            if(status) status.innerText='🎵 تم توصيل صوت الملف المحلي مباشرة للترجمة دون تشغيل الميكروفون.';
+            startLiveTranslation();
+            return;
+          }
+          stream.getTracks().forEach(t=>t.stop());
+        }catch(error){console.warn('Local audio capture unavailable; microphone fallback.',error);}
+      }
+    }
+  }
   openLiveTranslationPanel();
   const status=document.getElementById('liveStatus');
-  if(status) status.innerText='🎙️ الترجمة عبر الميكروفون: اسمح بالميكروفون وشغّل الصوت بمستوى مسموع.';
+  if(status) status.innerText='🎙️ هذا المصدر لا يسمح بالتقاط الصوت مباشرة؛ ستُستخدم الميكروفون. شغّل صوت الجهاز بمستوى مسموع.';
   startLiveTranslation();
 }
 async function startTabAudioTranslation(){if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia)return alert('مشاركة صوت التبويب غير مدعومة في هذا المتصفح');try{const stream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});const track=stream.getAudioTracks()[0];if(!track){stream.getTracks().forEach(t=>t.stop());return alert('اختر مشاركة تبويب Chrome وفعّل مشاركة الصوت');}liveCaptureStream=stream;liveInputTrack=track;openLiveTranslationPanel();startLiveTranslation();}catch(e){alert('تعذرت مشاركة التبويب: '+e.message);}}
