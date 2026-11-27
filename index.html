@@ -140,9 +140,11 @@ audio,video{width:100%}
 <div class="box">
 <h2>🌐 ترجمة شاملة - جوجل + Manus + داخل وخارج الكرة العائمة</h2>
 <input id="trText" placeholder="اكتب نص أو اسم فيديو أو أغنية للترجمة">
-<button class="btn-white" onclick="doTranslate('google')">ترجمة جوجل</button>
-<button class="btn-white" onclick="doTranslate('manus')">ترجمة Manus</button>
-<button class="btn-white" onclick="doTranslate('bing')">ترجمة Bing</button>
+<label class="small" for="textTarget">ترجم النص إلى:</label><select id="textTarget"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option></select>
+<button class="btn-green" onclick="doTranslate('inside')">🌐 ترجم داخل MyMusic</button>
+<button class="btn-white" onclick="window.open('https://translate.google.com/','_blank','noopener')">Google Translate</button>
+<button class="btn-white" onclick="window.open('https://www.deepl.com/translator','_blank','noopener')">DeepL</button>
+<button class="btn-white" onclick="window.open('https://www.bing.com/translator','_blank','noopener')">Bing</button>
 <div id="trRes" class="small"></div>
 <p class="small">الترجمة بتشتغل جوه الموقع من الزر العائم، وبره الموقع لما تفتح جوجل أو مانوس في تاب جديد، وانت بتسمع أو بتتفرج.</p>
 </div>
@@ -357,7 +359,23 @@ function openSearch(type){ let q=document.getElementById('gSearch').value.trim()
 function playYoutube(){ let v=document.getElementById('ytInput').value.trim()||document.getElementById('gSearch').value.trim(); if(!v) return alert('اكتب اسم فيديو أو الصق لينك يوتيوب'); let m=v.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_-]{11})/); if(m){ document.getElementById('ytBox').innerHTML='<iframe src="https://www.youtube.com/embed/'+m[1]+'" allowfullscreen></iframe>'; } else { window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(v),'_blank'); document.getElementById('ytBox').innerHTML='<div class="card">▶️ فتحنا بحث يوتيوب لـ <b>'+v+'</b> في تاب جديد</div>'; } }
 function openYTApp(){ let v=document.getElementById('ytInput').value.trim(); window.open(v?('https://www.youtube.com/results?search_query='+encodeURIComponent(v)):'https://www.youtube.com','_blank'); }
 function translateYT(){ let v=document.getElementById('ytInput').value.trim()||'video'; document.getElementById('ytTrans').innerHTML='<div class="card">🌐 ترجمة: <b>'+v+'</b><br><a href="https://translate.google.com/?sl=auto&tl=ar&text='+encodeURIComponent(v)+'" target="_blank" style="color:#fff">فتح ترجمة جوجل</a> | <a href="https://manus.im" target="_blank" style="color:#fff">فتح Manus</a></div>'; window.open('https://translate.google.com/?sl=auto&tl=ar&text='+encodeURIComponent(v),'_blank'); }
-function doTranslate(where){ let t=document.getElementById('trText').value.trim()||document.getElementById('ytInput').value.trim()||'MyMusic AI'; if(where=='google') window.open('https://translate.google.com/?sl=auto&tl=ar&text='+encodeURIComponent(t),'_blank'); if(where=='manus') window.open('https://manus.im/?q='+encodeURIComponent('ترجم: '+t),'_blank'); if(where=='bing') window.open('https://www.bing.com/translator?text='+encodeURIComponent(t),'_blank'); document.getElementById('trRes').innerText='✅ اتفتحت ترجمة '+where+' لـ: '+t; }
+async function doTranslate(where){
+ const input=document.getElementById('trText'), output=document.getElementById('trRes');
+ const t=input.value.trim();
+ if(!t){output.innerText='اكتب النص الذي تريد ترجمته أولاً.';input.focus();return;}
+ const target=document.getElementById('textTarget')?.value||'ar', source=detectTranscriptLanguage(t);
+ output.innerText='⏳ جارٍ ترجمة النص داخل MyMusic...';
+ try{
+  const translated=await translateTranscriptText(t,target,source);
+  output.innerText='🌐 الترجمة داخل MyMusic ('+source+' → '+target+'):\n'+translated;
+  lastLiveTranslation=translated;
+  document.getElementById('liveOriginal').innerText=t;
+  document.getElementById('liveResult').innerText=translated;
+  translationHistory.unshift({date:new Date().toLocaleString('ar-EG'),original:t,translated});
+  translationHistory=translationHistory.slice(0,100);
+  try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}
+ }catch(error){output.innerText='تعذرت الترجمة داخل الموقع: '+error.message+'\nحاول مرة أخرى أو استخدم أحد مواقع الترجمة الخارجية.';}
+}
 let myLocalMedia=[];
 function escapeHTML(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
 function saveMyFiles(inp){
