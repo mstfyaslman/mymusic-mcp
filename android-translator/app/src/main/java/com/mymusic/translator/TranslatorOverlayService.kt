@@ -312,7 +312,7 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
             override fun onError(error: Int) { if (listening) restartSpeechSoon() }
             override fun onResults(results: android.os.Bundle?) {
                 val heard = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull().orEmpty()
-                if (heard.isNotBlank()) translateAndShow(heard, "🎙️ الكلام المسموع", speechLanguage.substringBefore("-"))
+                if (heard.isNotBlank()) translateAndShow(heard, "🎙️ الكلام المسموع", speechLanguage.substringBefore("-"), true)
                 if (listening) restartSpeechSoon()
             }
             override fun onPartialResults(partialResults: android.os.Bundle?) {}
@@ -343,7 +343,7 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
         statusView?.text = "تم إيقاف الاستماع."
     }
 
-    private fun translateAndShow(text: String, label: String, sourceOverride: String? = null) {
+    private fun translateAndShow(text: String, label: String, sourceOverride: String? = null, speakResult: Boolean = false) {
         worker.execute {
             try {
                 val source = sourceOverride ?: if (text.any { it in '\u0600'..'\u06FF' }) "ar" else "en"
@@ -360,7 +360,7 @@ class TranslatorOverlayService : Service(), TextToSpeech.OnInitListener {
                 mainHandler.post {
                     statusView?.text = "✅ تمت الترجمة – $label"
                     resultView?.text = "الأصل:\n$text\n\nالعربية:\n${translated.ifBlank { "لم تتوفر ترجمة." }}"
-                    if (translated.isNotBlank()) speak(translated)
+                    if (translated.isNotBlank() && speakResult) speak(translated)
                 }
             } catch (error: Exception) {
                 mainHandler.post { statusView?.text = "تعذرت الترجمة: ${error.message}" }
