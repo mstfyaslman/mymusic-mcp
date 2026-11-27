@@ -45,11 +45,11 @@ export async function onRequest({ request, env }) {
       ? "Transcribe all audible speech and sung lyrics in the original language. Return valid SubRip SRT subtitles with timestamps for every cue (HH:MM:SS,mmm --> HH:MM:SS,mmm). Preserve speaker labels when clear. Include clearly readable on-screen text only when relevant, marked [ON-SCREEN]. Do not translate, summarize, or invent words. If no speech is audible, say so clearly."
       : "Transcribe all audible speech and sung lyrics in the original language. Return valid SubRip SRT subtitles with timestamps for every cue (HH:MM:SS,mmm --> HH:MM:SS,mmm). Preserve speaker labels when clear. Do not translate, summarize, or invent words. If no speech is audible, say so clearly.";
     let generated, result = {};
-    for (const model of ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.1-flash-lite", "gemini-3.5-flash"]) {
+    for (const model of ["gemini-3.5-flash-lite", "gemini-3.8-flash"]) {
       for (let attempt = 0; attempt < 2; attempt++) {
         generated = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent", {
           method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-          body: JSON.stringify({ contents: [{ role: "user", parts: [{ file_data: { mime_type: mime, file_uri: metadata.uri || uploadData.file.uri } }, { text: prompt }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 8192 } })
+          body: JSON.stringify({ contents: [{ role: "user", parts: [{ fileData: { mimeType: mime, fileUri: metadata.uri || uploadData.file.uri } }, { text: prompt }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 8192 } })
         });
         result = await generated.json().catch(() => ({}));
         if (generated.ok) break;
