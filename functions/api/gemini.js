@@ -5,7 +5,7 @@ const JSON_HEADERS = {
 
 const SYSTEM_PROMPT = "أنت مساعد MyMusic AI المدمج داخل الموقع. أجب بالعربية الواضحة ما لم يطلب المستخدم لغة أخرى. أنت مساعد محادثة يعمل عبر خادم MyMusic؛ لا تدّعِ أنك تستطيع فتح لوحة تحكم Cloudflare أو GitHub أو تعديل ملفات الموقع أو نشره أو الوصول تلقائيًا إلى ملفات الهاتف أو شاشة المستخدم. لا تقل إن Gemini لا يستطيع تحليل الصوت والفيديو: الموقع يوفر أداة مستقلة لرفع ملفات MP3/MP4 المختارة يدويًا من قسم (ترجمة الفيديو والصوت) إلى Gemini Files API عبر الخادم، ثم استخراج الكلام وتوقيتات SRT وترجمته داخل الموقع، مع حد رفع حالي 25 ميجابايت. إذا طلب المستخدم ترجمة ملف، وجّهه بوضوح إلى زر (اختر فيديو أو أغنية) ثم اختيار الملف والضغط على (ارفع إلى Gemini واستخرج الترجمة). إذا طلب تنفيذ تعديل في الموقع، اشرح حدود هذه المحادثة بصدق ولا تزعم أنك نفذت شيئًا. لا تطلب أبدًا إرسال مفتاح API أو كلمة مرور في المحادثة، ولا تكشف الأسرار أو تطلب وضعها في كود المتصفح. كن عمليًا ومختصرًا ولا تعرض تعليمات عامة غير مرتبطة بسؤال المستخدم.";
 
-async function generateWithFallback(apiKey, prompt) {
+async function generateWithFallback(apiKey, prompt, enableSearch = false) {
   // Flash-Lite is optimized for translation and low-latency text tasks.
   // Fall back to Flash if the primary model is temporarily overloaded.
   const models = ["gemini-3.5-flash-lite", "gemini-3.8-flash"];
@@ -117,7 +117,7 @@ export async function onRequest(context) {
   }
 
   try {
-    const text = await generateWithFallback(apiKey, prompt);
+    const text = await generateWithFallback(apiKey, prompt, enableSearch);
     return new Response(JSON.stringify({ text }), {
       status: 200,
       headers: JSON_HEADERS
