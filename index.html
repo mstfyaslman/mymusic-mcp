@@ -248,6 +248,35 @@ body.light-theme input,body.light-theme select,body.light-theme textarea{backgro
 <button class="btn-dark" onclick="exportTranslationHistory()">تنزيل الترجمات المحفوظة</button>
 </div>
 
+
+<section class="box" id="vevoAiHub" aria-labelledby="vevoAiTitle">
+  <h2 id="vevoAiTitle">🎬 VEVO داخل MyMusic AI</h2>
+  <p class="small">ابحث عن فيديوهات VEVO الرسمية وشغّل الفيديو هنا داخل الموقع، ثم جرّب استخراج الكلام/الكلمات وترجمتها بالذكاء الاصطناعي. التشغيل يتم من مشغل YouTube المضمّن، وليس بفتح نافذة جديدة.</p>
+  <div>
+    <input id="vevoSearchInput" class="vevo-field" type="search" maxlength="120" placeholder="ابحث باسم الفنان أو الأغنية — مثال: Adele Hello">
+    <button class="btn-gold" type="button" onclick="searchVevoVideos()">🔎 ابحث عن VEVO</button>
+  </div>
+  <div id="vevoStatus" class="vevo-status" role="status" aria-live="polite">اكتب اسم الفنان أو الأغنية لبدء البحث. نتائج البحث تحتاج إعداد YOUTUBE_API_KEY كـ Secret في Cloudflare Pages.</div>
+  <div id="vevoResults" class="vevo-grid"></div>
+  <div id="vevoNowPlaying" class="small" style="margin-top:10px;color:#e8bd55">لم يتم اختيار فيديو بعد.</div>
+  <div id="vevoPlayer" class="vevo-player"><div style="position:absolute;inset:0;display:grid;place-items:center;color:#c8aa65">سيظهر الفيديو هنا داخل الموقع بعد اختياره</div></div>
+  <div class="vevo-grid">
+    <button class="btn-gold" type="button" onclick="transcribeVevoVideo()">🎤 استخراج الكلام والكلمات من الفيديو</button>
+    <button class="btn-dark" type="button" onclick="downloadVevoSrt()" id="vevoDownloadBtn" disabled>⬇️ تنزيل SRT المترجم</button>
+  </div>
+  <label class="small" for="vevoTargetLanguage">لغة الترجمة</label>
+  <select id="vevoTargetLanguage" class="vevo-field">
+    <option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="de">Deutsch</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="hi">हिन्दी</option><option value="pt">Português</option><option value="ja">日本語</option>
+  </select>
+  <label class="small" for="vevoLyricsInput">أو الصق كلمات الأغنية / نص الترجمة هنا</label>
+  <textarea id="vevoLyricsInput" class="vevo-lyrics" maxlength="4500" placeholder="الصق الكلمات أو النص هنا، وسيترجمها Gemini داخل MyMusic AI..."></textarea>
+  <button class="btn-gold" type="button" onclick="translateVevoLyrics()">✨ ترجم الكلمات بالذكاء الاصطناعي</button>
+  <h3>النص الأصلي المستخرج</h3>
+  <div id="vevoOriginalOutput" class="vevo-output">سيظهر النص الأصلي هنا بعد التحليل.</div>
+  <h3>الترجمة</h3>
+  <div id="vevoTranslatedOutput" class="vevo-output">ستظهر الترجمة هنا مع الحفاظ على توقيتات SRT عند توفرها.</div>
+</section>
+
 <div class="box">
 <h2>🎵 مشغل MP3 - بحث وتحميل وتشغيل</h2>
 <input id="search" placeholder="اكتب اسم أغنية...">
