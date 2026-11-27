@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mymusic-egypt.pages.dev/sitemap.xml
+Sitemap: https://mymusic-3k6.pages.dev/sitemap.xml
