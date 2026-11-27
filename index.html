@@ -152,7 +152,7 @@ audio,video{width:100%}
 <h2>📂 ملفات الهاتف - فيديو / صوت / صور / أغاني</h2>
 <input type="file" id="myFiles" accept="audio/*,video/*,image/*" multiple onchange="saveMyFiles(this)">
 <div id="myFilesList"></div>
-<p class="small">اختَر ملف صوت أو فيديو ثم اضغط «حوّل الصوت إلى نص وترجمته». يُرسل الملف إلى خدمة MyMusic على Cloudflare لمعالجته، ولا يتم حفظه في سجل الموقع.</p>
+<p class="small">اختَر ملف صوت أو فيديو ثم اضغط «ارفع إلى Gemini واستخرج الترجمة». يرسل الملف من MyMusic إلى Gemini لمعالجته، ثم يحذف الخادم نسخة Gemini المؤقتة بعد اكتمال التحليل.</p>
 </div>
 
 <div class="box" id="mediaTranslationTools">
@@ -572,7 +572,7 @@ async function transcribeLocalMedia(index){
   if(item.file.size>25*1024*1024){output.innerText='حجم الملف أكبر من 25 ميجابايت. اختر ملفاً أصغر أو قصّ المقطع أولاً.';return;}
   const type=item.file.type||'application/octet-stream';
   if(!type.startsWith('audio/')&&!type.startsWith('video/')){output.innerText='اختر ملف صوت أو فيديو.';return;}
-  output.innerText='⏳ جارٍ إرسال الملف لتحويل الكلام إلى نص... لا تغلق الصفحة.';
+  output.innerText='⏳ جارٍ رفع الملف إلى Gemini وتحليل الصوت... لا تغلق الصفحة.';
   try{
     const form=new FormData();
     form.append('audio',item.file,item.file.name);
@@ -602,7 +602,7 @@ async function transcribeLocalMedia(index){
     translationHistory=translationHistory.slice(0,100);
     try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}
   }catch(error){
-    output.innerText='⚠️ تعذرت المعالجة: '+error.message+'\nتحقق من وجود GEMINI_API_KEY كـ Secret مشفّر في Cloudflare ثم أعد المحاولة.';
+    output.innerText='⚠️ تعذرت معالجة الملف عبر Gemini: '+error.message+'\nتحقق من وجود GEMINI_API_KEY كـ Secret مشفّر في Cloudflare ثم أعد المحاولة.';
   }
 }
 function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; currentUrl=s.audio; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
