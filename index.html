@@ -141,6 +141,22 @@ body.light-theme .small{color:#c9c1ad!important}
 body.light-theme input,body.light-theme select,body.light-theme textarea{background:#101010!important;color:#fff!important;border-color:#8a681d!important}
 @media(max-width:480px){.top{padding:20px 12px}.box{border-radius:16px}}
 
+
+/* MyMusic AI — VEVO in-page experience (additive; existing styles preserved) */
+#vevoAiHub{background:linear-gradient(145deg,#17130a,#090909);border:1px solid #8c6a25}
+#vevoAiHub h2,#vevoAiHub h3{color:#e8bd55}
+#vevoAiHub .vevo-field{width:min(100%,680px);text-align:right;background:#101010;border:1px solid #806222;color:#fff}
+#vevoAiHub .vevo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px}
+#vevoAiHub .vevo-result{background:#111;border:1px solid #57451f;border-radius:14px;padding:10px;display:flex;gap:10px;align-items:center;min-width:0}
+#vevoAiHub .vevo-result img{width:112px;aspect-ratio:16/9;object-fit:cover;border-radius:8px}
+#vevoAiHub .vevo-result b{display:block;color:#f4e4b8;font-size:13px}
+#vevoAiHub .vevo-result small{color:#b9aa86}
+#vevoAiHub .vevo-player{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;border:1px solid #70551d;margin-top:12px}
+#vevoAiHub .vevo-player iframe{width:100%;height:100%;border:0;position:absolute;inset:0}
+#vevoAiHub .vevo-status{background:#101010;border:1px solid #55451f;border-radius:10px;padding:10px;color:#e8d9b4;white-space:pre-wrap}
+#vevoAiHub .vevo-lyrics{width:100%;min-height:110px;text-align:start;direction:auto;background:#101010;color:#fff;border:1px solid #806222}
+#vevoAiHub .vevo-output{white-space:pre-wrap;direction:auto;text-align:start;max-height:360px;overflow:auto;background:#090909;border:1px solid #5d4b25;padding:12px;border-radius:12px;color:#f4e7c7}
+
 </style>
 </head>
 <body>
@@ -1115,6 +1131,102 @@ async function installApp(){
 }
 audio.addEventListener('timeupdate',()=>{ if(audio.duration) document.getElementById('progressBar').style.width=(audio.currentTime/audio.duration*100)+'%'; });
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
+
+/* VEVO in-page discovery, playback and AI translation. No external-window navigation. */
+let myMusicVevoCurrentId = "";
+let myMusicVevoCurrentTitle = "";
+let myMusicVevoOriginalSrt = "";
+let myMusicVevoTranslatedSrt = "";
+function vevoSetStatus(message){const el=document.getElementById("vevoStatus");if(el)el.textContent=message;}
+async function searchVevoVideos(){
+  const input=document.getElementById("vevoSearchInput");
+  const query=(input?.value||"").trim();
+  const results=document.getElementById("vevoResults");
+  if(!query){vevoSetStatus("اكتب اسم الفنان أو الأغنية أولاً.");input?.focus();return;}
+  results.innerHTML="";
+  vevoSetStatus("⏳ جارٍ البحث عن فيديوهات VEVO الرسمية...");
+  try{
+    const response=await fetch("/api/vevo-search?q="+encodeURIComponent(query),{headers:{"Accept":"application/json"}});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||"تعذر البحث الآن.");
+    if(!Array.isArray(data.items)||!data.items.length){vevoSetStatus(data.message||"لم نعثر على فيديوهات من قنوات تحمل اسم VEVO. جرّب اسم فنان أو أغنية آخر.");return;}
+    vevoSetStatus("✅ عُثر على "+data.items.length+" نتيجة من قنوات VEVO الرسمية. اختر فيديو لتشغيله هنا.");
+    results.innerHTML=data.items.map(item=>{
+      const id=String(item.id||"");
+      if(!/^[A-Za-z0-9_-]{11}$/.test(id))return "";
+      const title=escapeHTML(item.title||"VEVO video");
+      const channel=escapeHTML(item.channel||"VEVO");
+      const thumb=/^https:\/\//.test(item.thumbnail||"")?item.thumbnail:"";
+      return '<article class="vevo-result"><img loading="lazy" src="'+escapeHTML(thumb)+'" alt=""><div style="min-width:0;flex:1"><b>'+title+'</b><small>'+channel+'</small><br><button class="btn-gold" type="button" onclick="playVevoVideo(\''+id+'\',\''+title.replace(/&#39;/g,"")+'\',\''+channel+'\')">▶ تشغيل داخل الموقع</button></div></article>';
+    }).join("");
+  }catch(error){vevoSetStatus("⚠️ "+error.message);}
+}
+function playVevoVideo(id,title,channel){
+  if(!/^[A-Za-z0-9_-]{11}$/.test(id))return;
+  myMusicVevoCurrentId=id;myMusicVevoCurrentTitle=title||"VEVO";
+  myMusicVevoOriginalSrt="";myMusicVevoTranslatedSrt="";
+  document.getElementById("vevoDownloadBtn").disabled=true;
+  document.getElementById("vevoNowPlaying").textContent="يتم التشغيل داخل MyMusic AI: "+myMusicVevoCurrentTitle+" — "+(channel||"VEVO");
+  document.getElementById("vevoPlayer").innerHTML='<iframe title="VEVO music video" src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0&playsinline=1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+  document.getElementById("vevoOriginalOutput").textContent="لم يتم استخراج النص بعد.";
+  document.getElementById("vevoTranslatedOutput").textContent="اضغط استخراج الكلام والكلمات لبدء التحليل.";
+  vevoSetStatus("▶️ تم تحميل مشغل الفيديو داخل الصفحة. إذا منع صاحب الفيديو التضمين فلن يعمل المشغل لهذا الفيديو.");
+}
+async function transcribeVevoVideo(){
+  if(!myMusicVevoCurrentId){vevoSetStatus("اختر فيديو من نتائج البحث أولاً.");return;}
+  vevoSetStatus("⏳ يطلب MyMusic من Gemini استخراج الكلام والكلمات مع التوقيت. قد يستغرق ذلك بعض الوقت...");
+  try{
+    const response=await fetch("/api/transcribe-youtube",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:"https://www.youtube.com/watch?v="+myMusicVevoCurrentId})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||"تعذر استخراج النص من هذا الفيديو.");
+    const srt=String(data.text||"").trim();
+    if(!srt||srt==="NO_SPEECH")throw new Error("لم يتم العثور على كلام أو كلمات قابلة للاستخراج في الفيديو.");
+    myMusicVevoOriginalSrt=srt;
+    document.getElementById("vevoOriginalOutput").textContent=srt;
+    vevoSetStatus("✅ تم استخراج النص. جارٍ ترجمته إلى اللغة المختارة...");
+    await translateVevoSrt(srt);
+  }catch(error){vevoSetStatus("⚠️ "+error.message+" يمكنك لصق الكلمات يدويًا في مربع النص وتجربة ترجمتها.");}
+}
+async function translateVevoSrt(sourceText){
+  const target=document.getElementById("vevoTargetLanguage").value;
+  const prompt="Translate the following song/video subtitles into language code "+target+". Preserve every SRT cue number and timestamp exactly, preserve line breaks and return only valid SRT. Do not add commentary.\n\n"+sourceText.slice(0,4300);
+  const response=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||"تعذرت ترجمة النص بواسطة Gemini.");
+  myMusicVevoTranslatedSrt=String(data.text||"").trim();
+  if(!myMusicVevoTranslatedSrt)throw new Error("لم يُرجع Gemini ترجمة.");
+  document.getElementById("vevoTranslatedOutput").textContent=myMusicVevoTranslatedSrt;
+  document.getElementById("vevoDownloadBtn").disabled=false;
+  vevoSetStatus("✅ اكتملت ترجمة الفيديو داخل MyMusic AI. يمكنك تنزيل ملف SRT.");
+}
+async function translateVevoLyrics(){
+  const text=(document.getElementById("vevoLyricsInput").value||"").trim();
+  if(!text){vevoSetStatus("الصق كلمات الأغنية أو النص أولاً.");return;}
+  vevoSetStatus("⏳ جارٍ ترجمة الكلمات باستخدام Gemini...");
+  try{
+    const target=document.getElementById("vevoTargetLanguage").value;
+    const response=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"Translate the following song lyrics into language code "+target+". Preserve stanza and line breaks. Return only the translation, without commentary.\n\n"+text.slice(0,4300)})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||"تعذرت الترجمة.");
+    document.getElementById("vevoOriginalOutput").textContent=text;
+    document.getElementById("vevoTranslatedOutput").textContent=data.text||"لم تصل ترجمة.";
+    myMusicVevoTranslatedSrt="";
+    document.getElementById("vevoDownloadBtn").disabled=true;
+    vevoSetStatus("✅ تمت ترجمة الكلمات داخل الموقع.");
+  }catch(error){vevoSetStatus("⚠️ "+error.message);}
+}
+function downloadVevoSrt(){
+  if(!myMusicVevoTranslatedSrt)return;
+  const blob=new Blob(["\uFEFF"+myMusicVevoTranslatedSrt],{type:"application/x-subrip;charset=utf-8"});
+  const url=URL.createObjectURL(blob);const a=document.createElement("a");
+  a.href=url;a.download="MyMusic-AI-VEVO-translation.srt";a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+document.addEventListener("DOMContentLoaded",()=>{
+ const input=document.getElementById("vevoSearchInput");
+ if(input)input.addEventListener("keydown",event=>{if(event.key==="Enter")searchVevoVideos();});
+});
+
 </script>
 </body>
   </html>
