@@ -59,6 +59,7 @@ audio,video{width:100%}
 #floatMenu .floatLink:active{background:#444}
 #floatMenu b{display:block;margin:8px 2px 4px;color:#ffd166;font-size:13px}
 
+#geminiPanel{position:fixed;right:12px;left:12px;bottom:155px;z-index:1002;background:#111;border:1px solid #777;border-radius:16px;padding:12px;max-height:65vh;overflow:auto;box-shadow:0 8px 28px #000b;text-align:right;display:none}#geminiPanel textarea{width:100%;min-height:90px;resize:vertical;padding:10px;border-radius:10px;border:1px solid #555;background:#202020;color:#fff;font:inherit}#geminiReply{white-space:pre-wrap;overflow-wrap:anywhere;background:#202020;padding:10px;border-radius:10px;margin-top:8px;min-height:35px;max-height:30vh;overflow:auto;line-height:1.7}
 #liveTranslate{background:#202020;border:1px solid #555;border-radius:12px;padding:10px;margin:8px 0;text-align:right}
 #liveTranslatePanel{position:fixed;right:12px;left:12px;bottom:155px;z-index:1001;background:#111;border:1px solid #777;border-radius:16px;padding:12px;max-height:55vh;overflow:auto;box-shadow:0 8px 28px #000b;text-align:right}
 #liveTranslatePanel button{max-width:100%}
@@ -310,6 +311,8 @@ audio,video{width:100%}
 <button id="floatBtn" onclick="toggleFloatMenu()">🎧</button>
 <div id="floatMenu">
 <b>🎧 MyMusic AI</b><br>
+<button class="btn-blue" onclick="openGeminiPanel()">✨ اسأل مساعد MyMusic (Gemini)</button>
+
 <button onclick="togglePlay()">⏯️ تشغيل / إيقاف</button>
 <button onclick="nextSong()">⏭️ التالي</button>
 <button onclick="playYoutube()">▶️ تشغيل يوتيوب</button>
@@ -401,6 +404,7 @@ audio,video{width:100%}
 </div>
 <p class="small"><a href="/about.html" style="color:#fff">عن MyMusic</a> · <a href="/privacy.html" style="color:#fff">سياسة الخصوصية</a> · <a href="/terms.html" style="color:#fff">شروط الاستخدام</a></p>
 </div>
+<div id="geminiPanel" role="dialog" aria-label="مساعد MyMusic Gemini"><b>✨ مساعد MyMusic الذكي</b><p class="small">اسأل عن الدراسة أو البحث أو الترجمة أو أي موضوع. لا ترسل بيانات شخصية أو أسرارًا.</p><textarea id="geminiPrompt" maxlength="5000" placeholder="اكتب سؤالك هنا..."></textarea><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn-green" id="geminiSend" onclick="sendGeminiPrompt()">إرسال السؤال</button><button class="btn-dark" onclick="closeGeminiPanel()">إغلاق</button></div><div id="geminiReply" aria-live="polite">جاهز لاستقبال سؤالك.</div></div>
 <div id="player">
 <b id="pTitle">MyMusic AI - اختار أغنية</b><br><small id="pArtist">جاهز للتشغيل</small>
 <div class="progress"><div id="progressBar"></div></div>
@@ -574,6 +578,16 @@ function logout(){ document.getElementById('loginStatus').innerText='مش مسج
 function sendMsg(){ let n=document.getElementById('msgName').value||'صديقنا'; document.getElementById('msgReply').innerHTML='<div class="card">🤖 <b>MyMusic AI</b><br>أهلاً بيك يا '+n+'، شكراً لرسالتك ❤️<br>سنتواصل معك في أقرب فرصة.<br><small>- فريق MyMusic AI</small></div>'; }
 function toggleFloat(){ floatHidden=!floatHidden; document.getElementById('floatBtn').style.display=floatHidden?'none':'block'; document.getElementById('floatMenu').style.display='none'; if(floatHidden) alert('الزر العائم اتخفى - دوس على زرار إخفاء / إظهار الزر العائم فوق عشان يرجع'); }
 function toggleFloatMenu(){ let m=document.getElementById('floatMenu'); m.style.display=(m.style.display=='block')?'none':'block'; }
+function openGeminiPanel(){document.getElementById('floatMenu').style.display='none';document.getElementById('geminiPanel').style.display='block';document.getElementById('geminiPrompt').focus();}
+function closeGeminiPanel(){document.getElementById('geminiPanel').style.display='none';}
+async function sendGeminiPrompt(){
+ const input=document.getElementById('geminiPrompt'),reply=document.getElementById('geminiReply'),button=document.getElementById('geminiSend');
+ const prompt=input.value.trim();if(!prompt)return alert('اكتب سؤالك أولاً.');if(prompt.length>5000)return alert('السؤال طويل جدًا؛ اختصره إلى 5000 حرف.');
+ button.disabled=true;reply.textContent='⏳ جاري إرسال السؤال إلى Gemini...';
+ try{const response=await fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({prompt})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||('تعذر الاتصال ('+response.status+')'));if(!data.text)throw new Error('لم يصل رد من المساعد. حاول مرة أخرى.');reply.textContent=data.text;}
+ catch(error){reply.textContent='تعذر تشغيل مساعد Gemini: '+error.message+'\nتحقق من إعداد GEMINI_API_KEY كـ Secret مشفّر في Cloudflare ثم أعد النشر.';}
+ finally{button.disabled=false;}
+}
 
 function searchStudyLessons(){
  const grade=document.getElementById('studyGrade').value;
