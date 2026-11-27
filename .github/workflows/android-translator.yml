@@ -1,5 +1,8 @@
 name: Android translator build
 on:
+concurrency:
+  group: android-translator-${{ github.ref }}
+  cancel-in-progress: true
   push:
     paths:
       - "android-translator/**"
