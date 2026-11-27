@@ -18,6 +18,5 @@ android {
 
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
-    implementation("com.google.mlkit:text-recognition:16.0.1")
-    implementation("com.google.mlkit:text-recognition-arabic:16.0.1")
+    implementation("cz.adaptech.tesseract4android:tesseract4android:4.9.0")
 }
