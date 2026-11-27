@@ -113,14 +113,14 @@ audio,video{width:100%}
 <h2>📂 ملفات الهاتف - فيديو / صوت / صور / أغاني</h2>
 <input type="file" id="myFiles" accept="audio/*,video/*,image/*" multiple onchange="saveMyFiles(this)">
 <div id="myFilesList"></div>
-<p class="small">الملفات بتتحفظ في متصفحك بس، ومش بتتبعت لأي حد.</p>
+<p class="small">اختَر ملف صوت أو فيديو ثم اضغط «حوّل الصوت إلى نص وترجمته». يُرسل الملف إلى خدمة MyMusic على Cloudflare لمعالجته، ولا يتم حفظه في سجل الموقع.</p>
 </div>
 
 <div class="box" id="mediaTranslationTools">
 <h2>🎙️ ترجمة الفيديوهات وملفات MP3 - داخل وخارج القائمة العائمة</h2>
-<p class="small">شغّل الصوت أو الفيديو وارفع صوت الجهاز، ثم اسمح بالميكروفون للترجمة. لا يحتاج الموقع إلى التقاط صوت المشغل مباشرة.</p>
+<p class="small">لأفضل نتيجة على أندرويد: اختر ملف الصوت أو الفيديو من الهاتف في قسم الملفات، ثم حوّله إلى نص وترجمه من دون ميكروفون أو إيقاف التشغيل. الترجمة الحية لمصادر خارجية تظل حسب دعم المتصفح.</p>
 <button class="btn-green" onclick="openLiveTranslationPanel()">فتح لوحة الترجمة</button>
-<button class="btn-blue" onclick="translateCurrentMedia()">ترجمة صوت المشغل عبر الميكروفون</button>
+<button class="btn-blue" onclick="translateCurrentMedia()">محاولة ترجمة الميديا الحالية</button>
 <button class="btn-gold" onclick="startTabAudioTranslation()">ترجمة صوت تبويب أو موقع</button>
 <button class="btn-dark" onclick="exportTranslationHistory()">تنزيل الترجمات المحفوظة</button>
 </div>
@@ -245,7 +245,7 @@ audio,video{width:100%}
 <button onclick="nextSong()">⏭️ التالي</button>
 <button onclick="playYoutube()">▶️ تشغيل يوتيوب</button>
 <button onclick="doTranslate('google')">🌐 ترجمة جوجل</button>
-<button onclick="doTranslate('manus')">🚀 ترجمة Manus</button><button class="btn-green" onclick="openLiveTranslationPanel()">🎙️ افتح الترجمة المباشرة</button><button class="btn-blue" onclick="translateCurrentMedia()">▶️ ترجم صوت المشغل عبر الميكروفون</button><button class="btn-gold" onclick="startTabAudioTranslation()">🌐 ترجم صوت الموقع/التبويب</button>
+<button onclick="doTranslate('manus')">🚀 ترجمة Manus</button><button class="btn-green" onclick="openLiveTranslationPanel()">🎙️ افتح الترجمة المباشرة</button><button class="btn-blue" onclick="translateCurrentMedia()">▶️ ترجمة الميديا الحالية</button><button class="btn-gold" onclick="startTabAudioTranslation()">🌐 ترجم صوت الموقع/التبويب</button>
 
 <button onclick="openSearch('google')">🔍 بحث جوجل</button>
 <button onclick="toggleFloat()">👁️ إخفاء الزر</button>
@@ -254,7 +254,7 @@ audio,video{width:100%}
 
 <div id="liveTranslatePanel" role="region" aria-label="لوحة الترجمة المباشرة" style="display:none">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>🎙️ الترجمة المباشرة</b><button class="btn-dark" type="button" onclick="closeLiveTranslationPanel()" aria-label="إغلاق لوحة الترجمة">✕ إغلاق</button></div>
-  <p class="small">شغّل الفيديو بصوت مسموع، واسمح للميكروفون. الأداة تلتقط الكلام من الميكروفون ثم تترجمه؛ لا تلتقط صوت التبويب مباشرة؛ يلزم الميكروفون وسماع الصوت في المكان.</p>
+  <p class="small">يمكنك ترجمة ملف صوت أو فيديو من قسم ملفات الهاتف دون ميكروفون. الاستماع المباشر للوسائط الخارجية يعتمد على دعم المتصفح ومشاركة الصوت.</p>
   <label class="small" for="speechSource">لغة الكلام</label>
   <select id="speechSource">
     <option value="en-US">English</option><option value="ar-EG">العربية</option><option value="fr-FR">Français</option><option value="de-DE">Deutsch</option><option value="es-ES">Español</option><option value="tr-TR">Türkçe</option><option value="it-IT">Italiano</option><option value="ru-RU">Русский</option><option value="zh-CN">中文</option><option value="ja-JP">日本語</option><option value="ko-KR">한국어</option><option value="pt-BR">Português</option><option value="hi-IN">हिन्दी</option><option value="ur-PK">اردو</option><option value="fa-IR">فارسی</option><option value="bn-BD">বাংলা</option><option value="nl-NL">Nederlands</option><option value="el-GR">Ελληνικά</option><option value="he-IL">עברית</option><option value="id-ID">Bahasa Indonesia</option><option value="zh-CN">中文</option><option value="ja-JP">日本語</option><option value="ko-KR">한국어</option><option value="pt-BR">Português</option><option value="hi-IN">हिन्दी</option><option value="ur-PK">اردو</option><option value="fa-IR">فارسی</option><option value="bn-BD">বাংলা</option><option value="nl-NL">Nederlands</option><option value="el-GR">Ελληνικά</option><option value="he-IL">עברית</option><option value="id-ID">Bahasa Indonesia</option>
@@ -333,11 +333,64 @@ function saveMyFiles(inp){
   let markup='';
   myLocalMedia.forEach((item,i)=>{
     const name=escapeHTML(item.file.name), url=item.url;
-    if(item.file.type.startsWith('audio')) markup+='<div class="card">🎵 '+name+'<br><audio controls src="'+url+'"></audio></div>';
-    else if(item.file.type.startsWith('video')) markup+='<div class="card">🎬 '+name+'<br><video id="localVideo'+i+'" controls playsinline src="'+url+'" style="width:100%"></video><br><button class="btn-gold" onclick="ocrLocalVideo('+i+')">🔎 اقرأ وترجم الكلام الظاهر في إطار الفيديو</button></div>';
+    if(item.file.type.startsWith('audio')) markup+='<div class="card">🎵 '+name+'<br><audio controls src="'+url+'"></audio><br><button class="btn-green" onclick="transcribeLocalMedia('+i+')">📝 حوّل الصوت إلى نص وترجمه</button><div id="transcriptOutput'+i+'" class="small" aria-live="polite"></div></div>';
+    else if(item.file.type.startsWith('video')) markup+='<div class="card">🎬 '+name+'<br><video id="localVideo'+i+'" controls playsinline src="'+url+'" style="width:100%"></video><br><button class="btn-green" onclick="transcribeLocalMedia('+i+')">📝 حوّل صوت الفيديو إلى نص وترجمه</button><button class="btn-gold" onclick="ocrLocalVideo('+i+')">🔎 اقرأ وترجم الكلام الظاهر في إطار الفيديو</button><div id="transcriptOutput'+i+'" class="small" aria-live="polite"></div></div>';
     else if(item.file.type.startsWith('image')) markup+='<div class="card">🖼️ '+name+'<br><img id="localImage'+i+'" src="'+url+'" style="width:100%;border-radius:12px"><br><button class="btn-gold" onclick="ocrLocalImage('+i+')">🔎 اقرأ وترجم النص داخل الصورة</button></div>';
   });
   document.getElementById('myFilesList').innerHTML=markup||'لم يتم اختيار ملفات مدعومة.';
+}
+
+async function translateTranscriptText(text,target){
+  const chunks=[];
+  const sentences=String(text||'').split(/(?<=[.!?؟。])\\s+/);
+  let current='';
+  for(const sentence of sentences){
+    if((current+' '+sentence).trim().length>450 && current){chunks.push(current);current=sentence;}
+    else current=(current+' '+sentence).trim();
+  }
+  if(current)chunks.push(current);
+  const translated=[];
+  for(let i=0;i<chunks.length;i++){
+    const response=await fetch('https://api.mymemory.translated.net/get?'+new URLSearchParams({q:chunks[i],langpair:'auto|'+target}),{headers:{'Accept':'application/json'}});
+    if(!response.ok) throw new Error('تعذرت خدمة الترجمة للنص');
+    const data=await response.json();
+    const part=data&&data.responseData&&data.responseData.translatedText;
+    if(!part) throw new Error('لم تصل نتيجة الترجمة');
+    translated.push(part);
+  }
+  return translated.join(' ');
+}
+async function transcribeLocalMedia(index){
+  const item=myLocalMedia[index];
+  const output=document.getElementById('transcriptOutput'+index);
+  if(!item||!output)return;
+  if(item.file.size>25*1024*1024){output.innerText='حجم الملف أكبر من 25 ميجابايت. اختر ملفاً أصغر أو قصّ المقطع أولاً.';return;}
+  const type=item.file.type||'application/octet-stream';
+  if(!type.startsWith('audio/')&&!type.startsWith('video/')){output.innerText='اختر ملف صوت أو فيديو.';return;}
+  output.innerText='⏳ جارٍ إرسال الملف لتحويل الكلام إلى نص... لا تغلق الصفحة.';
+  try{
+    const form=new FormData();
+    form.append('audio',item.file,item.file.name);
+    const language=(document.getElementById('speechSource')?.value||'auto').split('-')[0];
+    form.append('language',language==='auto'?'':language);
+    const response=await fetch('/api/transcribe',{method:'POST',body:form});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||('خطأ من الخادم '+response.status));
+    const original=String(data.text||'').trim();
+    if(!original)throw new Error('لم يتم التعرف على كلام واضح في الملف');
+    output.innerText='📝 النص الأصلي:\\n'+original+'\\n\\n⏳ جارٍ ترجمة النص...';
+    const target=document.getElementById('speechTarget')?.value||'ar';
+    const translated=await translateTranscriptText(original,target);
+    output.innerText='📝 النص الأصلي:\\n'+original+'\\n\\n🌐 الترجمة:\\n'+translated;
+    lastLiveTranslation=translated;
+    document.getElementById('liveOriginal').innerText=original;
+    document.getElementById('liveResult').innerText=translated;
+    translationHistory.unshift({date:new Date().toLocaleString('ar-EG'),original,translated});
+    translationHistory=translationHistory.slice(0,100);
+    try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}
+  }catch(error){
+    output.innerText='⚠️ تعذرت المعالجة: '+error.message+'\\nتأكد من تفعيل Workers AI في Cloudflare ثم أعد المحاولة.';
+  }
 }
 function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; currentUrl=s.audio; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
 function togglePlay(){ if(audio.paused) audio.play(); else audio.pause(); }
