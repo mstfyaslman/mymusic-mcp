@@ -503,9 +503,9 @@ let myLocalMedia=[];
 let autoTranscribeOnSelect=false;
 function chooseMediaForTranslation(){autoTranscribeOnSelect=true;document.getElementById('myFiles').click();}
 function getMediaMime(file){
-  if(file.type&&/^(audio|video)\//i.test(file.type))return file.type;
+  if(file.type&&(file.type.startsWith('audio/')||file.type.startsWith('video/')))return file.type;
   const ext=(file.name||'').split('.').pop().toLowerCase();
-  const types={mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',wav:'audio/wav',ogg:'audio/ogg',flac:'audio/flac',mp4:'video/mp4',m4v:'video/mp4',mov:'video/quicktime',webm:'video/webm',3gp:'video/3gpp',avi:'video/x-msvideo',wmv:'video/x-ms-wmv'};
+  const types={mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',wav:'audio/wav',ogg:'audio/ogg',flac:'audio/flac',mp4:'video/mp4',m4v:'video/mp4',mov:'video/quicktime',webm:'video/webm','3gp':'video/3gpp',avi:'video/x-msvideo',wmv:'video/x-ms-wmv'};
   return types[ext]||file.type||'';
 }
 function escapeHTML(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
