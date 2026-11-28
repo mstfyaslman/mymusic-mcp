@@ -1009,29 +1009,76 @@
       var aiTranscriptOut = document.getElementById("aiTranscriptOut");
       var aiTranslationOut = document.getElementById("aiTranslationOut");
 
+      async function translateSrtText(sourceText, targetLang) {
+        var prompt = "Translate the following timestamped SRT subtitles into " + targetLang + ". Preserve every subtitle number and exact timestamp. Keep medical, engineering and scientific terminology accurate and context-aware. Return only valid SRT.\\n\\n" + sourceText.slice(0, 18000);
+        var out = await safeFetchJson("/api/gemini", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:prompt})});
+        return out.text || "";
+      }
+      function parseSrtCues(srt) {
+        return String(srt || "").replace(/\\r/g,"").split(/\\n\\s*\\n/).map(function(block) {
+          var lines=block.split("\\n"), ti=lines.findIndex(function(line){return /\\d{2}:\\d{2}:\\d{2}[,.]\\d{3}\\s*-->/.test(line);});
+          if(ti<0) return null;
+          var m=/(\\d{2}):(\\d{2}):(\\d{2})[,.](\\d{3})\\s*-->\\s*(\\d{2}):(\\d{2}):(\\d{2})[,.](\\d{3})/.exec(lines[ti]);
+          if(!m) return null;
+          var ms=function(a,b,c,d){return ((+a*3600)+(+b*60)+(+c))*1000+(+d);};
+          return {start:ms(m[1],m[2],m[3],m[4]),end:ms(m[5],m[6],m[7],m[8]),text:lines.slice(ti+1).join(" ")};
+        }).filter(Boolean);
+      }
+      function attachLocalSubtitleTrack(srt) {
+        var video=playerStage.querySelector("video"); if(!video) return;
+        var vtt="WEBVTT\\n\\n"+String(srt).replace(/\\r/g,"").replace(/^\\d+\\s*\\n/gm,"").replace(/,(\\d{3})/g,".$1");
+        var url=URL.createObjectURL(new Blob([vtt],{type:"text/vtt"}));
+        var track=document.createElement("track"); track.kind="subtitles"; track.label="الترجمة"; track.srclang="ar"; track.src=url; track.default=true; video.appendChild(track);
+      }
       aiMediaBtn.addEventListener("click", async function () {
-        var file = (aiMediaFileInput.files && aiMediaFileInput.files[0]) || activeLocalFile;
-        var targetLang = document.getElementById("aiTargetLang").value;
-        if (!file) {
-          setStatus(aiMediaStatus, "اختر ملف صوت أو فيديو أولاً (أو شغّل ملفاً من جهازك).", "error");
-          return;
-        }
-        aiMediaBtn.disabled = true;
-        setStatus(aiMediaStatus, "جاري رفع الملف وتحليله وترجمته بالذكاء الاصطناعي... يرجى الانتظار.", "");
+        var file=(aiMediaFileInput.files&&aiMediaFileInput.files[0])||activeLocalFile;
+        var targetLang=document.getElementById("aiTargetLang").value;
+        if(!file){setStatus(aiMediaStatus,"اختر ملف صوت أو فيديو أولاً.","error");return;}
+        aiMediaBtn.disabled=true; setStatus(aiMediaStatus,"جاري استخراج الكلام والتوقيتات من الملف...","");
         try {
-          var formData = new FormData();
-          formData.append("file", file);
-          formData.append("targetLang", targetLang);
-          var data = await safeFetchJson("/api/ai", { method: "POST", body: formData });
-          aiTranscriptOut.textContent = data.transcript || "لم يتم استخراج نص.";
-          aiTranslationOut.textContent = data.translation || "لم تتوفر ترجمة.";
-          setStatus(aiMediaStatus, "تمت الترجمة بنجاح عبر: " + (data.provider || "AI"), "success");
-        } catch (err) {
-          setStatus(aiMediaStatus, err.message, "error");
-        } finally {
-          aiMediaBtn.disabled = false;
-        }
+          var formData=new FormData(); formData.append("file",file);
+          var data=await safeFetchJson("/api/transcribe",{method:"POST",body:formData});
+          aiTranscriptOut.textContent=data.text||"لم يتم استخراج نص.";
+          setStatus(aiMediaStatus,"تم استخراج النص. جاري ترجمة المقاطع...","");
+          var translated=await translateSrtText(data.text||"",targetLang);
+          aiTranslationOut.textContent=translated||"لم تتوفر ترجمة.";
+          subtitleCues=parseSrtCues(translated); attachLocalSubtitleTrack(translated);
+          setStatus(aiMediaStatus,"اكتمل استخراج النص وترجمته. عدد المقاطع: "+(data.cueCount||"—"),"success");
+        } catch(err){setStatus(aiMediaStatus,err.message,"error");}
+        finally{aiMediaBtn.disabled=false;}
       });
+      document.getElementById("translateCurrentVideoBtn").addEventListener("click",async function(){
+        if(!currentYouTubeId){setStatus(aiMediaStatus,"شغّل فيديو YouTube/VEVO أولاً أو ارفع ملفاً من جهازك.","error");return;}
+        var btn=this;btn.disabled=true;
+        try{
+          setStatus(aiMediaStatus,"جاري تحليل رابط الفيديو العام واستخراج الكلام والتوقيتات...","");
+          var original=await safeFetchJson("/api/transcribe-youtube",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:"https://www.youtube.com/watch?v="+currentYouTubeId})});
+          aiTranscriptOut.textContent=original.text||"لم يتم استخراج نص.";
+          var translated=await translateSrtText(original.text||"",document.getElementById("aiTargetLang").value);
+          aiTranslationOut.textContent=translated; subtitleCues=parseSrtCues(translated);
+          setStatus(aiMediaStatus,"تمت ترجمة النص. عرض الترجمة المتزامنة يعتمد على دعم مشغل YouTube للتحكم بالتوقيت.","success");
+          startYouTubeSubtitleSync();
+        }catch(err){setStatus(aiMediaStatus,err.message,"error");}
+        finally{btn.disabled=false;}
+      });
+      var ytSyncTimer=null;
+      function startYouTubeSubtitleSync(){
+        var overlay=document.getElementById("subtitleOverlay"), frame=playerStage.querySelector("iframe");
+        if(!overlay||!frame)return;
+        function init(){
+          if(!window.YT||!window.YT.Player||!frame.isConnected)return;
+          try{
+            var player=new YT.Player(frame,{events:{onReady:function(){
+              if(ytSyncTimer)clearInterval(ytSyncTimer);
+              ytSyncTimer=setInterval(function(){
+                try{var t=player.getCurrentTime()*1000;var cue=subtitleCues.find(function(c){return t>=c.start&&t<c.end;});overlay.textContent=cue?cue.text:"";overlay.style.display=cue?"block":"none";}catch(e){}
+              },250);
+            }}});
+          }catch(e){}
+        }
+        if(window.YT&&window.YT.Player)init();
+        else{if(!document.querySelector('script[src*="youtube.com/iframe_api"]')){var api=document.createElement("script");api.src="https://www.youtube.com/iframe_api";document.head.appendChild(api);}window.onYouTubeIframeAPIReady=init;}
+      }
 
       document.getElementById("copyTranslationBtn").addEventListener("click", function () {
         var txt = aiTranslationOut.textContent.trim();
@@ -1267,12 +1314,12 @@
         }
 
         try {
-          var aiData = await safeFetchJson("/api/ai", {
+          var aiData = await safeFetchJson("/api/gemini", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "clip_insights", title: title, artist: artist })
+            body: JSON.stringify({ prompt: "اكتب نبذة موثوقة ومختصرة عن هذا العمل الموسيقي والفنان، وميّز بين المعلومات المؤكدة وما لا يمكن التحقق منه. اسم العمل: " + title + "؛ الفنان: " + artist + ". لا تخترع أسماء فريق العمل أو الأخبار." })
           });
-          aiInsightsBox.textContent = aiData.insights || "لم تتوفر نتيجة.";
+          aiInsightsBox.textContent = aiData.text || "لم تتوفر نتيجة.";
         } catch (err) {
           aiInsightsBox.textContent = err.message;
         }
