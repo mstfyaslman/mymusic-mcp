@@ -619,7 +619,7 @@
                 <option value="हिन्दी">الترجمة إلى: الهندية</option>
                 <option value="فارسی">الترجمة إلى: الفارسية</option>
               </select>
-              <button type="button" class="btn" id="aiTranslateMediaBtn">ترجمة الملف الصوتي/المرئي</button>
+              <button type="button" class="btn" id="aiTranslateMediaBtn">استخراج صوت الفيديو/الصوت وترجمته</button>
               <button type="button" class="btn btn-secondary" id="translateCurrentVideoBtn">ترجمة الفيديو الجاري</button>
             </div>
             <div class="status-msg" id="aiMediaStatus"></div>
@@ -635,6 +635,31 @@
                 <button type="button" class="btn btn-secondary btn-small" id="copyTranslationBtn">نسخ الترجمة</button>
                 <button type="button" class="btn btn-secondary btn-small" id="speakAiTranslationBtn">نطق الترجمة</button>
               </div>
+            </div>
+            <div class="result-box" id="dubStudio" style="margin-top:12px;border:1px solid rgba(255,176,74,.35);">
+              <strong>🎙️ استوديو الدبلجة الصوتية بالذكاء الاصطناعي</strong>
+              <p style="color:var(--muted);margin:6px 0 12px;">حوّل الترجمة إلى صوت منطوق باللغة المختارة، ثم شغّله متزامناً مع الفيديو. اختر صوتاً ثابتاً للدبلجة.</p>
+              <div class="input-row">
+                <select id="dubVoice" aria-label="صوت الدبلجة">
+                  <option value="Kore">صوت نسائي واضح – Kore</option>
+                  <option value="Aoede">صوت نسائي هادئ – Aoede</option>
+                  <option value="Leda">صوت نسائي دافئ – Leda</option>
+                  <option value="Puck">صوت رجالي حيوي – Puck</option>
+                  <option value="Charon">صوت رجالي عميق – Charon</option>
+                  <option value="Fenrir">صوت رجالي قوي – Fenrir</option>
+                  <option value="Orus">صوت رجالي ثابت – Orus</option>
+                  <option value="Zephyr">صوت محايد – Zephyr</option>
+                </select>
+                <label style="display:flex;align-items:center;gap:8px;color:var(--muted);"><input type="checkbox" id="dubMuteOriginal" checked> كتم الصوت الأصلي أثناء الدبلجة</label>
+              </div>
+              <div class="input-row">
+                <button type="button" class="btn" id="generateDubBtn">إنشاء الدبلجة الصوتية</button>
+                <button type="button" class="btn btn-secondary" id="playDubBtn" disabled>تشغيل الدبلجة المتزامنة</button>
+                <button type="button" class="btn btn-secondary" id="stopDubBtn" disabled>إيقاف الدبلجة</button>
+                <button type="button" class="btn btn-secondary" id="downloadDubBtn" disabled>تنزيل مسار الدبلجة WAV</button>
+              </div>
+              <div class="status-msg" id="dubStatus">ابدأ أولاً باستخراج الصوت وترجمة الحوار. يدعم الدبلجة إلى اللغات الموجودة في قائمة الترجمة.</div>
+              <audio id="dubPreviewAudio" controls style="display:none;width:100%;margin-top:10px;"></audio>
             </div>
           </div>
 
@@ -1032,7 +1057,8 @@
         blocks.forEach(function(block){if(group && (group.length+block.length+2)>3500){groups.push(group);group="";}group+=(group?"\n\n":"")+block;});
         if(group)groups.push(group);
         for(var i=0;i<groups.length;i++){
-          var prompt="Translate these timestamped SRT subtitles into "+targetLang+". Preserve cue numbers and exact timestamps. Keep medical, engineering and scientific terms precise and context-aware. Return only valid SRT.\n\n"+groups[i];
+          var glossary=(savedWords||[]).slice(0,40).map(function(w){return w.word+" = "+w.translation;}).join("; ");
+          var prompt="Translate these timestamped SRT subtitles into "+targetLang+". Preserve cue numbers and exact timestamps. Keep medical, engineering and scientific terms precise and context-aware. Use these saved glossary equivalents consistently when relevant: "+glossary+". Return only valid SRT.\n\n"+groups[i];
           var result=await safeFetchJson("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:prompt})});
           out.push(result.text||"");
         }
@@ -1048,6 +1074,134 @@
           return {start:ms(m[1],m[2],m[3],m[4]),end:ms(m[5],m[6],m[7],m[8]),text:lines.slice(ti+1).join(" ")};
         }).filter(Boolean);
       }
+      var dubSegments = [];
+      var dubAudioContext = null;
+      var dubTimer = null;
+      var dubActiveSources = [];
+      var dubScheduled = new Set();
+      var dubLastPlaybackTime = null;
+      var dubPreviewAudio = document.getElementById("dubPreviewAudio");
+      var dubStatus = document.getElementById("dubStatus");
+      var generateDubBtn = document.getElementById("generateDubBtn");
+      var playDubBtn = document.getElementById("playDubBtn");
+      var stopDubBtn = document.getElementById("stopDubBtn");
+      var downloadDubBtn = document.getElementById("downloadDubBtn");
+
+      function base64ToArrayBuffer(base64) {
+        var binary=atob(base64), bytes=new Uint8Array(binary.length);
+        for(var i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+        return bytes.buffer;
+      }
+      async function generateDubbingTrack() {
+        if(!subtitleCues.length) throw new Error("استخرج الترجمة أولاً قبل إنشاء الدبلجة.");
+        var total=subtitleCues.length, made=[];
+        dubSegments=[]; dubScheduled.clear();
+        if(!dubAudioContext) dubAudioContext=new (window.AudioContext||window.webkitAudioContext)();
+        for(var offset=0;offset<total;offset+=4) {
+          var batch=subtitleCues.slice(offset,offset+4).map(function(c){return {startMs:c.start,endMs:c.end,text:c.text};});
+          var result=await safeFetchJson("/api/dub-speech",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+            cues:batch,targetLanguage:document.getElementById("aiTargetLang").value,voiceName:document.getElementById("dubVoice").value
+          })});
+          for(var j=0;j<result.audio.length;j++) {
+            var item=result.audio[j], buffer=await dubAudioContext.decodeAudioData(base64ToArrayBuffer(item.audioBase64));
+            made.push({startMs:item.startMs,endMs:item.endMs,buffer:buffer});
+          }
+          dubSegments=made.slice();
+          setStatus(dubStatus,"تم توليد "+made.length+" من "+total+" مقطع صوتي ("+Math.round(made.length/total*100)+"%).","");
+        }
+        dubSegments=made;
+        playDubBtn.disabled=false; stopDubBtn.disabled=false; downloadDubBtn.disabled=false;
+        setStatus(dubStatus,"اكتملت الدبلجة الصوتية الحقيقية باستخدام Gemini TTS. يمكنك تشغيلها متزامنة مع الفيديو أو تنزيلها كملف WAV.","success");
+      }
+      generateDubBtn.addEventListener("click",async function(){
+        var btn=this; btn.disabled=true; playDubBtn.disabled=true; downloadDubBtn.disabled=true;
+        try { await generateDubbingTrack(); }
+        catch(e){setStatus(dubStatus,e.message,"error");}
+        finally{btn.disabled=false;}
+      });
+
+      function getDubPlaybackTime() {
+        var frame=playerStage.querySelector("iframe");
+        if(frame && window.myMusicYTPlayer) { try{return window.myMusicYTPlayer.getCurrentTime();}catch(e){} }
+        var media=playerStage.querySelector("video,audio");
+        return media ? media.currentTime : 0;
+      }
+      function isDubSourcePlaying() {
+        var frame=playerStage.querySelector("iframe");
+        if(frame && window.myMusicYTPlayer) { try{return window.myMusicYTPlayer.getPlayerState()===1;}catch(e){} }
+        var media=playerStage.querySelector("video,audio");
+        return !!(media && !media.paused && !media.ended);
+      }
+      function stopDubSources() {
+        dubActiveSources.forEach(function(source){try{source.stop();}catch(e){}});
+        dubActiveSources=[];
+      }
+      function setOriginalMuted(muted) {
+        var media=playerStage.querySelector("video,audio");
+        if(media) media.muted=muted;
+        if(window.myMusicYTPlayer) { try{muted?window.myMusicYTPlayer.mute():window.myMusicYTPlayer.unMute();}catch(e){} }
+      }
+      function startSynchronizedDubbing() {
+        if(!dubSegments.length) {setStatus(dubStatus,"أنشئ الدبلجة أولاً.","error");return;}
+        if(!playerStage.querySelector("video,audio,iframe")) {setStatus(dubStatus,"شغّل الفيلم أو الفيديو أولاً داخل المشغل.","error");return;}
+        if(!dubAudioContext) dubAudioContext=new (window.AudioContext||window.webkitAudioContext)();
+        dubAudioContext.resume();
+        stopDubSources(); dubScheduled.clear(); dubLastPlaybackTime=null;
+        if(document.getElementById("dubMuteOriginal").checked) setOriginalMuted(true);
+        if(dubTimer) clearInterval(dubTimer);
+        dubTimer=setInterval(function(){
+          var now=getDubPlaybackTime(), playing=isDubSourcePlaying();
+          if(dubLastPlaybackTime!==null && Math.abs(now-dubLastPlaybackTime)>1.25) {
+            stopDubSources(); dubScheduled.clear();
+            dubSegments.forEach(function(seg,i){if(seg.startMs<now*1000-250)dubScheduled.add(i);});
+          }
+          dubLastPlaybackTime=now;
+          if(!playing) { if(dubAudioContext.state==="running") dubAudioContext.suspend(); return; }
+          if(dubAudioContext.state==="suspended") dubAudioContext.resume();
+          dubSegments.forEach(function(seg,i){
+            if(dubScheduled.has(i)) return;
+            if(seg.startMs/1000<=now+0.45 && seg.endMs/1000>=now-0.12) {
+              var source=dubAudioContext.createBufferSource(); source.buffer=seg.buffer; source.connect(dubAudioContext.destination);
+              source.onended=function(){dubActiveSources=dubActiveSources.filter(function(x){return x!==source;});};
+              source.start(); dubActiveSources.push(source); dubScheduled.add(i);
+            }
+          });
+        },60);
+        playDubBtn.disabled=true; stopDubBtn.disabled=false;
+        setStatus(dubStatus,"الدبلجة تعمل متزامنة مع توقيت الفيلم. اترك الفيلم يعمل؛ وعند الإيقاف المؤقت تتوقف الدبلجة أيضاً.","success");
+      }
+      playDubBtn.addEventListener("click",startSynchronizedDubbing);
+      stopDubBtn.addEventListener("click",function(){
+        if(dubTimer) clearInterval(dubTimer); dubTimer=null; stopDubSources();
+        if(dubAudioContext && dubAudioContext.state==="suspended") dubAudioContext.resume();
+        setOriginalMuted(false); playDubBtn.disabled=!dubSegments.length;
+        setStatus(dubStatus,"تم إيقاف الدبلجة وإعادة الصوت الأصلي.","");
+      });
+
+      function encodeWav(buffer) {
+        var channels=buffer.numberOfChannels, sampleRate=buffer.sampleRate, frames=buffer.length;
+        var bytes= new ArrayBuffer(44+frames*channels*2), view=new DataView(bytes), offset=0;
+        function writeString(s){for(var i=0;i<s.length;i++)view.setUint8(offset++,s.charCodeAt(i));}
+        writeString("RIFF"); view.setUint32(offset,36+frames*channels*2,true); offset+=4; writeString("WAVE"); writeString("fmt "); view.setUint32(offset,16,true); offset+=4; view.setUint16(offset,1,true); offset+=2; view.setUint16(offset,channels,true); offset+=2; view.setUint32(offset,sampleRate,true); offset+=4; view.setUint32(offset,sampleRate*channels*2,true); offset+=4; view.setUint16(offset,channels*2,true); offset+=2; view.setUint16(offset,16,true); offset+=2; writeString("data"); view.setUint32(offset,frames*channels*2,true); offset+=4;
+        var data=[]; for(var c=0;c<channels;c++)data.push(buffer.getChannelData(c));
+        for(var i=0;i<frames;i++)for(var c=0;c<channels;c++){var sample=Math.max(-1,Math.min(1,data[c][i]));view.setInt16(offset,sample<0?sample*32768:sample*32767,true);offset+=2;}
+        return new Blob([bytes],{type:"audio/wav"});
+      }
+      downloadDubBtn.addEventListener("click",async function(){
+        if(!dubSegments.length)return;
+        var duration=Math.max.apply(null,dubSegments.map(function(s){return s.startMs/1000+s.buffer.duration;}));
+        if(duration>1200){setStatus(dubStatus,"مدة الفيلم أطول من 20 دقيقة؛ استخدم الدبلجة المتزامنة داخل المشغل لتجنب استهلاك ذاكرة الهاتف عند إنشاء WAV كامل.","error");return;}
+        downloadDubBtn.disabled=true; setStatus(dubStatus,"جاري تجميع المقاطع في ملف صوتي واحد...","");
+        try{
+          var rate=24000, offline=new OfflineAudioContext(1,Math.ceil(duration*rate),rate);
+          dubSegments.forEach(function(seg){var src=offline.createBufferSource();src.buffer=seg.buffer;src.connect(offline.destination);src.start(seg.startMs/1000);});
+          var rendered=await offline.startRendering(), blob=encodeWav(rendered), url=URL.createObjectURL(blob), a=document.createElement("a");
+          a.href=url;a.download="MyMusic-Dubbed-"+document.getElementById("aiTargetLang").value+".wav";a.click();
+          setStatus(dubStatus,"تم تجهيز ملف الدبلجة WAV للتنزيل.","success");setTimeout(function(){URL.revokeObjectURL(url);},60000);
+        }catch(e){setStatus(dubStatus,"تعذر تجميع ملف WAV: "+e.message,"error");}
+        finally{downloadDubBtn.disabled=false;}
+      });
+
       function attachLocalSubtitleTrack(srt) {
         var video=playerStage.querySelector("video"); if(!video) return;
         var vtt="WEBVTT\\n\\n"+String(srt).replace(/\\r/g,"").replace(/^\\d+\\s*\\n/gm,"").replace(/,(\\d{3})/g,".$1");
@@ -1094,6 +1248,7 @@
           if(!window.YT||!window.YT.Player||!frame.isConnected)return;
           try{
             var player=new YT.Player(frame,{events:{onReady:function(){
+              window.myMusicYTPlayer=player;
               if(ytSyncTimer)clearInterval(ytSyncTimer);
               ytSyncTimer=setInterval(function(){
                 try{var t=player.getCurrentTime()*1000;var cue=subtitleCues.find(function(c){return t>=c.start&&t<c.end;});overlay.textContent=cue?cue.text:"";overlay.style.display=cue?"block":"none";}catch(e){}
