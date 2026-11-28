@@ -641,6 +641,13 @@
           <!-- التبويب 2: القاموس المترجم الموثوق -->
           <div class="tab-panel" id="tabDictionary">
             <div class="input-row">
+              <select id="dictSpecialty" aria-label="مجال القاموس">
+                <option value="عام">قاموس عام</option>
+                <option value="هندسي">مصطلحات هندسية</option>
+                <option value="طبي">مصطلحات طبية</option>
+                <option value="علمي">مصطلحات علمية</option>
+                <option value="دراسي">مصطلحات دراسية</option>
+              </select>
               <select id="dictFromLang">
                 <option value="en">من: الإنجليزية</option>
                 <option value="ar">من: العربية</option>
@@ -1010,9 +1017,15 @@
       var aiTranslationOut = document.getElementById("aiTranslationOut");
 
       async function translateSrtText(sourceText, targetLang) {
-        var prompt = "Translate the following timestamped SRT subtitles into " + targetLang + ". Preserve every subtitle number and exact timestamp. Keep medical, engineering and scientific terminology accurate and context-aware. Return only valid SRT.\\n\\n" + sourceText.slice(0, 18000);
-        var out = await safeFetchJson("/api/gemini", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:prompt})});
-        return out.text || "";
+        var blocks=String(sourceText||"").replace(/\r/g,"").split(/\n\s*\n/).filter(Boolean), groups=[], group="", out=[];
+        blocks.forEach(function(block){if(group && (group.length+block.length+2)>3500){groups.push(group);group="";}group+=(group?"\n\n":"")+block;});
+        if(group)groups.push(group);
+        for(var i=0;i<groups.length;i++){
+          var prompt="Translate these timestamped SRT subtitles into "+targetLang+". Preserve cue numbers and exact timestamps. Keep medical, engineering and scientific terms precise and context-aware. Return only valid SRT.\n\n"+groups[i];
+          var result=await safeFetchJson("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:prompt})});
+          out.push(result.text||"");
+        }
+        return out.join("\n\n");
       }
       function parseSrtCues(srt) {
         return String(srt || "").replace(/\\r/g,"").split(/\\n\\s*\\n/).map(function(block) {
@@ -1170,7 +1183,13 @@
         dictOutput.textContent = "جاري البحث والترجمة من المصادر الموثوقة...";
 
         try {
+          var specialty = document.getElementById("dictSpecialty").value;
           var translated = await translateTextMyMemory(query, fromLang, toLang);
+          var specialistExplanation = "";
+          try {
+            var specialist = await safeFetchJson("/api/gemini", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"اشرح المصطلح التالي في سياق "+specialty+"، ثم قدم ترجمته الدقيقة إلى "+toLang+". اذكر المعنى الشائع والمعنى التخصصي ومثالاً قصيراً. المصطلح: "+query+"؛ اللغة المصدر: "+fromLang+"."})});
+            specialistExplanation = specialist.text || "";
+          } catch(e) {}
           var dictDetailsHtml = "";
 
           if (fromLang === "en" && query.indexOf(" ") === -1) {
@@ -1194,6 +1213,7 @@
           dictOutput.innerHTML =
             "<div><strong>النص:</strong> " + escapeHtml(query) + "</div>" +
             '<div style="font-size:1.1rem;color:var(--accent);margin-top:6px;"><strong>الترجمة:</strong> ' + escapeHtml(translated) + "</div>" +
+            (specialistExplanation ? '<div style="margin-top:10px;white-space:pre-wrap;"><strong>شرح القاموس التخصصي (' + escapeHtml(specialty) + '):</strong> ' + escapeHtml(specialistExplanation) + '</div>' : '') +
             dictDetailsHtml +
             '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">' +
             '<button type="button" class="btn btn-secondary btn-small" id="speakSrcBtn">نطق النص</button>' +
