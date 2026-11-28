@@ -2115,7 +2115,7 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
             for(var i=0;i<cues.length&&!socialDubStopRequested;i+=4){
               var batch=cues.slice(i,i+4).map(function(c){return{text:c.text,startMs:Math.max(0,Math.round(c.start)),endMs:Math.max(Math.round(c.start)+250,Math.round(c.end))};});
               socialDubStatusText("ينشئ Gemini الصوت المترجم ("+Math.min(i+4,cues.length)+" من "+cues.length+")...");
-              var response=await fetch("/api/dub-speech",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cues:batch,targetLanguage:document.getElementById("socialTargetLang").value==="ar"?"العربية":document.getElementById("socialTargetLang").selectedOptions[0].textContent,voiceName:document.getElementById("socialDubVoice").value})});
+              var response=await fetch("/api/dub-speech",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cues:batch,targetLanguage:({ar:"العربية",en:"English",fr:"Français",es:"Español",de:"Deutsch",it:"Italiano",tr:"Türkçe",pt:"Português",ru:"Русский",ja:"日本語",zh:"中文",hi:"हिन्दी"}[document.getElementById("socialTargetLang").value]||"العربية"),voiceName:document.getElementById("socialDubVoice").value})});
               var data=await response.json().catch(function(){return{};});if(!response.ok)throw new Error(data.error||"تعذر إنشاء الدبلجة.");
               for(var j=0;j<(data.audio||[]).length&&!socialDubStopRequested;j++){
                 var item=data.audio[j],blob=socialBase64Blob(item.audioBase64,item.mimeType),objectUrl=URL.createObjectURL(blob);
