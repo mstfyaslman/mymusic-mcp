@@ -1830,30 +1830,40 @@
           var url=document.getElementById("socialPublicUrl").value.trim();
           if(!url){publicStatus.textContent="الصق رابط المنشور أولاً.";return;}
           loadBtn.disabled=true;publicStatus.textContent="جارٍ التحقق من الرابط وجلب التضمين الرسمي من Meta...";
-          embedStage.replaceChildren();
+          embedStage.replaceChildren(subtitleLayer);subtitleLayer.style.display="none";
           try{
             var res=await fetch("/api/social-embed",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:url})});
             var data=await res.json();if(!res.ok)throw new Error(data.error||"تعذر عرض المنشور.");
-            embedStage.innerHTML=data.html;loadEmbedScript(data.provider);
+            embedStage.innerHTML=data.html;embedStage.appendChild(subtitleLayer);loadEmbedScript(data.provider);
+            publicStatus.classList.remove("error");
             publicStatus.textContent="تم تحميل كود التضمين الرسمي من "+data.provider+". إذا لم يظهر المنشور، فقد يكون خاصاً أو محذوفاً أو غير متاح في بلدك.";
-          }catch(e){publicStatus.textContent=e.message;publicStatus.classList.add("error");}
+          }catch(e){embedStage.replaceChildren(subtitleLayer);publicStatus.textContent=e.message;publicStatus.classList.add("error");}
           finally{loadBtn.disabled=false;}
         });
-        var socialTranslateTimer=null,socialLastTranslationKey="",socialTranslationBusy=false;
+        var socialTranslateTimer=null,socialLastTranslationKey="",socialTranslationBusy=false,socialTranslationPending=false,socialTranslationRevision=0;
         async function translateSocialText(){
           var text=document.getElementById("socialTextToTranslate").value.trim(),lang=document.getElementById("socialTargetLang").value,out=document.getElementById("socialTranslationResult"),btn=document.getElementById("socialTranslateBtn");
           if(!text){out.textContent="أدخل أو الصق نص المنشور أو الكلام المراد ترجمته.";return;}
           if(text.length>3500){out.textContent="النص طويل جدًا للترجمة السريعة. قسّمه إلى أجزاء أقصر.";return;}
-          var key=lang+"|"+text;if(key===socialLastTranslationKey||socialTranslationBusy)return;
-          socialTranslationBusy=true;btn.disabled=true;out.textContent="جارٍ ترجمة النص تلقائيًا بالذكاء الاصطناعي...";
-          try{var r=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"ترجم النص التالي ترجمة دقيقة وطبيعية إلى اللغة ذات الرمز "+lang+". أعد الترجمة فقط دون شرح، مع الحفاظ على المعنى والنبرة. النص:\\n"+text})});var d=await r.json();if(!r.ok)throw new Error(d.error||"تعذرت الترجمة.");out.textContent=d.text||"لم تصل نتيجة ترجمة.";socialLastTranslationKey=key;}
-          catch(e){out.textContent=e.message;}finally{socialTranslationBusy=false;btn.disabled=false;}
+          var key=lang+"|"+text;if(key===socialLastTranslationKey)return;
+          if(socialTranslationBusy){socialTranslationPending=true;return;}
+          var revision=socialTranslationRevision;
+          socialTranslationBusy=true;btn.disabled=true;out.textContent="جارٍ ترجمة النص بالذكاء الاصطناعي...";
+          try{
+            var r=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"ترجم النص التالي ترجمة دقيقة وطبيعية إلى اللغة ذات الرمز "+lang+". أعد الترجمة فقط دون شرح، مع الحفاظ على المعنى والنبرة. النص:\\n"+text})});
+            var d=await r.json();if(!r.ok)throw new Error(d.error||"تعذرت الترجمة.");
+            if(revision===socialTranslationRevision){out.textContent=d.text||"لم تصل نتيجة ترجمة.";socialLastTranslationKey=key;}
+          }catch(e){if(revision===socialTranslationRevision)out.textContent=e.message;}
+          finally{
+            socialTranslationBusy=false;btn.disabled=false;
+            if(socialTranslationPending){socialTranslationPending=false;if(document.getElementById("socialTranslationMode").value==="auto")scheduleSocialAutoTranslation();}
+          }
         }
         function scheduleSocialAutoTranslation(){clearTimeout(socialTranslateTimer);if(document.getElementById("socialTranslationMode").value!=="auto")return;socialTranslateTimer=setTimeout(translateSocialText,650);}
-        document.getElementById("socialTextToTranslate").addEventListener("input",function(){socialLastTranslationKey="";scheduleSocialAutoTranslation();});
-        document.getElementById("socialTargetLang").addEventListener("change",function(){socialLastTranslationKey="";scheduleSocialAutoTranslation();});
-        document.getElementById("socialTranslationMode").addEventListener("change",function(){socialLastTranslationKey="";if(this.value==="auto")scheduleSocialAutoTranslation();else{clearTimeout(socialTranslateTimer);document.getElementById("socialTranslationResult").textContent="الوضع اليدوي: اضغط «ترجمة الآن» لبدء الترجمة.";}});
-        document.getElementById("socialTranslateBtn").addEventListener("click",function(){clearTimeout(socialTranslateTimer);socialLastTranslationKey="";translateSocialText();});
+        document.getElementById("socialTextToTranslate").addEventListener("input",function(){socialTranslationRevision++;socialLastTranslationKey="";scheduleSocialAutoTranslation();});
+        document.getElementById("socialTargetLang").addEventListener("change",function(){socialTranslationRevision++;socialLastTranslationKey="";scheduleSocialAutoTranslation();});
+        document.getElementById("socialTranslationMode").addEventListener("change",function(){socialTranslationRevision++;socialLastTranslationKey="";if(this.value==="auto")scheduleSocialAutoTranslation();else{clearTimeout(socialTranslateTimer);socialTranslationPending=false;document.getElementById("socialTranslationResult").textContent="الوضع اليدوي: اضغط «ترجمة الآن» لبدء الترجمة.";}});
+        document.getElementById("socialTranslateBtn").addEventListener("click",function(){socialTranslationRevision++;socialLastTranslationKey="";clearTimeout(socialTranslateTimer);translateSocialText();});
         async function refreshAuthorizedFeed(){
           var status=document.getElementById("socialAccountStatus"),feed=document.getElementById("socialAccountFeed"),btn=document.getElementById("socialRefreshAccountBtn");
           btn.disabled=true;status.textContent="جارٍ التحقق من الحسابات والصلاحيات المصرح بها...";feed.replaceChildren();
