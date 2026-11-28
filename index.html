@@ -1164,7 +1164,8 @@
             if(seg.startMs/1000<=now+0.45 && seg.endMs/1000>=now-0.12) {
               var source=dubAudioContext.createBufferSource(); source.buffer=seg.buffer; source.connect(dubAudioContext.destination);
               source.onended=function(){dubActiveSources=dubActiveSources.filter(function(x){return x!==source;});};
-              source.start(); dubActiveSources.push(source); dubScheduled.add(i);
+              var delay=Math.max(0,seg.startMs/1000-now);
+              source.start(dubAudioContext.currentTime+delay); dubActiveSources.push(source); dubScheduled.add(i);
             }
           });
         },60);
