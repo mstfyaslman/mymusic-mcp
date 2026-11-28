@@ -1934,9 +1934,9 @@
           var mimeOptions=["audio/webm;codecs=opus","audio/webm","audio/mp4"];
           var mime=mimeOptions.find(function(x){return MediaRecorder.isTypeSupported(x);})||"";
           while(socialLiveActive){
-            var chunks=[],recorder=mime?new MediaRecorder(socialAudioStream,{mimeType:mime}):new MediaRecorder(socialAudioStream);
+            let chunks=[],recorder=mime?new MediaRecorder(socialAudioStream,{mimeType:mime}):new MediaRecorder(socialAudioStream);
             socialLiveRecorder=recorder;
-            var segmentStart=performance.now()-socialLiveStartedAt;
+            let segmentStart=performance.now()-socialLiveStartedAt;
             var stopped=new Promise(function(resolve){recorder.addEventListener("stop",resolve,{once:true});});
             recorder.addEventListener("dataavailable",function(event){if(event.data&&event.data.size)chunks.push(event.data);});
             recorder.start();
@@ -1945,7 +1945,7 @@
             await stopped;
             socialLiveRecorder=null;
             if(chunks.length){
-              var blob=new Blob(chunks,{type:recorder.mimeType||"audio/webm"});
+              const blob=new Blob(chunks,{type:recorder.mimeType||"audio/webm"});
               if(socialLivePending<4){
                 socialLivePending++;
                 socialLiveQueue=socialLiveQueue.then(function(){return socialProcessAudioChunk(blob,segmentStart);}).catch(function(error){socialLiveStatusText(error.message||"حدث خطأ أثناء ترجمة الصوت.",true);}).finally(function(){socialLivePending=Math.max(0,socialLivePending-1);});
