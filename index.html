@@ -597,7 +597,7 @@
           <!-- التبويب 1: مترجم الصوت والفيديو AI -->
           <div class="tab-panel active" id="tabAiMedia">
             <p style="font-size:0.88rem;color:var(--muted);margin-bottom:10px;">
-              ارفع ملف فيديو أو صوت حتى 25 ميجابايت لاستخراج الكلام والتوقيتات ثم ترجمته. يدعم القاموس المصطلحات التخصصية أيضاً.
+              ارفع ملف صوت أو فيديو حتى 90 ميجابايت. يمكن معالجة التسجيلات الصوتية الطويلة (3 ساعات وأكثر) على أجزاء متتابعة مع حفظ التوقيتات. للفيديو الأطول من ساعة استخرج الصوت أولاً.
             </p>
             <div class="input-row">
               <input type="file" id="aiMediaFile" accept="audio/*,video/*" />
@@ -1210,17 +1210,46 @@
         var url=URL.createObjectURL(new Blob([vtt],{type:"text/vtt"}));
         var track=document.createElement("track"); track.kind="subtitles"; track.label="الترجمة"; track.srclang="ar"; track.src=url; track.default=true; video.appendChild(track);
       }
+      function getMediaDurationSeconds(file) {
+        return new Promise(function(resolve,reject){
+          var media=document.createElement(file.type.startsWith("video/")?"video":"audio");
+          var url=URL.createObjectURL(file);
+          media.preload="metadata";
+          media.onloadedmetadata=function(){var duration=media.duration;URL.revokeObjectURL(url);media.remove();if(!Number.isFinite(duration)||duration<=0)reject(new Error("تعذر قراءة مدة الملف."));else resolve(duration);};
+          media.onerror=function(){URL.revokeObjectURL(url);media.remove();reject(new Error("تعذر قراءة مدة الصوت أو الفيديو."));};
+          media.src=url;
+        });
+      }
       async function transcribeAndTranslateFile(file) {
         if(!file) throw new Error("اختر ملف صوت أو فيديو أولاً.");
-        setStatus(aiMediaStatus,"جاري استخراج الكلام والصوت من الملف عبر Gemini...", "");
-        var formData=new FormData(); formData.append("file",file,file.name||"mymusic-media");
-        var data=await safeFetchJson("/api/transcribe",{method:"POST",body:formData});
-        aiTranscriptOut.textContent=data.text||"لم يتم استخراج نص.";
-        setStatus(aiMediaStatus,"تم استخراج الصوت والكلام. جاري الترجمة مع الاستعانة بقاموسك المحفوظ...", "");
-        var translated=await translateSrtText(data.text||"",document.getElementById("aiTargetLang").value);
+        if(file.size>90*1024*1024) throw new Error("حجم الملف أكبر من 90 ميجابايت. استخدم صوتاً مضغوطاً أو قسّم الملف إلى أجزاء.");
+        var duration=await getMediaDurationSeconds(file);
+        if(file.type.startsWith("video/") && duration>3600) throw new Error("لترجمة فيديو أطول من ساعة، اضغط «تحويل الفيديو إلى صوت» أولاً، ثم ارفع المسار الصوتي الناتج. ترجمة الصوت تدعم التقسيم إلى أجزاء حتى 3 ساعات وأكثر.");
+        var formData=new FormData(); formData.append("file",file,file.name||"mymusic-media"); formData.append("uploadOnly","1");
+        setStatus(aiMediaStatus,"جاري رفع الملف مرة واحدة إلى Gemini Files API ("+Math.ceil(duration/60)+" دقيقة)...","");
+        var uploaded=await safeFetchJson("/api/transcribe",{method:"POST",body:formData});
+        var transcriptParts=[], segmentSeconds=900, segmentCount=Math.ceil(duration/segmentSeconds);
+        try {
+          for(var startSec=0,index=0;startSec<duration;startSec+=segmentSeconds,index++){
+            var endSec=Math.min(duration,startSec+segmentSeconds);
+            setStatus(aiMediaStatus,"جاري تفريغ الجزء "+(index+1)+" من "+segmentCount+" ("+Math.floor(startSec/60)+"–"+Math.ceil(endSec/60)+" دقيقة). لا تغلق الصفحة...","");
+            var segment=await safeFetchJson("/api/transcribe-segment",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+              fileUri:uploaded.fileUri,mimeType:uploaded.mimeType,startSeconds:startSec,endSeconds:endSec
+            })});
+            if(segment.text) transcriptParts.push(segment.text);
+            aiTranscriptOut.textContent=transcriptParts.join("\n\n")||"لم يتم العثور على كلام في الأجزاء المعالجة حتى الآن.";
+          }
+        } finally {
+          safeFetchJson("/api/transcribe-cleanup",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({fileName:uploaded.fileName})}).catch(function(){});
+        }
+        var originalSrt=transcriptParts.join("\n\n");
+        if(!originalSrt) throw new Error("لم يتم العثور على كلام واضح في الملف.");
+        aiTranscriptOut.textContent=originalSrt;
+        setStatus(aiMediaStatus,"اكتمل استخراج الكلام من "+Math.ceil(duration/60)+" دقيقة. جاري ترجمة جميع الأجزاء مع الاستعانة بالقاموس...","");
+        var translated=await translateSrtText(originalSrt,document.getElementById("aiTargetLang").value);
         aiTranslationOut.textContent=translated||"لم تتوفر ترجمة.";
         subtitleCues=parseSrtCues(translated); attachLocalSubtitleTrack(translated);
-        setStatus(aiMediaStatus,"اكتمل استخراج الصوت والترجمة. عدد المقاطع: "+(data.cueCount||subtitleCues.length||"—")+". يمكنك الآن إنشاء الدبلجة الصوتية.","success");
+        setStatus(aiMediaStatus,"اكتملت ترجمة الملف بالكامل ("+Math.floor(duration/3600)+" ساعة و"+Math.floor((duration%3600)/60)+" دقيقة). عدد المقاطع: "+subtitleCues.length+". يمكنك الآن إنشاء الدبلجة الصوتية.","success");
       }
       aiMediaBtn.addEventListener("click",async function(){
         var file=(aiMediaFileInput.files&&aiMediaFileInput.files[0])||activeLocalFile;
