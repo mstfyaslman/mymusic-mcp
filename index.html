@@ -1028,7 +1028,38 @@ function translateCurrentMedia(){
   if(status) status.innerText='🎙️ هذا المصدر لا يسمح بالتقاط الصوت مباشرة؛ ستُستخدم الميكروفون. شغّل صوت الجهاز بمستوى مسموع.';
   startLiveTranslation();
 }
-async function startTabAudioTranslation(){if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia)return alert('مشاركة صوت التبويب غير مدعومة في هذا المتصفح');try{const stream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});const track=stream.getAudioTracks()[0];if(!track){stream.getTracks().forEach(t=>t.stop());return alert('اختر مشاركة تبويب Chrome وفعّل مشاركة الصوت');}liveCaptureStream=stream;liveInputTrack=track;openLiveTranslationPanel();startLiveTranslation();}catch(e){alert('تعذرت مشاركة التبويب: '+e.message);}}
+async function startTabAudioTranslation(){
+  const canShareTabAudio=!!(navigator.mediaDevices&&typeof navigator.mediaDevices.getDisplayMedia==='function');
+  if(!canShareTabAudio){
+    openLiveTranslationPanel();
+    const status=document.getElementById('liveStatus');
+    if(status) status.innerText='📱 هاتفك لا يدعم مشاركة صوت التبويب. سنستخدم ميكروفون الهاتف كحل بديل: ارفع صوت الفيديو أو الأغنية واسمح للمتصفح باستخدام الميكروفون.';
+    liveInputTrack=null;
+    startLiveTranslation();
+    return;
+  }
+  try{
+    const stream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
+    const track=stream.getAudioTracks()[0];
+    if(!track){
+      stream.getTracks().forEach(t=>t.stop());
+      openLiveTranslationPanel();
+      const status=document.getElementById('liveStatus');
+      if(status) status.innerText='لم يرسل المتصفح مسارًا صوتيًا. سنحاول الاستماع عبر ميكروفون الهاتف؛ ارفع صوت الفيديو واسمح بالميكروفون.';
+      liveInputTrack=null;
+      startLiveTranslation();
+      return;
+    }
+    liveCaptureStream=stream;
+    liveInputTrack=track;
+    openLiveTranslationPanel();
+    startLiveTranslation();
+  }catch(e){
+    openLiveTranslationPanel();
+    const status=document.getElementById('liveStatus');
+    if(status) status.innerText='تعذرت مشاركة التبويب: '+e.message+'. يمكنك استخدام زر الاستماع والترجمة بالميكروفون بعد السماح به.';
+  }
+}
 function saveLiveTranslation(){const original=document.getElementById('liveOriginal').innerText;const translated=document.getElementById('liveResult').innerText;if(!translated)return alert('لا توجد ترجمة لحفظها');translationHistory.unshift({date:new Date().toLocaleString('ar-EG'),original:original,translated:translated});translationHistory=translationHistory.slice(0,100);try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}showTranslationHistory();}
 function showTranslationHistory(){const box=document.getElementById('translationHistory');if(!box)return;box.innerHTML=translationHistory.slice(0,10).map(x=>'<div class="card">'+escapeHTML(x.date)+'<br>'+escapeHTML(x.original)+'<br>'+escapeHTML(x.translated)+'</div>').join('')||'لا توجد ترجمات محفوظة';}
 function exportTranslationHistory(){if(!translationHistory.length)return alert('لا يوجد سجل محفوظ');const txt=translationHistory.map((x,i)=>(i+1)+'. '+x.date+'\n'+x.original+'\n'+x.translated).join('\n\n');const blob=new Blob(['\uFEFF'+txt],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='MyMusic-Translations.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
