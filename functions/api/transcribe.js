@@ -12,11 +12,12 @@ export async function onRequest({ request, env }) {
   const file = form.get("audio") || form.get("video") || form.get("file");
   if (!file || typeof file.arrayBuffer !== "function") return json({ error: "اختر ملف صوت أو فيديو أولاً." }, 400);
   if (!file.size) return json({ error: "الملف فارغ." }, 400);
-  if (file.size > 25 * 1024 * 1024) return json({ error: "الحد الحالي 25 ميجابايت للملف." }, 413);
+  if (file.size > 90 * 1024 * 1024) return json({ error: "الحد الحالي 90 ميجابايت للملف. للملفات الأكبر استخرج الصوت بجودة مضغوطة أو قسّمه إلى أجزاء." }, 413);
   const mime = (file.type || "").toLowerCase();
   const supported = /^(audio\/(mpeg|mp3|wav|x-wav|ogg|flac|mp4|webm|aac|3gpp|x-m4a)|video\/(mp4|mpeg|quicktime|webm|x-msvideo|x-ms-wmv|x-flv|3gpp|x-m4v))$/;
   if (!supported.test(mime)) return json({ error: "صيغة غير مدعومة. استخدم MP4 أو MOV أو WebM أو MP3 أو WAV." }, 415);
   let uploadedName = "";
+  let keepUploaded = false;
   try {
     const bytes = await file.arrayBuffer();
     const start = await fetch("https://generativelanguage.googleapis.com/upload/v1beta/files?key=" + encodeURIComponent(apiKey), {
@@ -41,6 +42,11 @@ export async function onRequest({ request, env }) {
       metadata = statusData; state = metadata.state;
     }
     if (state !== "ACTIVE") throw new Error("استغرق تجهيز الملف وقتًا أطول من المتوقع. جرّب فيديو أقصر.");
+    if (form.get("uploadOnly") === "1") {
+      keepUploaded = true;
+      return json({ fileUri: metadata.uri || uploadData.file.uri, fileName: uploadedName, mimeType: mime, fileSize: file.size, provider: "Gemini Files API" });
+    }
+
     const prompt = mime.startsWith("video/")
       ? "Transcribe all audible speech and sung lyrics in the original language. Return valid SubRip SRT subtitles with timestamps for every cue (HH:MM:SS,mmm --> HH:MM:SS,mmm). Preserve speaker labels when clear. Include clearly readable on-screen text only when relevant, marked [ON-SCREEN]. Do not translate, summarize, or invent words. If no speech is audible, say so clearly."
       : "Transcribe all audible speech and sung lyrics in the original language. Return valid SubRip SRT subtitles with timestamps for every cue (HH:MM:SS,mmm --> HH:MM:SS,mmm). Preserve speaker labels when clear. Do not translate, summarize, or invent words. If no speech is audible, say so clearly.";
@@ -92,6 +98,6 @@ export async function onRequest({ request, env }) {
   } catch (error) {
     return json({ error: String(error?.message || "حدث خطأ أثناء معالجة الملف.").slice(0, 700) }, 502);
   } finally {
-    if (uploadedName) await fetch("https://generativelanguage.googleapis.com/v1beta/" + uploadedName + "?key=" + encodeURIComponent(apiKey), { method: "DELETE" }).catch(() => {});
+    if (uploadedName && !keepUploaded) await fetch("https://generativelanguage.googleapis.com/v1beta/" + uploadedName + "?key=" + encodeURIComponent(apiKey), { method: "DELETE" }).catch(() => {});
   }
 }
