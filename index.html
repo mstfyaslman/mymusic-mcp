@@ -2446,24 +2446,27 @@ document.getElementById('myLearningCopy').addEventListener('click',async()=>{try
  let entries=[],active=null;
  try{entries=JSON.parse(localStorage.getItem(KEY)||"[]");if(!Array.isArray(entries))entries=[];}catch(e){entries=[];}
  entries=entries.filter(x=>x&&typeof x.url==="string"&&/^https:\/\//i.test(x.url)).slice(0,12);
- function persist(){try{localStorage.setItem(KEY,JSON.stringify(entries.map(({id,title,url})=>({id,title,url}))));}catch(e){info("تعذر حفظ الجلسة: مساحة التخزين ممتلئة.");}}
+ function persist(){try{localStorage.setItem(KEY,JSON.stringify(entries.map(({id,title,url,closed})=>({id,title,url,closed:!!closed}))));}catch(e){info("تعذر حفظ الجلسة: مساحة التخزين ممتلئة.");}}
  function info(msg){const el=document.getElementById("mmwInfo");if(el)el.textContent=msg;}
  function render(){
   tabs.replaceChildren();host.querySelectorAll(".mmw-frame").forEach(x=>x.remove());
-  entries.forEach(item=>{
-   const b=document.createElement("button");b.type="button";b.className="mmw-tab"+(item.id===active?" active":"");b.textContent=item.title;b.title=item.url;b.addEventListener("click",()=>activate(item.id));tabs.appendChild(b);
+  entries.filter(x=>!x.closed).forEach(item=>{
+   const wrap=document.createElement("span");wrap.style.display="inline-flex";wrap.style.gap="3px";
+   const b=document.createElement("button");b.type="button";b.className="mmw-tab"+(item.id===active?" active":"");b.textContent=item.title;b.title=item.url;b.addEventListener("click",()=>activate(item.id));wrap.appendChild(b);
+   const ext=document.createElement("button");ext.type="button";ext.className="mmw-tab";ext.textContent="↗";ext.title="فتح في تبويب المتصفح";ext.addEventListener("click",()=>window.open(item.url,"_blank","noopener,noreferrer"));wrap.appendChild(ext);
+   const x=document.createElement("button");x.type="button";x.className="mmw-tab";x.textContent="×";x.title="إغلاق الصفحة مع الاحتفاظ بها";x.addEventListener("click",()=>{item.closed=true;if(active===item.id){active=(entries.find(z=>!z.closed)||{}).id||null;}persist();render();info("أُغلقت الصفحة من مساحة العمل وحُفظ رابطها لاستعادتها.");});wrap.appendChild(x);tabs.appendChild(wrap);
    const frame=document.createElement("iframe");frame.className="mmw-frame";frame.dataset.id=item.id;frame.title=item.title;frame.loading="lazy";frame.referrerPolicy="strict-origin-when-cross-origin";frame.src=item.url;frame.hidden=item.id!==active;host.appendChild(frame);
   });
-  empty.style.display=entries.length?"none":"block";renderSaved();
+  empty.style.display=entries.some(x=>!x.closed)?"none":"block";renderSaved();
  }
- function renderSaved(){saved.replaceChildren();entries.forEach(item=>{const b=document.createElement("button");b.type="button";b.className="mmw-saved";b.textContent="★ "+item.title;b.addEventListener("click",()=>{if(!entries.some(x=>x.id===item.id)){entries.push(item);render();}activate(item.id);panel.classList.add("open");toggle.setAttribute("aria-expanded","true");});saved.appendChild(b);});}
- function activate(id){active=id;host.querySelectorAll(".mmw-frame").forEach(f=>f.hidden=f.dataset.id!==id);Array.from(tabs.children).forEach((b,i)=>b.classList.toggle("active",entries[i]&&entries[i].id===id));const item=entries.find(x=>x.id===id);if(item)info("الموقع النشط: "+item.title+" — إذا منع الموقع التضمين فافتحه خارجياً من زر المتصفح أو استخدم الرابط المحفوظ.");}
+ function renderSaved(){saved.replaceChildren();entries.forEach(item=>{const b=document.createElement("button");b.type="button";b.className="mmw-saved";b.textContent="★ "+item.title;b.addEventListener("click",()=>{item.closed=false;if(!host.querySelector('[data-id="'+item.id+'"]')){active=item.id;render();}activate(item.id);persist();panel.classList.add("open");toggle.setAttribute("aria-expanded","true");});saved.appendChild(b);});}
+ function activate(id){const item=entries.find(x=>x.id===id);if(!item)return;item.closed=false;active=id;host.querySelectorAll(".mmw-frame").forEach(f=>f.hidden=f.dataset.id!==id);Array.from(tabs.children).forEach((wrap)=>{const b=wrap.querySelector(".mmw-tab");if(b)b.classList.toggle("active",b.textContent===item.title);});persist();info("الموقع النشط: "+item.title+" — إذا منع الموقع التضمين فافتحه خارجياً من زر ↗.");}
  function addSite(raw){
   let u;try{u=new URL(raw);}catch(e){info("اكتب رابطاً صحيحاً يبدأ بـ https://");return;}
   if(u.protocol!=="https:"){info("لأمانك، النوافذ المتعددة تقبل روابط HTTPS فقط.");return;}
   if(entries.some(x=>x.url===u.href)){const old=entries.find(x=>x.url===u.href);activate(old.id);return;}
   if(entries.length>=12){info("يمكن فتح 12 موقعاً في الجلسة. احذف موقعاً من القائمة أولاً.");return;}
-  const title=u.hostname.replace(/^www\./,"");const item={id:"w"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,url:u.href};entries.push(item);active=item.id;persist();render();
+  const title=u.hostname.replace(/^www\./,"");const item={id:"w"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,url:u.href,closed:false};entries.push(item);active=item.id;persist();render();
  }
  toggle.addEventListener("click",()=>{const open=!panel.classList.contains("open");panel.classList.toggle("open",open);toggle.setAttribute("aria-expanded",String(open));});
  close.addEventListener("click",()=>{panel.classList.remove("open");toggle.setAttribute("aria-expanded","false");});
@@ -2471,7 +2474,7 @@ document.getElementById('myLearningCopy').addEventListener('click',async()=>{try
  urlInput.addEventListener("keydown",e=>{if(e.key==="Enter")add.click();});
  saveAll.addEventListener("click",()=>{persist();info("تم حفظ قائمة المواقع. ستُستعاد عند فتح MyMusic مرة أخرى؛ إعادة تشغيل الصوت تلقائياً قد تتطلب نقرة بسبب قيود المتصفح.");});
  render();
- if(entries.length){active=entries[0].id;render();info("تمت استعادة "+entries.length+" موقعاً محفوظاً. قد تحتاج بعض المواقع إلى تسجيل الدخول أو إعادة التحميل.");}
+ if(entries.length){active=(entries.find(x=>!x.closed)||{}).id||null;render();info("تمت استعادة "+entries.length+" موقعاً محفوظاً. قد تحتاج بعض المواقع إلى تسجيل الدخول أو إعادة التحميل.");}
  // PWA shell caching: this does not make third-party websites available offline.
  if("serviceWorker" in navigator && location.protocol==="https:"){navigator.serviceWorker.register("/service-worker.js").catch(()=>{});}
 })();
