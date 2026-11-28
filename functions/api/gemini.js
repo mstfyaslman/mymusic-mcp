@@ -51,7 +51,11 @@ async function generateWithFallback(apiKey, prompt, enableSearch = false) {
 
       const message = data?.error?.message || "تعذر على Gemini معالجة الطلب.";
       const status = response.status;
-      lastError = Object.assign(new Error(message), { status });
+      const details = Array.isArray(data?.error?.details) ? data.error.details : [];
+      const reason = details.find(item => item?.reason)?.reason || "";
+      const service = details.find(item => item?.metadata?.service)?.metadata?.service || "";
+      const methodName = details.find(item => item?.metadata?.methodName)?.metadata?.methodName || "";
+      lastError = Object.assign(new Error(message), { status, reason, service, methodName });
 
       // Retry transient overload/rate-limit/server errors, then try fallback model.
       if ([429, 500, 502, 503, 504].includes(status) && attempt === 0) {
@@ -125,6 +129,9 @@ export async function onRequest(context) {
   } catch (error) {
     const upstreamStatus = Number(error?.status || 0);
     const rawMessage = String(error?.message || "");
+    const reason = String(error?.reason || "");
+    const service = String(error?.service || "");
+    const methodName = String(error?.methodName || "");
     const permissionDenied = upstreamStatus === 403 ||
       /permission denied on the service|permission_denied|access denied|api_key_service_blocked/i.test(rawMessage);
 
@@ -132,7 +139,7 @@ export async function onRequest(context) {
     // Keep the diagnostic actionable without exposing the API key or raw provider payload.
     const status = upstreamStatus === 429 ? 429 : permissionDenied ? 503 : 502;
     const message = permissionDenied
-      ? "رفضت Google صلاحية استخدام Gemini (403 PERMISSION_DENIED). الخادم يقرأ GEMINI_API_KEY، لكن Google لا تسمح لهذا المفتاح أو المشروع بتنفيذ الطلب. افتح Google AI Studio > Get API key، وتأكد أن المفتاح من مشروع Gemini الصحيح وأن المفتاح/المشروع غير محظور. إذا كان المفتاح من نوع Standard فتأكد من قيود API أنها تسمح بـ Gemini API؛ أما مفاتيح Auth الجديدة فاستخدم إعداداتها كما أنشأها AI Studio. بعد التصحيح استبدل Secret GEMINI_API_KEY في Cloudflare Pages > Settings > Variables and Secrets ضمن Production ثم أعد النشر. لا تضع المفتاح داخل ملفات الموقع أو ترسله في المحادثة."
+      ? "رفضت Google طلب Gemini (403 PERMISSION_DENIED). هذا ليس خطأ في مشغل VEVO. التشخيص: reason=" + (reason || "غير متاح") + "، service=" + (service || "غير متاح") + "، method=" + (methodName || "غير متاح") + ". افحص في Google AI Studio صفحة Projects وحالة المشروع وModel availability & rate limits، وتأكد أن Generative Language API مفعّلة وأن مفتاح API مرتبط بالمشروع الصحيح ومسموح له باستخدام Gemini API. أكمل التحقق من العمر والهاتف والتحقق بخطوتين إذا طلبها Google. إذا ظهرت حالة Unavailable أو استمر ACCESS_DENIED حتى عند اختبار المفتاح مباشرة، فالمشكلة غالبًا قيد على المشروع/الحساب لدى Google وتحتاج طلب مراجعة من دعم Gemini؛ إنشاء مفاتيح متكررة أو تعديل كود الموقع لن يرفع هذا القيد. لا ترسل المفتاح في المحادثة ولا تضعه في كود المتصفح. Secret الخادم يبقى GEMINI_API_KEY في Cloudflare Pages Production."
       : upstreamStatus === 429
         ? "وصل الطلب إلى Gemini، لكن تم تجاوز حد الاستخدام أو معدل الطلبات (429). انتظر قليلًا ثم أعد المحاولة أو راجع الحصة المتاحة للمشروع."
         : upstreamStatus === 503 || /high demand|overload|temporarily unavailable/i.test(rawMessage)
