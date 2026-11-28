@@ -840,6 +840,12 @@
       var savedPlaylist = safeStorageGet("mymusic_playlist", []);
       var savedWords = safeStorageGet("mymusic_vocab", []);
 
+      function ensureSubtitleOverlay() {
+        var overlay=document.getElementById("subtitleOverlay");
+        if(!overlay){overlay=document.createElement("div");overlay.id="subtitleOverlay";overlay.className="subtitle-overlay";playerStage.appendChild(overlay);}
+        return overlay;
+      }
+
       function playEmbeddedYouTube(videoId, title, artist) {
         if (!videoId) return;
         currentYouTubeId = videoId;
@@ -848,6 +854,7 @@
           '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&rel=0&enablejsapi=1&origin=' + encodeURIComponent(location.origin) + '" ' +
           'title="' + escapeHtml(title || "مشغل الكليبات") + '" ' +
           'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+        ensureSubtitleOverlay();
         if (title) clipTitleInput.value = title;
         if (artist) clipArtistInput.value = artist;
         if (title || artist) loadFullArtistAndClipInfo(title, artist);
@@ -861,6 +868,7 @@
         playerStage.innerHTML = isAudio
           ? '<audio controls autoplay src="' + objectUrl + '"></audio>'
           : '<video controls autoplay playsinline src="' + objectUrl + '"></video>';
+        ensureSubtitleOverlay();
 
         try {
           var dt = new DataTransfer();
@@ -1066,7 +1074,8 @@
         try{
           setStatus(aiMediaStatus,"جاري تحليل رابط الفيديو العام واستخراج الكلام والتوقيتات...","");
           var original=await safeFetchJson("/api/transcribe-youtube",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:"https://www.youtube.com/watch?v="+currentYouTubeId})});
-          aiTranscriptOut.textContent=original.text||"لم يتم استخراج نص.";
+          if(!original.text || original.text.trim()==="NO_SPEECH") throw new Error("لم يتم العثور على كلام أو كلمات واضحة في صوت الفيديو.");
+          aiTranscriptOut.textContent=original.text;
           var translated=await translateSrtText(original.text||"",document.getElementById("aiTargetLang").value);
           aiTranslationOut.textContent=translated; subtitleCues=parseSrtCues(translated);
           setStatus(aiMediaStatus,"تمت ترجمة النص. عرض الترجمة المتزامنة يعتمد على دعم مشغل YouTube للتحكم بالتوقيت.","success");
