@@ -568,8 +568,37 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
 #memberCenter .mc-provider{background:#202119!important;border:1px solid #665638!important;color:#eee!important}
 @media(max-width:600px){#memberMenuButton{top:10px;left:10px;width:42px;height:42px}#memberCenter .mc-drawer{padding:15px}}
 </style>
+<style id="mymusic-multi-window-style">
+#mmwToggle{position:fixed;right:16px;bottom:18px;z-index:99990;width:48px;height:48px;border:1px solid rgba(199,169,107,.65);border-radius:50%;background:#24251f;color:#d8c18b;box-shadow:0 5px 22px #0009;font-size:20px;cursor:pointer}
+#mmwPanel{position:fixed;z-index:99989;right:12px;bottom:76px;width:min(460px,calc(100vw - 24px));height:min(720px,calc(100dvh - 100px));display:none;flex-direction:column;background:#10120f;color:#eee9dc;border:1px solid #75613b;border-radius:16px;box-shadow:0 14px 50px #000c;overflow:hidden}
+#mmwPanel.open{display:flex}#mmwHead{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#191b16;border-bottom:1px solid #55482f;gap:8px}
+#mmwHead strong{color:#d9bf83}#mmwHead button,#mmwPanel button{cursor:pointer}
+#mmwClose{background:transparent;color:#ddd;border:0;font-size:20px;padding:4px 9px}
+#mmwToolbar{display:flex;gap:6px;padding:9px;flex-wrap:wrap}
+#mmwToolbar input{flex:1;min-width:120px;background:#080a08;color:#eee;border:1px solid #55482f;border-radius:8px;padding:9px}
+#mmwToolbar button,.mmw-action{background:#292a23;color:#e5d2a5;border:1px solid #76613b;border-radius:8px;padding:8px 10px}
+#mmwTabs{display:flex;gap:6px;overflow-x:auto;padding:0 9px 9px}
+.mmw-tab{white-space:nowrap;background:#1d201a;color:#ddd;border:1px solid #45483d;border-radius:9px;padding:7px 9px}
+.mmw-tab.active{border-color:#d1ae68;color:#f2d99f;background:#302b1d}
+#mmwFrameHost{position:relative;flex:1;min-height:140px;background:#080908;border-top:1px solid #393a31}
+.mmw-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+.mmw-frame[hidden]{display:none}
+#mmwInfo{padding:9px 12px;color:#bdb6a5;font-size:12px;line-height:1.7;border-top:1px solid #393a31}
+#mmwSaved{max-height:110px;overflow:auto;padding:4px 10px 10px;display:flex;gap:6px;flex-wrap:wrap}
+.mmw-saved{font-size:12px;background:#1c211b;color:#d8c18b;border:1px solid #4f563f;border-radius:8px;padding:6px}
+@media(max-width:600px){#mmwToggle{right:12px;bottom:12px;width:44px;height:44px}#mmwPanel{right:6px;bottom:64px;width:calc(100vw - 12px);height:calc(100dvh - 80px)}}
+</style>
 </head>
 <body>
+<button id="mmwToggle" type="button" aria-label="فتح النوافذ المتعددة" aria-expanded="false" title="النوافذ المتعددة">▣</button>
+<section id="mmwPanel" aria-label="النوافذ والتبويبات المحفوظة">
+ <div id="mmwHead"><strong>MyMusic · النوافذ المتعددة</strong><button id="mmwClose" type="button" aria-label="إخفاء النافذة">×</button></div>
+ <div id="mmwToolbar"><input id="mmwUrl" type="url" placeholder="أدخل رابط موقع HTTPS"><button id="mmwAdd" type="button">فتح موقع</button><button id="mmwSaveAll" type="button">حفظ الجلسة</button></div>
+ <div id="mmwTabs" role="tablist" aria-label="المواقع المفتوحة"></div>
+ <div id="mmwFrameHost"><div id="mmwEmpty" style="padding:22px;color:#bbb;text-align:center">أضف موقعاً لفتحه هنا. بعض المواقع تمنع العرض داخل النوافذ المضمنة؛ استخدم زر الفتح الخارجي عند ظهور المنع.</div></div>
+ <div id="mmwInfo">تبقى الصفحات المفتوحة في هذه الجلسة مخفية عند التنقل بدلاً من حذفها، وقد يستمر تشغيل الصوت حسب دعم الموقع والمتصفح. لا يمكن ضمان استمرار التشغيل بعد إغلاق المتصفح أو تجاوز منع التضمين.</div>
+ <div id="mmwSaved" aria-label="المواقع المحفوظة"></div>
+</section>
 
   <button id="memberMenuButton" type="button" aria-label="فتح مركز العضوية" aria-expanded="false"><span>☰</span></button>
   <div id="memberCenter" aria-hidden="true">
@@ -2410,5 +2439,42 @@ document.getElementById('myLearningCopy').addEventListener('click',async()=>{try
 })();
 </script>
 
+<script id="mymusic-multi-window-script">
+(function(){
+ const KEY="mymusic_multi_windows_v1",toggle=document.getElementById("mmwToggle"),panel=document.getElementById("mmwPanel"),close=document.getElementById("mmwClose"),urlInput=document.getElementById("mmwUrl"),add=document.getElementById("mmwAdd"),saveAll=document.getElementById("mmwSaveAll"),tabs=document.getElementById("mmwTabs"),host=document.getElementById("mmwFrameHost"),saved=document.getElementById("mmwSaved"),empty=document.getElementById("mmwEmpty");
+ if(!toggle||!panel)return;
+ let entries=[],active=null;
+ try{entries=JSON.parse(localStorage.getItem(KEY)||"[]");if(!Array.isArray(entries))entries=[];}catch(e){entries=[];}
+ entries=entries.filter(x=>x&&typeof x.url==="string"&&/^https:\/\//i.test(x.url)).slice(0,12);
+ function persist(){try{localStorage.setItem(KEY,JSON.stringify(entries.map(({id,title,url})=>({id,title,url}))));}catch(e){info("تعذر حفظ الجلسة: مساحة التخزين ممتلئة.");}}
+ function info(msg){const el=document.getElementById("mmwInfo");if(el)el.textContent=msg;}
+ function render(){
+  tabs.replaceChildren();host.querySelectorAll(".mmw-frame").forEach(x=>x.remove());
+  entries.forEach(item=>{
+   const b=document.createElement("button");b.type="button";b.className="mmw-tab"+(item.id===active?" active":"");b.textContent=item.title;b.title=item.url;b.addEventListener("click",()=>activate(item.id));tabs.appendChild(b);
+   const frame=document.createElement("iframe");frame.className="mmw-frame";frame.dataset.id=item.id;frame.title=item.title;frame.loading="lazy";frame.referrerPolicy="strict-origin-when-cross-origin";frame.src=item.url;frame.hidden=item.id!==active;host.appendChild(frame);
+  });
+  empty.style.display=entries.length?"none":"block";renderSaved();
+ }
+ function renderSaved(){saved.replaceChildren();entries.forEach(item=>{const b=document.createElement("button");b.type="button";b.className="mmw-saved";b.textContent="★ "+item.title;b.addEventListener("click",()=>{if(!entries.some(x=>x.id===item.id)){entries.push(item);render();}activate(item.id);panel.classList.add("open");toggle.setAttribute("aria-expanded","true");});saved.appendChild(b);});}
+ function activate(id){active=id;host.querySelectorAll(".mmw-frame").forEach(f=>f.hidden=f.dataset.id!==id);Array.from(tabs.children).forEach((b,i)=>b.classList.toggle("active",entries[i]&&entries[i].id===id));const item=entries.find(x=>x.id===id);if(item)info("الموقع النشط: "+item.title+" — إذا منع الموقع التضمين فافتحه خارجياً من زر المتصفح أو استخدم الرابط المحفوظ.");}
+ function addSite(raw){
+  let u;try{u=new URL(raw);}catch(e){info("اكتب رابطاً صحيحاً يبدأ بـ https://");return;}
+  if(u.protocol!=="https:"){info("لأمانك، النوافذ المتعددة تقبل روابط HTTPS فقط.");return;}
+  if(entries.some(x=>x.url===u.href)){const old=entries.find(x=>x.url===u.href);activate(old.id);return;}
+  if(entries.length>=12){info("يمكن فتح 12 موقعاً في الجلسة. احذف موقعاً من القائمة أولاً.");return;}
+  const title=u.hostname.replace(/^www\./,"");const item={id:"w"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,url:u.href};entries.push(item);active=item.id;persist();render();
+ }
+ toggle.addEventListener("click",()=>{const open=!panel.classList.contains("open");panel.classList.toggle("open",open);toggle.setAttribute("aria-expanded",String(open));});
+ close.addEventListener("click",()=>{panel.classList.remove("open");toggle.setAttribute("aria-expanded","false");});
+ add.addEventListener("click",()=>{if(urlInput.value.trim())addSite(urlInput.value.trim());});
+ urlInput.addEventListener("keydown",e=>{if(e.key==="Enter")add.click();});
+ saveAll.addEventListener("click",()=>{persist();info("تم حفظ قائمة المواقع. ستُستعاد عند فتح MyMusic مرة أخرى؛ إعادة تشغيل الصوت تلقائياً قد تتطلب نقرة بسبب قيود المتصفح.");});
+ render();
+ if(entries.length){active=entries[0].id;render();info("تمت استعادة "+entries.length+" موقعاً محفوظاً. قد تحتاج بعض المواقع إلى تسجيل الدخول أو إعادة التحميل.");}
+ // PWA shell caching: this does not make third-party websites available offline.
+ if("serviceWorker" in navigator && location.protocol==="https:"){navigator.serviceWorker.register("/service-worker.js").catch(()=>{});}
+})();
+</script>
 </body>
   </html>
