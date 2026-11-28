@@ -766,7 +766,7 @@
             </div>
             <div class="result-box" id="dubStudio" style="margin-top:12px;border:1px solid rgba(255,176,74,.35);">
               <strong>🎙️ استوديو الدبلجة الصوتية بالذكاء الاصطناعي</strong>
-              <p style="color:var(--muted);margin:6px 0 12px;">حوّل الترجمة إلى صوت منطوق باللغة المختارة، ثم شغّله متزامناً مع الفيديو. اختر صوتاً ثابتاً للدبلجة.</p>
+              <p style="color:var(--muted);margin:6px 0 12px;">حوّل كل سطر ترجمة إلى صوت Gemini باللغة المختارة، ثم شغّله متزامناً مع الفيديو. إنشاء الصوت يستهلك حصة Gemini، والملفات الطويلة تُنزّل في أجزاء WAV متتابعة مدة كل جزء حتى 10 دقائق.</p>
               <div class="input-row">
                 <select id="dubVoice" aria-label="صوت الدبلجة">
                   <option value="Kore">صوت نسائي واضح – Kore</option>
@@ -784,7 +784,7 @@
                 <button type="button" class="btn" id="generateDubBtn">إنشاء الدبلجة الصوتية</button>
                 <button type="button" class="btn btn-secondary" id="playDubBtn" disabled>تشغيل الدبلجة المتزامنة</button>
                 <button type="button" class="btn btn-secondary" id="stopDubBtn" disabled>إيقاف الدبلجة</button>
-                <button type="button" class="btn btn-secondary" id="downloadDubBtn" disabled>تنزيل مسار الدبلجة WAV</button>
+                <button type="button" class="btn btn-secondary" id="downloadDubBtn" disabled>تنزيل ملفات الدبلجة WAV</button>
               </div>
               <div class="progress-track" role="progressbar" aria-label="تقدم إنشاء الدبلجة" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="dubProgressFill"></div></div>
               <div class="progress-meta"><span id="dubProgressLabel">جاهز لإنشاء الدبلجة</span><strong id="dubProgressPercent">0%</strong></div>
