@@ -522,8 +522,90 @@
 @media(max-width:700px){#myToolsFab{left:10px;bottom:12px;padding:10px 13px}#myToolsPanel{inset:1vh 1vw;border-radius:12px}#myToolsPanel .tools-layout{grid-template-columns:1fr;grid-template-rows:minmax(145px,35%) 1fr}#myToolsPanel .tool-items{grid-template-columns:repeat(2,minmax(0,1fr))}#myToolsPanel .tool-view iframe{min-height:250px}#myLearningLab{padding:12px}}
 @media(min-width:1100px){#myToolsPanel{inset:3vh 5vw}}
 </style>
+
+<style id="mymusic-global-dark-refresh">
+:root{--bg:#080909;--surface:#111311;--surface-2:#191c19;--border:rgba(184,151,89,.42);--border-soft:rgba(255,255,255,.11);--text:#f3f0e8;--muted:#b7b1a4;--primary:#8b7040;--primary-dark:#594629;--accent:#c7a96b;--success:#a6ad91;--danger:#c77d70}
+body{background:#080909!important;background-image:radial-gradient(ellipse at 50% -20%,rgba(139,112,64,.14),transparent 55%)!important;color:#f3f0e8}
+.topbar,.footer{background:rgba(8,9,9,.97)!important;border-color:rgba(184,151,89,.35)!important}
+.card,.modal-content,.social-world-card,#myToolsPanel{background:linear-gradient(145deg,#141613,#0d0f0d)!important;border-color:rgba(184,151,89,.35)!important}
+.workshop-hero,.workshop-tile,.vevo-search,.vevo-result,.result-box,.info-box,.playlist-item,.social-panel,.social-subtitle-settings,.url-import-panel{background:#171a16!important;border-color:rgba(184,151,89,.3)!important;color:#f3f0e8}
+.workshop-hero p,.workshop-tile small,.playlist-info small,.social-note{color:#b7b1a4!important}
+a,.info-box h4,.workshop-tile strong,.workshop-chip,.status-msg{color:#c7a96b!important}
+.btn,.btn:hover,.tab-btn.active,.brand-badge{background:linear-gradient(135deg,#8b7040,#594629)!important;border-color:#c7a96b!important;color:#fff!important}
+.btn-secondary,.nav-btn,.tab-btn{background:#191c19!important;border-color:rgba(184,151,89,.35)!important;color:#eee9dd!important}
+input,select,textarea{background:#141713!important;color:#f3f0e8!important;border-color:rgba(184,151,89,.32)!important}
+input::placeholder,textarea::placeholder{color:#a9a293!important}
+.ad-slot{background:#111311!important;border-color:rgba(184,151,89,.45)!important;color:#b7b1a4!important}
+.workshop-chip{background:#211d14!important;border-color:rgba(184,151,89,.38)!important}
+.subtitle-overlay{background:rgba(8,9,9,.9)!important}
+#myToolsFab{background:#8b7040!important;border-color:#c7a96b!important;color:#fff!important}
+#myToolsPanel .tools-head{background:#080909!important;border-color:rgba(184,151,89,.35)!important}
+.social-platforms button{background:#111311!important;border-color:rgba(184,151,89,.35)!important;color:#f3f0e8!important}
+.social-platforms button.active{background:#594629!important}
+#memberCenter *{box-sizing:border-box}
+#memberMenuButton{position:fixed;left:16px;top:16px;z-index:10020;width:46px;height:46px;border-radius:13px;border:1px solid #b99a5b;background:#111311;color:#e4c98e;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 28px #0009}
+#memberMenuButton span{font-size:25px;line-height:1}
+#memberCenter{position:fixed;inset:0;z-index:10030;display:none;color:#f3f0e8;font-family:Cairo, sans-serif}
+#memberCenter.open{display:block}
+#memberCenter .mc-backdrop{position:absolute;inset:0;background:#000b;backdrop-filter:blur(4px)}
+#memberCenter .mc-drawer{position:absolute;left:0;top:0;height:100%;width:min(430px,92vw);overflow:auto;background:linear-gradient(160deg,#171914,#090a09 75%);border-right:1px solid #8b7040;box-shadow:20px 0 70px #0009;padding:20px}
+#memberCenter .mc-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #51452f;padding-bottom:14px;margin-bottom:16px}
+#memberCenter h2,#memberCenter h3{margin:0;color:#e4c98e}
+#memberCenter .mc-close{border:1px solid #655332;background:#22231e;color:#eee;border-radius:9px;padding:6px 11px;font:inherit;cursor:pointer}
+#memberCenter .mc-profile{display:flex;gap:12px;align-items:center;padding:14px;background:#202119;border:1px solid #57492e;border-radius:15px;margin-bottom:16px}
+#memberCenter .mc-avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#594629;color:#fff;font-size:22px}
+#memberCenter .mc-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 18px}
+#memberCenter .mc-nav button{padding:10px 8px;background:#171a16;color:#eee;border:1px solid #51452f;border-radius:10px;font:inherit;cursor:pointer}
+#memberCenter .mc-nav button.active{background:#594629;border-color:#c7a96b}
+#memberCenter .mc-section{display:none;background:#121410;border:1px solid #3f392a;border-radius:14px;padding:15px;margin:12px 0}
+#memberCenter .mc-section.active{display:block}
+#memberCenter .mc-section label{display:block;color:#c8bd9f;font-size:.9rem;margin:10px 0 5px}
+#memberCenter .mc-section input,#memberCenter .mc-section select{width:100%;padding:10px;border-radius:9px;background:#1b1e18;color:#fff;border:1px solid #655332;font:inherit}
+#memberCenter .mc-action{width:100%;padding:10px;margin-top:10px;border-radius:10px;border:1px solid #b99a5b;background:#594629;color:#fff;font:inherit;cursor:pointer}
+#memberCenter .mc-muted{color:#b7b1a4;font-size:.86rem}
+#memberCenter .mc-row{padding:10px 0;border-bottom:1px solid #333126;overflow-wrap:anywhere}
+#memberCenter .mc-plan{border:1px solid #8b7040;background:linear-gradient(140deg,#292316,#151610);padding:14px;border-radius:13px;margin:10px 0}
+#memberCenter .mc-provider{background:#202119!important;border:1px solid #665638!important;color:#eee!important}
+@media(max-width:600px){#memberMenuButton{top:10px;left:10px;width:42px;height:42px}#memberCenter .mc-drawer{padding:15px}}
+</style>
 </head>
 <body>
+
+  <button id="memberMenuButton" type="button" aria-label="فتح مركز العضوية" aria-expanded="false"><span>☰</span></button>
+  <div id="memberCenter" aria-hidden="true">
+    <div class="mc-backdrop" data-mc-close></div>
+    <aside class="mc-drawer" role="dialog" aria-modal="true" aria-label="مركز العضوية">
+      <div class="mc-head"><h2>مركز العضوية</h2><button class="mc-close" type="button" data-mc-close>إغلاق ×</button></div>
+      <div class="mc-profile"><div class="mc-avatar" id="mcAvatar">M</div><div><strong id="mcDisplayName">زائر MyMusic</strong><div class="mc-muted" id="mcDisplayEmail">حساب محلي على هذا الجهاز</div></div></div>
+      <nav class="mc-nav" aria-label="أقسام العضوية">
+        <button type="button" data-mc-tab="profile" class="active">الملف الشخصي</button><button type="button" data-mc-tab="settings">الإعدادات</button>
+        <button type="button" data-mc-tab="plan">خطة الاشتراك</button><button type="button" data-mc-tab="activity">النشاط والمحادثات</button>
+        <button type="button" data-mc-tab="saved">الصفحات المحفوظة</button><button type="button" data-mc-tab="topics">فهرس الموضوعات</button>
+        <button type="button" data-mc-tab="login">تسجيل الدخول</button>
+      </nav>
+      <section class="mc-section active" data-mc-section="profile"><h3>الملف الشخصي</h3>
+        <label for="mcName">الاسم</label><input id="mcName" maxlength="80" autocomplete="name" placeholder="اسمك">
+        <label for="mcPhone">رقم الهاتف</label><input id="mcPhone" maxlength="30" autocomplete="tel" placeholder="+20...">
+        <label for="mcEmail">البريد الإلكتروني</label><input id="mcEmail" maxlength="120" type="email" autocomplete="email" placeholder="name@example.com">
+        <button class="mc-action" id="mcSaveProfile" type="button">حفظ البيانات على هذا الجهاز</button><p class="mc-muted">هذه البيانات محلية ولا تنشئ حساباً موثقاً أو تزامناً بين الأجهزة.</p>
+      </section>
+      <section class="mc-section" data-mc-section="settings"><h3>الإعدادات</h3>
+        <label for="mcLanguage">لغة الواجهة المفضلة</label><select id="mcLanguage"><option value="ar">العربية</option><option value="en">English</option></select>
+        <label><input id="mcTrack" type="checkbox" checked style="width:auto"> حفظ سجل النشاط محلياً</label>
+        <button class="mc-action" id="mcSaveSettings" type="button">حفظ الإعدادات</button>
+        <p class="mc-muted">اختيار اللغة يُحفظ كتفضيل؛ لا يترجم تلقائياً كل نصوص الموقع.</p>
+      </section>
+      <section class="mc-section" data-mc-section="plan"><h3>خطة الاشتراك</h3>
+        <div class="mc-plan"><strong>Free — مجانية</strong><p class="mc-muted">الخطة الحالية. استخدم الميزات المتاحة وفق حدود الموقع.</p></div>
+        <div class="mc-plan"><strong>Premium — قريباً</strong><p class="mc-muted">السعر ومزايا الخطة النهائية سيحددهما مالك الموقع. الدفع والتفعيل غير مربوطين حالياً.</p></div>
+      </section>
+      <section class="mc-section" data-mc-section="activity"><h3>النشاط المحفوظ</h3><div id="mcActivityList" class="mc-muted">لا يوجد نشاط محفوظ بعد.</div><button class="mc-action" id="mcClearActivity" type="button">مسح سجل النشاط</button></section>
+      <section class="mc-section" data-mc-section="saved"><h3>الصفحات المحفوظة</h3><button class="mc-action" id="mcSavePage" type="button">حفظ الصفحة الحالية</button><div id="mcSavedList" class="mc-muted">لا توجد صفحات محفوظة.</div></section>
+      <section class="mc-section" data-mc-section="topics"><h3>فهرس الموضوعات</h3><p class="mc-muted">اختصارات لأقسام الموقع الموجودة حالياً.</p><div id="mcTopics"><div class="mc-row"><a href="#workshopSection">الورشة التعليمية</a></div><div class="mc-row"><a href="#playerSection">مشغل الموسيقى</a></div><div class="mc-row"><a href="#myLearningLab">المساعد التعليمي</a></div></div></section>
+      <section class="mc-section" data-mc-section="login"><h3>تسجيل الدخول</h3><p class="mc-muted">خيارات الهاتف وGoogle وFacebook وApple تحتاج إعداد خادم آمن ومفاتيح OAuth/OTP. لم يتم تفعيل تسجيل دخول حقيقي بعد.</p><button class="mc-action mc-provider" type="button" disabled>الهاتف · غير مفعّل</button><button class="mc-action mc-provider" type="button" disabled>Google · غير مفعّل</button><button class="mc-action mc-provider" type="button" disabled>Facebook · غير مفعّل</button><button class="mc-action mc-provider" type="button" disabled>Apple · غير مفعّل</button></section>
+    </aside>
+  </div>
+
   <header class="topbar">
     <div class="container topbar-inner">
       <div class="brand">
@@ -2177,5 +2259,38 @@ run.addEventListener('click',async()=>{let source=input.value.trim();if(!source)
 document.getElementById('myLearningCopy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(output.textContent);status.textContent='تم نسخ النتيجة.'}catch(e){status.textContent='تعذر النسخ التلقائي؛ حدد النص وانسخه.'}});document.getElementById('myLearningClear').addEventListener('click',()=>{input.value='';output.textContent='';status.textContent='تم مسح النص والنتيجة.'});
 })();
 </script>
+
+<script id="mymusic-member-center-runtime">
+(function(){
+  'use strict';
+  var root=document.getElementById('memberCenter'),toggle=document.getElementById('memberMenuButton');
+  if(!root||!toggle)return;
+  var keys={profile:'mymusic.member.profile.v1',settings:'mymusic.member.settings.v1',activity:'mymusic.member.activity.v1',saved:'mymusic.member.saved.v1'};
+  function read(key,fallback){try{var x=JSON.parse(localStorage.getItem(key)||'null');return x===null?fallback:x}catch(e){return fallback}}
+  function write(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true}catch(e){return false}}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function open(){root.classList.add('open');root.setAttribute('aria-hidden','false');toggle.setAttribute('aria-expanded','true')}
+  function close(){root.classList.remove('open');root.setAttribute('aria-hidden','true');toggle.setAttribute('aria-expanded','false')}
+  toggle.addEventListener('click',open);
+  root.querySelectorAll('[data-mc-close]').forEach(function(b){b.addEventListener('click',close)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&root.classList.contains('open'))close()});
+  root.querySelectorAll('[data-mc-tab]').forEach(function(b){b.addEventListener('click',function(){var tab=b.dataset.mcTab;root.querySelectorAll('[data-mc-tab]').forEach(function(x){x.classList.toggle('active',x===b)});root.querySelectorAll('[data-mc-section]').forEach(function(x){x.classList.toggle('active',x.dataset.mcSection===tab)})})});
+  var profile=read(keys.profile,{name:'',phone:'',email:''}),settings=read(keys.settings,{language:'ar',track:true});
+  function renderProfile(){document.getElementById('mcName').value=profile.name||'';document.getElementById('mcPhone').value=profile.phone||'';document.getElementById('mcEmail').value=profile.email||'';document.getElementById('mcDisplayName').textContent=profile.name||'زائر MyMusic';document.getElementById('mcDisplayEmail').textContent=profile.email||'حساب محلي على هذا الجهاز';document.getElementById('mcAvatar').textContent=(profile.name||'M').trim().charAt(0).toUpperCase()}
+  renderProfile();
+  document.getElementById('mcSaveProfile').addEventListener('click',function(){profile={name:document.getElementById('mcName').value.trim(),phone:document.getElementById('mcPhone').value.trim(),email:document.getElementById('mcEmail').value.trim()};if(write(keys.profile,profile)){renderProfile();alert('تم حفظ الملف الشخصي على هذا الجهاز.')}else alert('تعذر الحفظ؛ مساحة التخزين قد تكون ممتلئة.')});
+  document.getElementById('mcLanguage').value=settings.language||'ar';document.getElementById('mcTrack').checked=settings.track!==false;
+  document.getElementById('mcSaveSettings').addEventListener('click',function(){settings={language:document.getElementById('mcLanguage').value,track:document.getElementById('mcTrack').checked};write(keys.settings,settings);document.documentElement.lang=settings.language;document.documentElement.dir=settings.language==='ar'?'rtl':'ltr';alert('تم حفظ تفضيلاتك. تغيير اللغة لا يترجم كل نصوص الموقع تلقائياً.')});
+  function activity(){return read(keys.activity,[])}
+  function renderActivity(){var box=document.getElementById('mcActivityList'),items=activity();box.innerHTML=items.length?items.slice(0,40).map(function(x){return '<div class="mc-row"><strong>'+esc(x.title)+'</strong><div class="mc-muted">'+esc(x.time)+'</div></div>'}).join(''):'لا يوجد نشاط محفوظ بعد.'}
+  function renderSaved(){var box=document.getElementById('mcSavedList'),items=read(keys.saved,[]);box.innerHTML=items.length?items.map(function(x,i){return '<div class="mc-row"><a href="'+esc(x.url)+'">'+esc(x.title)+'</a> <button type="button" data-remove-saved="'+i+'" style="float:right">حذف</button></div>'}).join(''):'لا توجد صفحات محفوظة.';box.querySelectorAll('[data-remove-saved]').forEach(function(b){b.addEventListener('click',function(){var a=read(keys.saved,[]);a.splice(Number(b.dataset.removeSaved),1);write(keys.saved,a);renderSaved()})})}
+  function log(title){if(settings.track===false)return;var a=activity();a.unshift({title:title,time:new Date().toLocaleString()});write(keys.activity,a.slice(0,100));renderActivity()}
+  document.getElementById('mcSavePage').addEventListener('click',function(){var a=read(keys.saved,[]),url=location.href;if(!a.some(function(x){return x.url===url}))a.unshift({url:url,title:document.title||url});write(keys.saved,a.slice(0,100));renderSaved();log('حفظ الصفحة: '+(document.title||url))});
+  document.getElementById('mcClearActivity').addEventListener('click',function(){write(keys.activity,[]);renderActivity()});
+  document.addEventListener('click',function(e){var el=e.target.closest('button,a');if(!el||root.contains(el)||el===toggle)return;var label=(el.innerText||el.getAttribute('aria-label')||el.title||'تفاعل داخل الموقع').trim().slice(0,100);if(label)log(label)});
+  renderActivity();renderSaved();
+})();
+</script>
+
 </body>
   </html>
