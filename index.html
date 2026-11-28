@@ -431,6 +431,28 @@
       padding: 22px;
     }
 
+ 
+    /* Learning workshop visual system inspired by the supplied reference */
+    body { background-color:#090611; background-image:linear-gradient(145deg,rgba(255,145,115,.88) 0%,rgba(151,82,194,.82) 48%,rgba(18,9,34,.96) 100%); background-attachment:fixed; }
+    :root { --bg:#090611; --surface:#21132d; --surface-2:#30203d; --border:rgba(255,165,80,.28); --primary:#f28b22; --primary-dark:#b95716; --accent:#ffb04a; --muted:#c8b8d4; }
+    .topbar { background:rgba(12,7,20,.94); border-bottom-color:rgba(255,176,74,.22); }
+    .card { background:linear-gradient(145deg,rgba(37,22,49,.97),rgba(20,12,30,.97)); border-color:rgba(255,176,74,.23); }
+    .workshop-hero { margin:18px 0 20px; padding:22px; border-radius:18px; background:linear-gradient(120deg,rgba(35,18,48,.97),rgba(73,35,87,.92)); border:1px solid rgba(255,176,74,.34); box-shadow:0 14px 35px rgba(0,0,0,.28); }
+    .workshop-hero h2 { color:#fff; font-size:1.45rem; margin-bottom:6px; }
+    .workshop-hero p { color:#d7c8df; }
+    .workshop-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-top:16px; }
+    .workshop-tile { background:linear-gradient(145deg,#392347,#24152f); border:1px solid rgba(255,176,74,.25); border-radius:14px; padding:14px; color:#fff; min-height:112px; }
+    .workshop-tile strong { display:block; color:#ffb04a; margin:5px 0; }
+    .workshop-tile small { color:#d1c0dc; }
+    .vevo-search { background:rgba(35,21,47,.9); border:1px solid rgba(255,176,74,.28); border-radius:12px; padding:14px; margin:12px 0; }
+    .vevo-results { display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); gap:10px; margin-top:12px; }
+    .vevo-result { background:#1a1024; border:1px solid rgba(255,176,74,.2); border-radius:10px; padding:8px; cursor:pointer; color:#fff; text-align:right; }
+    .vevo-result img { width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:7px; }
+    .vevo-result:hover { border-color:#ffb04a; }
+    .workshop-chip { display:inline-block; background:rgba(255,176,74,.13); color:#ffc16f; border:1px solid rgba(255,176,74,.25); padding:4px 10px; border-radius:999px; font-size:.78rem; margin:4px 3px; }
+    .subtitle-overlay { position:absolute; z-index:5; left:4%; right:4%; bottom:7%; text-align:center; pointer-events:none; color:white; font-weight:800; font-size:clamp(16px,2.2vw,25px); text-shadow:0 2px 4px #000,0 0 8px #000; background:rgba(15,8,22,.58); border-radius:8px; padding:6px 10px; display:none; }
+    @media(max-width:760px){ .workshop-grid{grid-template-columns:repeat(2,minmax(0,1fr));} .workshop-hero{padding:16px;} }
+
     @media (max-width: 960px) {
       .main-grid {
         grid-template-columns: 1fr;
@@ -450,6 +472,7 @@
       </div>
 
       <nav class="nav-links">
+        <button type="button" class="nav-btn" data-scroll="workshopSection">الورشة التعليمية</button>
         <button type="button" class="nav-btn" data-scroll="playerSection">المشغل</button>
         <button type="button" class="nav-btn" data-scroll="translatorSection">مترجم AI والقاموس</button>
         <button type="button" class="nav-btn" data-scroll="insightsSection">معلومات الكليب</button>
@@ -464,6 +487,19 @@
       <span>مساحة إعلانية (728x90 / Responsive)</span>
       ضع هنا كود إعلان Google AdSense أو رابط تسويق بالعمولة أو بانر رعاية
     </div>
+
+ 
+    <section class="workshop-hero" id="workshopSection">
+      <span class="workshop-chip">MyMusic Learning Lab</span>
+      <h2>ورشة العمل والتعلّم الذكي</h2>
+      <p>مساحة واحدة للطلاب والمهندسين والأطباء وكل من يريد التعلّم، مع مشغل فيديو وصوت وترجمة وقاموس للمصطلحات.</p>
+      <div class="workshop-grid">
+        <div class="workshop-tile">🎓<strong>ورشة الطلاب</strong><small>محاضرات، لغات، مراجعة وشرح الدروس</small></div>
+        <div class="workshop-tile">⚙️<strong>ورشة المهندسين</strong><small>مصطلحات تقنية وهندسية وترجمة الشروحات</small></div>
+        <div class="workshop-tile">🩺<strong>ورشة الأطباء</strong><small>مصطلحات طبية ومحاضرات علمية</small></div>
+        <div class="workshop-tile">💡<strong>ورشة الجميع</strong><small>تعلم اللغات والمهارات والمحتوى العام</small></div>
+      </div>
+    </section>
 
     <div class="main-grid">
       <!-- العمود الرئيسي -->
@@ -490,7 +526,21 @@
             <input type="file" id="localMediaInput" accept="audio/*,video/*" />
           </div>
 
-          <div class="player-stage" id="playerStage">
+ 
+          <div class="vevo-search" id="vevoSearchBox">
+            <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">
+              <strong>بحث VEVO داخل MyMusic</strong>
+              <a href="https://www.vevo.com/" target="_blank" rel="noopener noreferrer">فتح موقع VEVO الرسمي ↗</a>
+            </div>
+            <div class="input-row" style="margin-top:10px;">
+              <input type="text" id="vevoQuery" placeholder="ابحث باسم الفنان أو الأغنية..." />
+              <button type="button" class="btn" id="vevoSearchBtn">بحث فيديوهات VEVO</button>
+            </div>
+            <div class="status-msg" id="vevoSearchStatus">اختر نتيجة لتشغيلها داخل مشغل MyMusic.</div>
+            <div class="vevo-results" id="vevoResults"></div>
+          </div>
+
+          <div class="player-stage" id="playerStage"><div class="subtitle-overlay" id="subtitleOverlay"></div>
             <div class="player-placeholder">
               <h3>ابدأ بتشغيل أي كليب أو أغنية هنا</h3>
               <p>الصق رابط كليب من YouTube/Vevo أو ارفع ملف صوت/فيديو ليفتح مباشرة داخل الصفحة مع عرض نبذة الكليب والفنان.</p>
@@ -547,7 +597,7 @@
           <!-- التبويب 1: مترجم الصوت والفيديو AI -->
           <div class="tab-panel active" id="tabAiMedia">
             <p style="font-size:0.88rem;color:var(--muted);margin-bottom:10px;">
-              ارفع ملف فيديو أو صوت (حتى 4.5MB) ليقوم الذكاء الاصطناعي بتفريغه بدقة وترجمته لأي لغة.
+              ارفع ملف فيديو أو صوت حتى 25 ميجابايت لاستخراج الكلام والتوقيتات ثم ترجمته. يدعم القاموس المصطلحات التخصصية أيضاً.
             </p>
             <div class="input-row">
               <input type="file" id="aiMediaFile" accept="audio/*,video/*" />
@@ -569,7 +619,8 @@
                 <option value="हिन्दी">الترجمة إلى: الهندية</option>
                 <option value="فارسی">الترجمة إلى: الفارسية</option>
               </select>
-              <button type="button" class="btn" id="aiTranslateMediaBtn">تفريغ وترجمة بالذكاء الاصطناعي</button>
+              <button type="button" class="btn" id="aiTranslateMediaBtn">ترجمة الملف الصوتي/المرئي</button>
+              <button type="button" class="btn btn-secondary" id="translateCurrentVideoBtn">ترجمة الفيديو الجاري</button>
             </div>
             <div class="status-msg" id="aiMediaStatus"></div>
 
@@ -727,7 +778,7 @@
           data = JSON.parse(text);
         } catch (e) {
           if (res.status === 404 || text.trim().indexOf("<") === 0) {
-            throw new Error("ملف الخادم functions/api/ai.js غير مضاف بعد في مستودع GitHub.");
+            throw new Error("مسار الخدمة غير متاح. تحقق من نشر Cloudflare Pages Functions ثم أعد المحاولة.");
           }
           throw new Error("استجابة غير متوقعة من الخادم (" + res.status + ").");
         }
@@ -777,11 +828,15 @@
       var playlistContainer = document.getElementById("playlistContainer");
 
       var activeLocalFile = null;
+      var currentYouTubeId = null;
+      var subtitleCues = [];
       var savedPlaylist = safeStorageGet("mymusic_playlist", []);
       var savedWords = safeStorageGet("mymusic_vocab", []);
 
       function playEmbeddedYouTube(videoId, title, artist) {
         if (!videoId) return;
+        currentYouTubeId = videoId;
+        subtitleCues = [];
         playerStage.innerHTML =
           '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&rel=0" ' +
           'title="' + escapeHtml(title || "مشغل الكليبات") + '" ' +
@@ -857,6 +912,41 @@
         savedPlaylist = savedPlaylist.slice(0, 30);
         safeStorageSet("mymusic_playlist", savedPlaylist);
         renderPlaylist();
+      });
+
+
+      // VEVO search uses the server-side YouTube Data API key; it is never exposed in the browser.
+      var vevoSearchBtn = document.getElementById("vevoSearchBtn");
+      var vevoQuery = document.getElementById("vevoQuery");
+      var vevoResults = document.getElementById("vevoResults");
+      var vevoSearchStatus = document.getElementById("vevoSearchStatus");
+      async function searchVevo() {
+        var q = vevoQuery.value.trim();
+        if (!q) { setStatus(vevoSearchStatus, "اكتب اسم أغنية أو فنان أولاً.", "error"); return; }
+        vevoSearchBtn.disabled = true;
+        vevoResults.innerHTML = "";
+        setStatus(vevoSearchStatus, "جاري البحث عن فيديوهات VEVO القابلة للتضمين...", "");
+        try {
+          var data = await safeFetchJson("/api/vevo-search?q=" + encodeURIComponent(q) + "&mode=vevo");
+          if (!data.items || !data.items.length) { setStatus(vevoSearchStatus, data.message || "لا توجد نتائج حالياً.", ""); return; }
+          vevoResults.innerHTML = data.items.map(function(item) {
+            return '<button type="button" class="vevo-result" data-vevo-id="' + escapeHtml(item.id) + '" data-vevo-title="' + escapeHtml(item.title) + '" data-vevo-channel="' + escapeHtml(item.channel) + '">' +
+              '<img loading="lazy" src="' + escapeHtml(item.thumbnail) + '" alt=""><strong>' + escapeHtml(item.title) + '</strong><small style="display:block;color:var(--muted)">' + escapeHtml(item.channel) + '</small></button>';
+          }).join("");
+          setStatus(vevoSearchStatus, "اختر فيديو لتشغيله داخل الصفحة.", "success");
+        } catch (e) { setStatus(vevoSearchStatus, e.message, "error"); }
+        finally { vevoSearchBtn.disabled = false; }
+      }
+      vevoSearchBtn.addEventListener("click", searchVevo);
+      vevoQuery.addEventListener("keydown", function(e) { if (e.key === "Enter") searchVevo(); });
+      vevoResults.addEventListener("click", function(e) {
+        var card = e.target.closest("[data-vevo-id]");
+        if (!card) return;
+        var id = card.dataset.vevoId, title = card.dataset.vevoTitle, artist = card.dataset.vevoChannel;
+        clipTitleInput.value = title; clipArtistInput.value = artist;
+        clipUrlInput.value = "https://www.youtube.com/watch?v=" + id;
+        playEmbeddedYouTube(id, title, artist);
+        document.getElementById("playerSection").scrollIntoView({behavior:"smooth"});
       });
 
       function renderPlaylist() {
