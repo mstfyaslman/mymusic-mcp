@@ -862,6 +862,7 @@
 
       function playLocalMediaFile(file) {
         if (!file) return;
+        currentYouTubeId = null;
         activeLocalFile = file;
         var objectUrl = URL.createObjectURL(file);
         var isAudio = file.type && file.type.indexOf("audio/") === 0;
@@ -892,10 +893,12 @@
         }
 
         if (/^https?:\/\/.+\.(mp4|webm|mp3|wav|m4a|ogg)(\?.*)?$/i.test(urlVal)) {
+          currentYouTubeId = null;
           var isAudio = /\.(mp3|wav|m4a|ogg)(\?.*)?$/i.test(urlVal);
           playerStage.innerHTML = isAudio
             ? '<audio controls autoplay src="' + escapeHtml(urlVal) + '"></audio>'
             : '<video controls autoplay playsinline src="' + escapeHtml(urlVal) + '"></video>';
+          ensureSubtitleOverlay();
           if (title || artist) loadFullArtistAndClipInfo(title, artist);
           return;
         }
