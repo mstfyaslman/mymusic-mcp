@@ -665,6 +665,7 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
       <nav class="nav-links">
         <button type="button" class="nav-btn" data-scroll="workshopSection">الورشة التعليمية</button>
         <button type="button" class="nav-btn" data-scroll="playerSection">المشغل</button>
+        <button type="button" class="nav-btn" data-scroll="partnerMusicSection">Spotify وAnghami</button>
         <button type="button" class="nav-btn" data-scroll="translatorSection">مترجم AI والقاموس</button>
         <button type="button" class="nav-btn" data-scroll="insightsSection">معلومات الكليب</button>
         <button type="button" class="nav-btn" data-legal="about">من نحن</button>
@@ -834,6 +835,31 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
             <div class="status-msg" id="vevoSearchStatus">اختر نتيجة لتشغيلها داخل مشغل MyMusic.</div>
             <div class="vevo-results" id="vevoResults"></div>
           </div>
+
+
+          <section class="card" id="partnerMusicSection" style="margin:16px 0;">
+            <div class="card-title"><span>منصات الموسيقى الشريكة</span><small>Spotify • Anghami • داخل MyMusic</small></div>
+            <p style="color:var(--muted);line-height:1.8;">شغّل المحتوى المسموح بتضمينه من المنصات الرسمية داخل الموقع. يلزم رابط مشاركة Spotify أو رابط أداة Anghami الرسمية.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px;">
+              <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px;min-width:0;">
+                <h3 style="margin:0 0 8px;color:var(--text);">Spotify</h3>
+                <label for="mmSpotifyUrl" style="display:block;margin-bottom:6px;">رابط أغنية أو ألبوم أو قائمة تشغيل أو فنان</label>
+                <input id="mmSpotifyUrl" type="url" inputmode="url" placeholder="https://open.spotify.com/track/..." style="width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);">
+                <button type="button" class="btn" id="mmSpotifyLoad" style="margin-top:9px;">تشغيل Spotify هنا</button>
+                <p id="mmSpotifyStatus" role="status" style="font-size:.85rem;color:var(--muted);">أدخل رابط Spotify ثم اضغط تشغيل.</p>
+                <div id="mmSpotifyFrame" style="min-height:80px;"></div>
+              </div>
+              <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px;min-width:0;">
+                <h3 style="margin:0 0 8px;color:var(--text);">Anghami</h3>
+                <label for="mmAnghamiUrl" style="display:block;margin-bottom:6px;">رابط التضمين الذي تنشئه من أداة Anghami الرسمية</label>
+                <input id="mmAnghamiUrl" type="url" inputmode="url" placeholder="ألصق رابط Widget الرسمي هنا" style="width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);">
+                <button type="button" class="btn" id="mmAnghamiLoad" style="margin-top:9px;">تشغيل Anghami هنا</button>
+                <p id="mmAnghamiStatus" role="status" style="font-size:.85rem;color:var(--muted);">أنشئ أداة التضمين من Anghami ثم ألصق رابطها هنا.</p>
+                <div id="mmAnghamiFrame" style="min-height:80px;"></div>
+              </div>
+            </div>
+            <p style="font-size:.82rem;color:var(--muted);margin-top:12px;">ملاحظة: التشغيل والتوفر يعتمدان على إعدادات كل منصة، والمنطقة، ونوع الحساب وحقوق المحتوى. لا يغيّر هذا القسم مشغل MyMusic الأصلي.</p>
+          </section>
 
           <div class="player-stage" id="playerStage"><div class="subtitle-overlay" id="subtitleOverlay"></div>
             <div class="player-placeholder">
@@ -2519,5 +2545,49 @@ document.getElementById('myLearningCopy').addEventListener('click',async()=>{try
  if("serviceWorker" in navigator && location.protocol==="https:"){navigator.serviceWorker.register("/service-worker.js").catch(()=>{});}
 })();
 </script>
+
+<script>
+(function(){
+  "use strict";
+  function setStatus(id,msg,isError){
+    var el=document.getElementById(id);
+    if(el){el.textContent=msg;el.style.color=isError?"#ffb4b4":"var(--muted)";}
+  }
+  function makeFrame(src,title,height){
+    var frame=document.createElement("iframe");
+    frame.src=src; frame.title=title; frame.loading="lazy";
+    frame.allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+    frame.allowFullscreen=true; frame.referrerPolicy="strict-origin-when-cross-origin";
+    frame.style.cssText="display:block;width:100%;max-width:100%;height:"+height+"px;border:0;border-radius:10px;background:#050608;margin-top:8px";
+    return frame;
+  }
+  var spBtn=document.getElementById("mmSpotifyLoad");
+  if(spBtn) spBtn.addEventListener("click",function(){
+    var raw=document.getElementById("mmSpotifyUrl").value.trim();
+    try{
+      var u=new URL(raw);
+      if(u.protocol!=="https:"||u.hostname!=="open.spotify.com") throw new Error("domain");
+      var parts=u.pathname.split("/").filter(Boolean);
+      if(parts[0]!=="track"&&parts[0]!=="album"&&parts[0]!=="playlist"&&parts[0]!=="artist"&&parts[0]!=="episode"&&parts[0]!=="show") throw new Error("type");
+      if(!parts[1]||!/^[A-Za-z0-9]+$/.test(parts[1])) throw new Error("id");
+      var embed="https://open.spotify.com/embed/"+parts[0]+"/"+parts[1];
+      var box=document.getElementById("mmSpotifyFrame"); box.replaceChildren(makeFrame(embed,"Spotify player",352));
+      setStatus("mmSpotifyStatus","تم تحميل مشغل Spotify المضمّن. قد يتطلب التشغيل حساباً أو دعماً من المنصة.",false);
+    }catch(e){setStatus("mmSpotifyStatus","الرابط غير صالح. استخدم رابط مشاركة مباشر من open.spotify.com لنوع محتوى مدعوم.",true);}
+  });
+  var anBtn=document.getElementById("mmAnghamiLoad");
+  if(anBtn) anBtn.addEventListener("click",function(){
+    var raw=document.getElementById("mmAnghamiUrl").value.trim();
+    try{
+      var match=raw.match(/<iframe[^>]+src\s*=\s*["']([^"']+)["']/i);
+      var u=new URL(match?match[1]:raw);
+      if(u.protocol!=="https:"||(u.hostname!=="widget.anghami.com"&&u.hostname!=="play.anghami.com")) throw new Error("domain");
+      var box=document.getElementById("mmAnghamiFrame"); box.replaceChildren(makeFrame(u.href,"Anghami player",352));
+      setStatus("mmAnghamiStatus","تم تحميل إطار Anghami. إذا لم يعمل، استخدم رابط Widget الصادر من أداة Anghami الرسمية.",false);
+    }catch(e){setStatus("mmAnghamiStatus","استخدم رابط HTTPS أو كود iframe من أداة Anghami الرسمية فقط.",true);}
+  });
+})();
+</script>
+
 </body>
   </html>
