@@ -1224,6 +1224,7 @@
         if(!file) throw new Error("اختر ملف صوت أو فيديو أولاً.");
         if(file.size>90*1024*1024) throw new Error("حجم الملف أكبر من 90 ميجابايت. استخدم صوتاً مضغوطاً أو قسّم الملف إلى أجزاء.");
         var duration=await getMediaDurationSeconds(file);
+        if(duration>34200) throw new Error("الحد الأقصى الحالي لمدة الملف الصوتي 9 ساعات ونصف لكل معالجة. قسّم التسجيل إلى ملفات أقصر.");
         if(file.type.startsWith("video/") && duration>3600) throw new Error("لترجمة فيديو أطول من ساعة، اضغط «تحويل الفيديو إلى صوت» أولاً، ثم ارفع المسار الصوتي الناتج. ترجمة الصوت تدعم التقسيم إلى أجزاء حتى 3 ساعات وأكثر.");
         var formData=new FormData(); formData.append("file",file,file.name||"mymusic-media"); formData.append("uploadOnly","1");
         setStatus(aiMediaStatus,"جاري رفع الملف مرة واحدة إلى Gemini Files API ("+Math.ceil(duration/60)+" دقيقة)...","");
