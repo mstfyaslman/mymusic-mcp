@@ -1932,9 +1932,9 @@
           if(!raw||raw==="NO_SPEECH")return;
           var parsed=parseSocialSrt(raw);
           if(!parsed.length){socialLiveStatusText("وصل الصوت، لكن لم تصل ترجمة بتوقيتات صالحة لهذا المقطع.");return;}
-          // Results arrive after cloud inference; schedule this segment from the moment it becomes available.
-          var anchor=Math.max(subtitleClock*1000,performance.now()-socialLiveStartedAt),firstStart=parsed[0].start;
-          parsed.forEach(function(cue){cue.start=anchor+(cue.start-firstStart);cue.end=anchor+(cue.end-firstStart);subtitleCues.push(cue);});
+          // Keep the segment's original capture-time offset so cloud latency does not shift subtitles forward.
+          var anchor=Math.max(0,Number(data.offsetMs)||Number(offsetMs)||0);
+          parsed.forEach(function(cue){cue.start=anchor+cue.start;cue.end=anchor+cue.end;subtitleCues.push(cue);});
           subtitleCues.sort(function(a,b){return a.start-b.start;});
           subtitleClock=Math.max(subtitleClock,(performance.now()-socialLiveStartedAt)/1000);
           paintSubtitle();
