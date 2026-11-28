@@ -709,6 +709,36 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
         <div id="socialAccountStatus" class="status-msg" role="status">يلزم إعداد تطبيق Meta ومفاتيحه وربط KV في Cloudflare قبل تفعيل تسجيل الدخول.</div>
         <div id="socialAccountFeed"></div>
       </div>
+      <section class="social-panel" id="socialGrowthHub" style="margin-top:14px">
+        <div class="card-title"><span>📈 مركز المشاهدة والمتابعة والشراكات</span><small>Social Growth & Creator Partners</small></div>
+        <p class="social-note">اكتشف الصفحات والحسابات العامة وتابعها من خلال إجراءات Meta الرسمية. فتح المحتوى داخل MyMusic متاح فقط عندما تسمح Meta بالتضمين؛ لا يمكن تجاوز تسجيل الدخول أو قيود الحسابات الخاصة.</p>
+        <div class="social-grid">
+          <div class="social-panel">
+            <strong>اكتشاف ومتابعة Facebook</strong>
+            <p class="social-note">افتح الصفحة العامة أو تابعها عبر Facebook الرسمي.</p>
+            <button type="button" class="btn" id="socialFacebookDiscover">استكشاف Facebook</button>
+          </div>
+          <div class="social-panel">
+            <strong>اكتشاف ومتابعة Instagram</strong>
+            <p class="social-note">افتح الحساب العام أو تابع عبر Instagram الرسمي.</p>
+            <button type="button" class="btn" id="socialInstagramDiscover">استكشاف Instagram</button>
+          </div>
+        </div>
+        <div class="social-subtitle-settings" style="margin-top:12px">
+          <strong>🤝 شراكات صناع المحتوى والإعلانات</strong>
+          <p class="social-note">أضف فقط صفحات يملكها الشريك أو فوّضك بإدارتها. يمكن تحقيق الدخل من إعلانات MyMusic والرعايات والإحالات المتفق عليها؛ مشاهدات أو متابعات Meta وحدها لا تضمن عمولة أو أرباحاً.</p>
+          <div class="input-row">
+            <input id="creatorPartnerName" type="text" maxlength="80" placeholder="اسم الصفحة أو صانع المحتوى">
+            <select id="creatorPartnerPlatform"><option value="facebook">Facebook</option><option value="instagram">Instagram</option></select>
+          </div>
+          <div class="input-row">
+            <input id="creatorPartnerUrl" type="url" placeholder="رابط الصفحة أو الحساب العام">
+            <button type="button" class="btn" id="creatorPartnerAdd">إضافة إلى دليل الشركاء</button>
+          </div>
+          <div id="creatorPartnerStatus" class="status-msg" role="status">الدليل محفوظ في هذا المتصفح فقط. لا تُضف حساباً دون إذن صاحبه.</div>
+          <div id="creatorPartnerList"></div>
+        </div>
+      </section>
     </section>
 
     <div class="main-grid">
@@ -2311,6 +2341,30 @@ document.getElementById('myLearningCopy').addEventListener('click',async()=>{try
   document.getElementById('mcSavePage').addEventListener('click',function(){var a=read(keys.saved,[]),url=location.href;if(!a.some(function(x){return x.url===url}))a.unshift({url:url,title:document.title||url});write(keys.saved,a.slice(0,100));renderSaved();log('حفظ الصفحة: '+(document.title||url))});
   document.getElementById('mcClearActivity').addEventListener('click',function(){write(keys.activity,[]);renderActivity()});
   document.addEventListener('click',function(e){var el=e.target.closest('button,a');if(!el||root.contains(el)||el===toggle)return;var label=(el.innerText||el.getAttribute('aria-label')||el.title||'تفاعل داخل الموقع').trim().slice(0,100);if(label)log(label)});
+  // Social discovery and locally managed creator directory (no fabricated Meta permissions or earnings)
+  (function initSocialGrowthHub(){
+    var fb=document.getElementById('socialFacebookDiscover'),ig=document.getElementById('socialInstagramDiscover');
+    if(fb)fb.addEventListener('click',function(){window.open('https://www.facebook.com/watch/','_blank','noopener,noreferrer')});
+    if(ig)ig.addEventListener('click',function(){window.open('https://www.instagram.com/explore/','_blank','noopener,noreferrer')});
+    var key='mymusic_creator_partners_v1',name=document.getElementById('creatorPartnerName'),platform=document.getElementById('creatorPartnerPlatform'),url=document.getElementById('creatorPartnerUrl'),add=document.getElementById('creatorPartnerAdd'),list=document.getElementById('creatorPartnerList'),status=document.getElementById('creatorPartnerStatus');
+    if(!add||!list)return;
+    function read(){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}}
+    function render(){
+      list.replaceChildren();read().forEach(function(item,index){
+        var card=document.createElement('div');card.className='social-account-item';
+        var title=document.createElement('strong');title.textContent=item.name+' · '+(item.platform==='facebook'?'Facebook':'Instagram');card.appendChild(title);
+        var link=document.createElement('a');link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='فتح الحساب الرسمي';card.appendChild(link);
+        var remove=document.createElement('button');remove.type='button';remove.className='btn btn-secondary btn-small';remove.textContent='حذف من الدليل';remove.addEventListener('click',function(){var rows=read();rows.splice(index,1);localStorage.setItem(key,JSON.stringify(rows));render()});card.appendChild(remove);list.appendChild(card);
+      });
+      if(!list.children.length){var empty=document.createElement('p');empty.className='social-note';empty.textContent='لا توجد صفحات مضافة بعد.';list.appendChild(empty)}
+    }
+    add.addEventListener('click',function(){
+      var n=(name.value||'').trim(),u=(url.value||'').trim();
+      if(!n||!u){status.textContent='أدخل اسم الصفحة والرابط أولاً.';return}
+      try{var parsed=new URL(u);if(parsed.protocol!=='https:'||!(parsed.hostname==='facebook.com'||parsed.hostname.endsWith('.facebook.com')||parsed.hostname==='instagram.com'||parsed.hostname.endsWith('.instagram.com')))throw new Error('استخدم رابط HTTPS رسمي من facebook.com أو instagram.com.');var rows=read();if(rows.length>=50)throw new Error('وصل الدليل إلى الحد الأقصى (50 صفحة).');if(rows.some(function(x){return x.url===parsed.href}))throw new Error('هذا الحساب موجود بالفعل.');rows.push({name:n,platform:platform.value,url:parsed.href});localStorage.setItem(key,JSON.stringify(rows));name.value='';url.value='';status.textContent='تمت إضافة الصفحة إلى دليل هذا المتصفح.';render()}catch(e){status.textContent=e.message||'تعذر التحقق من الرابط.'}
+    });
+    render();
+  })();
   renderActivity();renderSaved();
 })();
 </script>
