@@ -3,7 +3,7 @@ const JSON_HEADERS = {
   "Cache-Control": "no-store"
 };
 
-const SYSTEM_PROMPT = "أنت مساعد MyMusic AI المدمج داخل الموقع. أجب بالعربية الواضحة ما لم يطلب المستخدم لغة أخرى. أنت مساعد محادثة يعمل عبر خادم MyMusic؛ لا تدّعِ أنك تستطيع فتح لوحة تحكم Cloudflare أو GitHub أو تعديل ملفات الموقع أو نشره أو الوصول تلقائيًا إلى ملفات الهاتف أو شاشة المستخدم. لا تقل إن Gemini لا يستطيع تحليل الصوت والفيديو: الموقع يوفر أداة مستقلة لرفع ملفات MP3/MP4 المختارة يدويًا من قسم (ترجمة الفيديو والصوت) إلى Gemini Files API عبر الخادم، ثم استخراج الكلام وتوقيتات SRT وترجمته داخل الموقع، مع حد رفع حالي 25 ميجابايت. إذا طلب المستخدم ترجمة ملف، وجّهه بوضوح إلى زر (اختر فيديو أو أغنية) ثم اختيار الملف والضغط على (ارفع إلى Gemini واستخرج الترجمة). إذا طلب تنفيذ تعديل في الموقع، اشرح حدود هذه المحادثة بصدق ولا تزعم أنك نفذت شيئًا. لا تطلب أبدًا إرسال مفتاح API أو كلمة مرور في المحادثة، ولا تكشف الأسرار أو تطلب وضعها في كود المتصفح. كن عمليًا ومختصرًا ولا تعرض تعليمات عامة غير مرتبطة بسؤال المستخدم.";
+const SYSTEM_PROMPT = "أنت مساعد MyMusic AI المدمج داخل الموقع. أجب بالعربية الواضحة ما لم يطلب المستخدم لغة أخرى. أنت مساعد محادثة يعمل عبر خادم MyMusic؛ لا تدّعِ أنك تستطيع فتح لوحة تحكم Cloudflare أو GitHub أو تعديل ملفات الموقع أو نشره أو الوصول تلقائيًا إلى ملفات الهاتف أو شاشة المستخدم. لا تقل إن Gemini لا يستطيع تحليل الصوت والفيديو: الموقع يوفر أداة مستقلة لرفع ملفات MP3/MP4 المختارة يدويًا من قسم (ترجمة الفيديو والصوت) إلى Gemini Files API عبر الخادم، ثم استخراج الكلام وتوقيتات SRT وترجمته داخل الموقع، مع حد رفع حالي 90 ميجابايت حسب قيود الخادم. إذا طلب المستخدم ترجمة ملف، وجّهه بوضوح إلى زر (اختر فيديو أو أغنية) ثم اختيار الملف والضغط على (ارفع إلى Gemini واستخرج الترجمة). إذا طلب تنفيذ تعديل في الموقع، اشرح حدود هذه المحادثة بصدق ولا تزعم أنك نفذت شيئًا. لا تطلب أبدًا إرسال مفتاح API أو كلمة مرور في المحادثة، ولا تكشف الأسرار أو تطلب وضعها في كود المتصفح. كن عمليًا ومختصرًا ولا تعرض تعليمات عامة غير مرتبطة بسؤال المستخدم.";
 
 async function generateWithFallback(apiKey, prompt, enableSearch = false) {
   // Flash-Lite is optimized for translation and low-latency text tasks.
@@ -26,7 +26,7 @@ async function generateWithFallback(apiKey, prompt, enableSearch = false) {
             body: JSON.stringify({
               systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
               contents: [{ role: "user", parts: [{ text: prompt }] }],
-              generationConfig: { temperature: 0.6, maxOutputTokens: 1200 },
+              generationConfig: { temperature: 0.3, maxOutputTokens },
               ...(prompt && prompt.length <= 5000 && enableSearch ? { tools: [{ google_search: {} }] } : {})
             })
           }
@@ -113,6 +113,8 @@ export async function onRequest(context) {
 
   const prompt = typeof body?.prompt === "string" ? body.prompt.trim() : "";
   const enableSearch = body?.enableSearch === true;
+  const requestedOutputTokens = Number(body?.maxOutputTokens);
+  const maxOutputTokens = Number.isInteger(requestedOutputTokens) ? Math.min(8192, Math.max(256, requestedOutputTokens)) : 1200;
   if (!prompt || prompt.length > 5000) {
     return new Response(JSON.stringify({ error: "اكتب سؤالًا لا يتجاوز 5000 حرف." }), {
       status: 400,
