@@ -12,12 +12,25 @@ export async function onRequest({request,env}) {
   const tokenUrl=new URL("https://graph.facebook.com/v27.0/oauth/access_token");
   tokenUrl.searchParams.set("client_id",env.META_APP_ID);tokenUrl.searchParams.set("client_secret",env.META_APP_SECRET);tokenUrl.searchParams.set("redirect_uri",env.META_REDIRECT_URI);tokenUrl.searchParams.set("code",code);
   const tr=await fetch(tokenUrl);const td=await tr.json();if(!tr.ok||!td.access_token)throw new Error(td?.error?.message||"تعذر استبدال رمز OAuth.");
-  const meUrl=new URL("https://graph.facebook.com/v27.0/me");meUrl.searchParams.set("fields","id,name");meUrl.searchParams.set("access_token",td.access_token);
+  let accessToken=td.access_token,expiresIn=Number(td.expires_in)||3600;
+  // Exchange the short-lived login token for a longer-lived token when Meta allows it.
+  try{
+   const exchangeUrl=new URL("https://graph.facebook.com/v27.0/oauth/access_token");
+   exchangeUrl.searchParams.set("grant_type","fb_exchange_token");exchangeUrl.searchParams.set("client_id",env.META_APP_ID);
+   exchangeUrl.searchParams.set("client_secret",env.META_APP_SECRET);exchangeUrl.searchParams.set("fb_exchange_token",accessToken);
+   const er=await fetch(exchangeUrl);const ed=await er.json();
+   if(er.ok&&ed.access_token){accessToken=ed.access_token;expiresIn=Number(ed.expires_in)||expiresIn;}
+  }catch(e){}
+  const meUrl=new URL("https://graph.facebook.com/v27.0/me");meUrl.searchParams.set("fields","id,name");meUrl.searchParams.set("access_token",accessToken);
   const mr=await fetch(meUrl);const me=await mr.json();if(!mr.ok||!me.id)throw new Error(me?.error?.message||"تعذر تحديد الحساب.");
-  const expiresAt=Date.now()+(Number(td.expires_in)||3600)*1000;
-  await env.SOCIAL_KV.put("meta-user:"+me.id,JSON.stringify({access_token:td.access_token,expires_at:expiresAt,name:me.name||"Meta account"}),{expirationTtl:Math.max(3600,Number(td.expires_in)||3600)});
-  const payload=me.id+"."+Math.floor(Date.now()/1000+60*60*24*30);
+  const sessionTtl=Math.max(3600,Math.min(60*60*24*30,expiresIn));
+  const expiresAt=Date.now()+expiresIn*1000;
+  await env.SOCIAL_KV.put("meta-user:"+me.id,JSON.stringify({access_token:accessToken,expires_at:expiresAt,name:me.name||"Meta account"}),{expirationTtl:Math.max(3600,expiresIn)});
+  const payload=me.id+"."+Math.floor(Date.now()/1000+sessionTtl);
   const signature=await sign(payload,env.META_APP_SECRET);
-  return new Response(null,{status:302,headers:{"Location":"/?social=connected","Set-Cookie":"mymusic_meta_session="+payload+"."+signature+"; HttpOnly; Secure; SameSite=Lax; Path=/api/social-account; Max-Age=2592000, "+clear,"Cache-Control":"no-store"}});
+  const headers=new Headers({"Location":"/?social=connected","Cache-Control":"no-store"});
+  headers.append("Set-Cookie","mymusic_meta_session="+payload+"."+signature+"; HttpOnly; Secure; SameSite=Lax; Path=/api/social-account; Max-Age="+sessionTtl);
+  headers.append("Set-Cookie",clear);
+  return new Response(null,{status:302,headers});
  }catch(e){return new Response("تعذر إكمال ربط Meta: "+String(e.message||"خطأ غير معروف").slice(0,240),{status:502,headers:{...H,"Set-Cookie":clear}});}
 }
