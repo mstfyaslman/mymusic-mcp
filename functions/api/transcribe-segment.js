@@ -57,7 +57,7 @@ export async function onRequest({ request, env }) {
     "Keep cues short and preserve speaker labels when clearly distinguishable. If no words are audible in this interval, return exactly NO_SPEECH."
   ].join(" ");
   let lastError = null;
-  for (const model of ["gemini-3.5-transcribe", "gemini-3.6-flash", "gemini-3.5-flash-lite"]) {
+  for (const model of ["gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-3.8-flash"]) {
     for (let attempt = 0; attempt < 2; attempt++) {
       let response, data = {};
       try {
