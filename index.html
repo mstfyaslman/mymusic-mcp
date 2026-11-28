@@ -699,6 +699,13 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
           <textarea id="socialTextToTranslate" rows="5" placeholder="الصق وصف المنشور أو الكلام/النص الظاهر في الريلز أو الفيديو هنا..."></textarea>
           <button type="button" class="btn" id="socialTranslateBtn">ترجمة الآن</button>
           <div id="socialTranslationResult" class="result-box" aria-live="polite">في الوضع التلقائي ستبدأ الترجمة عند إدخال النص. في الوضع اليدوي اضغط «ترجمة الآن».</div>
+          <div class="social-subtitle-settings" style="margin-top:12px">
+            <strong>ترجمة النصوص من الصور واللقطات</strong>
+            <p class="social-note">ارفع صورة منشور أو لقطة شاشة؛ يستخرج Gemini النص الظاهر ويترجمه إلى اللغة المختارة.</p>
+            <input id="socialImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+            <button type="button" class="btn" id="socialTranslateImageBtn" style="margin-top:8px">استخراج النص وترجمته من الصورة</button>
+            <div id="socialImageTranslationResult" class="result-box" aria-live="polite">لم يتم اختيار صورة بعد.</div>
+          </div>
         </div>
       </div>
       <div class="social-panel" style="margin-top:14px">
@@ -2057,6 +2064,16 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
         document.getElementById("socialTargetLang").addEventListener("change",function(){socialTranslationRevision++;socialLastTranslationKey="";scheduleSocialAutoTranslation();});
         document.getElementById("socialTranslationMode").addEventListener("change",function(){socialTranslationRevision++;socialLastTranslationKey="";if(this.value==="auto")scheduleSocialAutoTranslation();else{clearTimeout(socialTranslateTimer);socialTranslationPending=false;document.getElementById("socialTranslationResult").textContent="الوضع اليدوي: اضغط «ترجمة الآن» لبدء الترجمة.";}});
         document.getElementById("socialTranslateBtn").addEventListener("click",function(){socialTranslationRevision++;socialLastTranslationKey="";clearTimeout(socialTranslateTimer);translateSocialText();});
+        document.getElementById("socialTranslateImageBtn").addEventListener("click",async function(){
+          var file=document.getElementById("socialImageFile").files[0],out=document.getElementById("socialImageTranslationResult"),btn=this;
+          if(!file){out.textContent="اختر صورة أولاً.";return;}
+          if(!/^image\/(jpeg|png|webp|gif)$/.test(file.type)||file.size>8*1024*1024){out.textContent="اختر صورة JPG أو PNG أو WEBP أو GIF بحجم لا يتجاوز 8 ميجابايت.";return;}
+          var form=new FormData();form.append("image",file);form.append("language",document.getElementById("socialTargetLang").value);
+          btn.disabled=true;out.textContent="جارٍ استخراج النص من الصورة وترجمته عبر Google Gemini...";
+          try{var response=await fetch("/api/social-image-translate",{method:"POST",body:form});var data=await response.json();if(!response.ok)throw new Error(data.error||"تعذرت معالجة الصورة.");out.textContent=data.text||"لم يتم العثور على نص واضح في الصورة.";}
+          catch(error){out.textContent=error.message||"حدث خطأ أثناء ترجمة الصورة.";}
+          finally{btn.disabled=false;}
+        });
         // Live Facebook tab-audio capture: user-authorized browser sharing only.
         var socialLiveActive=false,socialDisplayStream=null,socialAudioStream=null,socialLiveRecorder=null,socialLiveStartedAt=0,socialLiveQueue=Promise.resolve(),socialLivePending=0;
         var socialLiveStartBtn=document.getElementById("socialLiveAudioStart"),socialLiveMicBtn=document.getElementById("socialLiveMicStart"),socialLiveStopBtn=document.getElementById("socialLiveAudioStop"),socialLiveStatus=document.getElementById("socialLiveAudioStatus");
