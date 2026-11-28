@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#050608" />
+  <title>MyMusic AI — مشغل الكليبات والموسيقى ومترجم الذكاء الاصطناعي</title>
+  <meta name="description" content="شاهد الكليبات داخل الموقع، وترجم ملفات الفيديو والصوت لجميع اللغات بالذكاء الاصطناعي، مع قاموس موثوق ونبذة عن كل كليب وفنان وفريق العمل." />
+  <meta name="keywords" content="موسيقى, كليبات, ترجمة فيديو بالذكاء الاصطناعي, ترجمة صوت, قاموس, MyMusic AI" />
+  <meta property="og:title" content="MyMusic AI — مشغل الكليبات ومترجم الذكاء الاصطناعي" />
+  <meta property="og:description" content="تشغيل الفيديوهات داخل الموقع مع مترجم فيديو وصوت ذكي لجميع اللغات وقاموس موثوق." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mymusic-3k6.pages.dev/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- ضع كود Google AdSense هنا عند قبول حسابك -->
+
+  <style>
+    :root {
+      --bg: #050608;
+      --surface: #0b1224;
+      --surface-2: #111c36;
+      --border: rgba(139, 19, 45, 0.35);
+      --border-soft: rgba(255, 255, 255, 0.09);
+      --text: #f4f6fb;
+      --muted: #98a6c4;
+      --primary: #8b132d;
+      --primary-dark: #590a1b;
+      --accent: #e05672;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Cairo", "Segoe UI", Tahoma, sans-serif;
+      background-color: var(--bg);
+      background-image: radial-gradient(
+        circle at top right,
+        rgba(139, 19, 45, 0.28) 0%,
+        #0a1226 36%,
+        #050608 78%
+      );
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1280px, 94%);
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(5, 6, 8, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), #101d3b);
+      border: 1px solid rgba(224, 86, 114, 0.45);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(139, 19, 45, 0.38);
+    }
+
+    .brand h1 {
+      font-size: 1.25rem;
+      line-height: 1.2;
+    }
+
+    .brand small {
+      color: var(--muted);
+      font-size: 0.8rem;
+      display: block;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border-soft);
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--primary);
+      background: var(--surface-2);
+      color: var(--accent);
+    }
+
+    .ad-slot {
+      background: linear-gradient(135deg, rgba(139, 19, 45, 0.16), rgba(11, 18, 36, 0.92));
+      border: 1px dashed rgba(139, 19, 45, 0.55);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: center;
+      color: var(--muted);
+      margin: 18px 0;
+    }
+
+    .ad-slot span {
+      display: block;
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 20px;
+      margin-top: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--surface) 0%, #070c18 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    }
+
+    .card-title {
+      font-size: 1.08rem;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-soft);
+      padding-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="file"],
+    select,
+    textarea {
+      width: 100%;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 0.94rem;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .input-row > input,
+    .input-row > select {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      border: 1px solid rgba(224, 86, 114, 0.35);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn:hover {
+      opacity: 0.94;
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+
+    .player-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #020305;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      margin-bottom: 14px;
+    }
+
+    .player-stage iframe,
+    .player-stage video {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #000;
+    }
+
+    .player-stage audio {
+      width: 90%;
+    }
+
+    .player-placeholder {
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: var(--surface-2);
+      color: var(--muted);
+      border: 1px solid var(--border-soft);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary), #101d3b);
+      color: #fff;
+      border-color: rgba(224, 86, 114, 0.45);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .result-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.94rem;
+    }
+
+    .status-msg {
+      font-size: 0.88rem;
+      margin-top: 8px;
+      color: var(--accent);
+    }
+
+    .status-msg.error {
+      color: var(--danger);
+    }
+
+    .status-msg.success {
+      color: var(--success);
+    }
+
+    .playlist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    .playlist-info strong {
+      display: block;
+      font-size: 0.95rem;
+    }
+
+    .playlist-info small {
+      color: var(--muted);
+    }
+
+    .share-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .info-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .info-box h4 {
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      background: #040507;
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      margin-top: 30px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 3, 5, 0.84);
+      display: none;
+      place-items: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal.open {
+      display: grid;
+    }
+
+    .modal-content {
+      width: min(680px, 100%);
+      max-height: 85vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+
+    @media (max-width: 960px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <div class="brand-badge">M+</div>
+        <div>
+          <h1>MyMusic AI</h1>
+          <small>مشغل الكليبات المدمج • مترجم الصوت والفيديو الذكي • القاموس الموثوق</small>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button type="button" class="nav-btn" data-scroll="playerSection">المشغل</button>
+        <button type="button" class="nav-btn" data-scroll="translatorSection">مترجم AI والقاموس</button>
+        <button type="button" class="nav-btn" data-scroll="insightsSection">معلومات الكليب</button>
+        <button type="button" class="nav-btn" data-legal="about">من نحن</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- مساحة إعلانية علوية للربح -->
+    <div class="ad-slot" id="adTopBanner">
+      <span>مساحة إعلانية (728x90 / Responsive)</span>
+      ضع هنا كود إعلان Google AdSense أو رابط تسويق بالعمولة أو بانر رعاية
+    </div>
+
+    <div class="main-grid">
+      <!-- العمود الرئيسي -->
+      <div>
+        <section class="card" id="playerSection">
+          <div class="card-title">
+            <span>مشغل الكليبات والصوتيات داخل الموقع</span>
+            <small style="color:var(--accent);">يفتح داخل الصفحة بدون نوافذ خارجية</small>
+          </div>
+
+          <div class="input-row">
+            <input type="text" id="clipTitleInput" placeholder="اسم الأغنية أو الكليب (مثال: Blinding Lights)" />
+            <input type="text" id="clipArtistInput" placeholder="اسم الفنان (مثال: The Weeknd)" />
+          </div>
+
+          <div class="input-row">
+            <input type="url" id="clipUrlInput" placeholder="الصق رابط فيديو YouTube / Vevo أو رابط MP4/MP3 مباشر..." />
+            <button type="button" class="btn" id="playUrlBtn">تشغيل داخل الموقع</button>
+            <button type="button" class="btn btn-secondary" id="saveTrackBtn">حفظ في القائمة</button>
+          </div>
+
+          <div class="input-row" style="align-items:center;">
+            <label for="localMediaInput" style="font-size:0.9rem;color:var(--muted);">أو اختر ملف فيديو/صوت من جهازك للتشغيل والترجمة:</label>
+            <input type="file" id="localMediaInput" accept="audio/*,video/*" />
+          </div>
+
+          <div class="player-stage" id="playerStage">
+            <div class="player-placeholder">
+              <h3>ابدأ بتشغيل أي كليب أو أغنية هنا</h3>
+              <p>الصق رابط كليب من YouTube/Vevo أو ارفع ملف صوت/فيديو ليفتح مباشرة داخل الصفحة مع عرض نبذة الكليب والفنان.</p>
+            </div>
+          </div>
+
+          <div class="share-bar">
+            <button type="button" class="btn btn-small" id="shareNativeBtn">مشاركة مجانية</button>
+            <button type="button" class="btn btn-secondary btn-small" id="shareWhatsappBtn">نشر عبر واتساب</button>
+            <button type="button" class="btn btn-secondary btn-small" id="shareTelegramBtn">نشر عبر تيليجرام</button>
+            <button type="button" class="btn btn-secondary btn-small" id="fetchInfoBtn">تحديث نبذة الكليب وفريق العمل</button>
+          </div>
+        </section>
+
+        <!-- معلومات الكليب والفنان وفريق العمل والأخبار -->
+        <section class="card" id="insightsSection">
+          <div class="card-title">
+            <span>نبذة الكليب والفنان وفريق العمل والأخبار</span>
+            <small style="color:var(--muted);">Wikipedia + MusicBrainz + AI</small>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-box">
+              <h4>نبذة الفنان</h4>
+              <div id="artistBioBox" style="font-size:0.9rem;color:var(--muted);">شغّل كليباً أو أدخل اسم الفنان واضغط "تحديث نبذة الكليب".</div>
+            </div>
+            <div class="info-box">
+              <h4>الإصدار وفريق العمل</h4>
+              <div id="creditsBox" style="font-size:0.9rem;color:var(--muted);">تظهر هنا بيانات العمل والإنتاج الموثقة.</div>
+            </div>
+          </div>
+
+          <div class="result-box" id="aiInsightsBox" style="margin-top:14px;">سيظهر هنا تحليل الذكاء الاصطناعي حول الكليب، وفكرته، وفريق العمل، وأبرز الأخبار فور تشغيل الكليب.</div>
+        </section>
+
+        <!-- قائمة التشغيل المحفوظة -->
+        <section class="card">
+          <div class="card-title"><span>قائمة الكليبات المحفوظة</span></div>
+          <div id="playlistContainer"></div>
+        </section>
+      </div>
+
+      <!-- العمود الجانبي: المترجم + القاموس + الإعلان -->
+      <div>
+        <section class="card" id="translatorSection">
+          <div class="card-title"><span>مترجم AI والقاموس الموثوق</span></div>
+
+          <div class="tabs">
+            <button type="button" class="tab-btn active" data-tab="tabAiMedia">ترجمة فيديو/صوت AI</button>
+            <button type="button" class="tab-btn" data-tab="tabDictionary">القاموس المترجم</button>
+            <button type="button" class="tab-btn" data-tab="tabLiveMic">الاستماع المباشر</button>
+          </div>
+
+          <!-- التبويب 1: مترجم الصوت والفيديو AI -->
+          <div class="tab-panel active" id="tabAiMedia">
+            <p style="font-size:0.88rem;color:var(--muted);margin-bottom:10px;">
+              ارفع ملف فيديو أو صوت (حتى 4.5MB) ليقوم الذكاء الاصطناعي بتفريغه بدقة وترجمته لأي لغة.
+            </p>
+            <div class="input-row">
+              <input type="file" id="aiMediaFile" accept="audio/*,video/*" />
+            </div>
+            <div class="input-row">
+              <select id="aiTargetLang">
+                <option value="العربية">الترجمة إلى: العربية</option>
+                <option value="English">الترجمة إلى: الإنجليزية</option>
+                <option value="Français">الترجمة إلى: الفرنسية</option>
+                <option value="Español">الترجمة إلى: الإسبانية</option>
+                <option value="Deutsch">الترجمة إلى: الألمانية</option>
+                <option value="Türkçe">الترجمة إلى: التركية</option>
+                <option value="Italiano">الترجمة إلى: الإيطالية</option>
+                <option value="Português">الترجمة إلى: البرتغالية</option>
+                <option value="Русский">الترجمة إلى: الروسية</option>
+                <option value="日本語">الترجمة إلى: اليابانية</option>
+                <option value="한국어">الترجمة إلى: الكورية</option>
+                <option value="中文">الترجمة إلى: الصينية</option>
+                <option value="हिन्दी">الترجمة إلى: الهندية</option>
+                <option value="فارسی">الترجمة إلى: الفارسية</option>
+              </select>
+              <button type="button" class="btn" id="aiTranslateMediaBtn">تفريغ وترجمة بالذكاء الاصطناعي</button>
+            </div>
+            <div class="status-msg" id="aiMediaStatus"></div>
+
+            <div class="result-box">
+              <strong>النص الأصلي المستخرج:</strong>
+              <div id="aiTranscriptOut" style="margin-top:6px;color:var(--muted);">—</div>
+            </div>
+            <div class="result-box">
+              <strong>الترجمة بالذكاء الاصطناعي:</strong>
+              <div id="aiTranslationOut" style="margin-top:6px;color:var(--accent);">—</div>
+              <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+                <button type="button" class="btn btn-secondary btn-small" id="copyTranslationBtn">نسخ الترجمة</button>
+                <button type="button" class="btn btn-secondary btn-small" id="speakAiTranslationBtn">نطق الترجمة</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- التبويب 2: القاموس المترجم الموثوق -->
+          <div class="tab-panel" id="tabDictionary">
+            <div class="input-row">
+              <select id="dictFromLang">
+                <option value="en">من: الإنجليزية</option>
+                <option value="ar">من: العربية</option>
+                <option value="fr">من: الفرنسية</option>
+                <option value="es">من: الإسبانية</option>
+                <option value="de">من: الألمانية</option>
+                <option value="tr">من: التركية</option>
+                <option value="it">من: الإيطالية</option>
+                <option value="pt">من: البرتغالية</option>
+                <option value="ja">من: اليابانية</option>
+                <option value="ko">من: الكورية</option>
+                <option value="ru">من: الروسية</option>
+              </select>
+              <select id="dictToLang">
+                <option value="ar">إلى: العربية</option>
+                <option value="en">إلى: الإنجليزية</option>
+                <option value="fr">إلى: الفرنسية</option>
+                <option value="es">إلى: الإسبانية</option>
+                <option value="de">إلى: الألمانية</option>
+                <option value="tr">إلى: التركية</option>
+                <option value="it">إلى: الإيطالية</option>
+                <option value="pt">إلى: البرتغالية</option>
+                <option value="ja">إلى: اليابانية</option>
+                <option value="ko">إلى: الكورية</option>
+                <option value="ru">إلى: الروسية</option>
+              </select>
+            </div>
+            <div class="input-row">
+              <input type="text" id="dictQuery" placeholder="اكتب كلمة أو جملة من الأغنية للترجمة والشرح..." />
+              <button type="button" class="btn" id="dictSearchBtn">ترجمة وشرح</button>
+            </div>
+            <div class="result-box" id="dictOutput">ستظهر هنا الترجمة الموثوقة والتعريف والنطق.</div>
+
+            <h4 style="margin-top:14px;font-size:0.95rem;">قاموسي المحفوظ</h4>
+            <div id="vocabList" style="margin-top:8px;"></div>
+          </div>
+
+          <!-- التبويب 3: الاستماع المباشر -->
+          <div class="tab-panel" id="tabLiveMic">
+            <p style="font-size:0.88rem;color:var(--muted);margin-bottom:10px;">
+              التقاط الصوت المباشر من الميكروفون وترجمته لحظياً (مناسب عند تشغيل أغنية عبر السماعات).
+            </p>
+            <div class="input-row">
+              <select id="liveSrcLang">
+                <option value="en-US">لغة الصوت: الإنجليزية</option>
+                <option value="ar-EG">لغة الصوت: العربية</option>
+                <option value="fr-FR">لغة الصوت: الفرنسية</option>
+                <option value="es-ES">لغة الصوت: الإسبانية</option>
+                <option value="de-DE">لغة الصوت: الألمانية</option>
+                <option value="tr-TR">لغة الصوت: التركية</option>
+              </select>
+              <select id="liveDstLang">
+                <option value="ar">ترجم إلى: العربية</option>
+                <option value="en">ترجم إلى: الإنجليزية</option>
+                <option value="fr">ترجم إلى: الفرنسية</option>
+                <option value="es">ترجم إلى: الإسبانية</option>
+              </select>
+            </div>
+            <button type="button" class="btn" id="micLiveBtn" style="width:100%;">بدء الاستماع والترجمة الفورية</button>
+            <div class="result-box"><strong>المسموع:</strong> <span id="liveTranscriptBox">—</span></div>
+            <div class="result-box"><strong>الترجمة:</strong> <span id="liveTranslateBox" style="color:var(--accent);">—</span></div>
+          </div>
+        </section>
+
+        <!-- مساحة إعلانية جانبية للربح -->
+        <div class="ad-slot" id="adSidebar">
+          <span>مساحة إعلانية جانبية (300x250)</span>
+          ضع هنا كود إعلان AdSense أو عرض ترويجي مجاني لشركائك
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="javascript:void(0)" data-legal="privacy">سياسة الخصوصية</a>
+        <a href="javascript:void(0)" data-legal="terms">شروط الاستخدام</a>
+        <a href="javascript:void(0)" data-legal="about">من نحن</a>
+        <a href="javascript:void(0)" data-legal="contact">اتصل بنا</a>
+      </div>
+      <p>© 2026 MyMusic AI — جميع الحقوق محفوظة</p>
+    </div>
+  </footer>
+
+  <!-- نافذة الصفحات القانونية المطلوبة لقبول AdSense -->
+  <div class="modal" id="legalModal">
+    <div class="modal-content">
+      <div class="card-title">
+        <span id="legalTitle"></span>
+        <button type="button" class="btn btn-secondary btn-small" id="closeLegalModal">إغلاق</button>
+      </div>
+      <p id="legalBody" style="color:var(--muted);line-height:1.8;"></p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      function safeStorageGet(key, fallback) {
+        try {
+          var raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (e) {
+          return fallback;
+        }
+      }
+
+      function safeStorageSet(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {}
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function setStatus(el, msg, type) {
+        el.textContent = msg;
+        el.className = "status-msg " + (type || "");
+      }
+
+      async function safeFetchJson(url, options) {
+        var res = await fetch(url, options);
+        var text = await res.text();
+        var data = null;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          if (res.status === 404 || text.trim().indexOf("<") === 0) {
+            throw new Error("ملف الخادم functions/api/ai.js غير مضاف بعد في مستودع GitHub.");
+          }
+          throw new Error("استجابة غير متوقعة من الخادم (" + res.status + ").");
+        }
+        if (!res.ok) {
+          throw new Error((data && data.error) || "حدث خطأ من الخادم (" + res.status + ").");
+        }
+        return data;
+      }
+
+      function extractYouTubeId(input) {
+        var clean = (input || "").trim();
+        if (!clean) return null;
+        if (/^[a-zA-Z0-9_-]{11}$/.test(clean)) return clean;
+        try {
+          var url = new URL(clean);
+          if (url.hostname.indexOf("youtu.be") !== -1) {
+            return url.pathname.slice(1).split("/")[0];
+          }
+          if (url.searchParams.get("v")) {
+            return url.searchParams.get("v");
+          }
+          var parts = url.pathname.split("/").filter(Boolean);
+          var idx = parts.findIndex(function (p) {
+            return p === "embed" || p === "shorts" || p === "live";
+          });
+          if (idx !== -1 && parts[idx + 1]) return parts[idx + 1];
+        } catch (e) {
+          return null;
+        }
+        return null;
+      }
+
+      // التنقل السلس
+      document.querySelectorAll("[data-scroll]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var target = document.getElementById(btn.dataset.scroll);
+          if (target) target.scrollIntoView({ behavior: "smooth" });
+        });
+      });
+
+      var playerStage = document.getElementById("playerStage");
+      var clipTitleInput = document.getElementById("clipTitleInput");
+      var clipArtistInput = document.getElementById("clipArtistInput");
+      var clipUrlInput = document.getElementById("clipUrlInput");
+      var localMediaInput = document.getElementById("localMediaInput");
+      var aiMediaFileInput = document.getElementById("aiMediaFile");
+      var playlistContainer = document.getElementById("playlistContainer");
+
+      var activeLocalFile = null;
+      var savedPlaylist = safeStorageGet("mymusic_playlist", []);
+      var savedWords = safeStorageGet("mymusic_vocab", []);
+
+      function playEmbeddedYouTube(videoId, title, artist) {
+        if (!videoId) return;
+        playerStage.innerHTML =
+          '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&rel=0" ' +
+          'title="' + escapeHtml(title || "مشغل الكليبات") + '" ' +
+          'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+        if (title) clipTitleInput.value = title;
+        if (artist) clipArtistInput.value = artist;
+        if (title || artist) loadFullArtistAndClipInfo(title, artist);
+      }
+
+      function playLocalMediaFile(file) {
+        if (!file) return;
+        activeLocalFile = file;
+        var objectUrl = URL.createObjectURL(file);
+        var isAudio = file.type && file.type.indexOf("audio/") === 0;
+        playerStage.innerHTML = isAudio
+          ? '<audio controls autoplay src="' + objectUrl + '"></audio>'
+          : '<video controls autoplay playsinline src="' + objectUrl + '"></video>';
+
+        try {
+          var dt = new DataTransfer();
+          dt.items.add(file);
+          aiMediaFileInput.files = dt.files;
+        } catch (e) {}
+
+        var guessName = file.name.replace(/\.[^/.]+$/, "");
+        if (!clipTitleInput.value.trim()) clipTitleInput.value = guessName;
+      }
+
+      document.getElementById("playUrlBtn").addEventListener("click", function () {
+        var urlVal = clipUrlInput.value.trim();
+        var ytId = extractYouTubeId(urlVal);
+        var title = clipTitleInput.value.trim() || "كليب موسيقي";
+        var artist = clipArtistInput.value.trim() || "";
+
+        if (ytId) {
+          playEmbeddedYouTube(ytId, title, artist);
+          return;
+        }
+
+        if (/^https?:\/\/.+\.(mp4|webm|mp3|wav|m4a|ogg)(\?.*)?$/i.test(urlVal)) {
+          var isAudio = /\.(mp3|wav|m4a|ogg)(\?.*)?$/i.test(urlVal);
+          playerStage.innerHTML = isAudio
+            ? '<audio controls autoplay src="' + escapeHtml(urlVal) + '"></audio>'
+            : '<video controls autoplay playsinline src="' + escapeHtml(urlVal) + '"></video>';
+          if (title || artist) loadFullArtistAndClipInfo(title, artist);
+          return;
+        }
+
+        alert("يرجى إدخال رابط YouTube / Vevo صحيح أو رابط ملف فيديو/صوت مباشر (MP4 / MP3).");
+      });
+
+      localMediaInput.addEventListener("change", function (e) {
+        var file = e.target.files && e.target.files[0];
+        if (file) playLocalMediaFile(file);
+      });
+
+      aiMediaFileInput.addEventListener("change", function (e) {
+        if (e.target.files && e.target.files[0]) {
+          activeLocalFile = e.target.files[0];
+        }
+      });
+
+      document.getElementById("saveTrackBtn").addEventListener("click", function () {
+        var url = clipUrlInput.value.trim();
+        var title = clipTitleInput.value.trim() || "مقطع محفوظ";
+        var artist = clipArtistInput.value.trim() || "فنان غير محدد";
+        var ytId = extractYouTubeId(url);
+        if (!ytId && !url) {
+          alert("أدخل رابط الفيديو أولاً لحفظه في قائمتك.");
+          return;
+        }
+        savedPlaylist.unshift({ id: Date.now(), title: title, artist: artist, url: url, ytId: ytId });
+        savedPlaylist = savedPlaylist.slice(0, 30);
+        safeStorageSet("mymusic_playlist", savedPlaylist);
+        renderPlaylist();
+      });
+
+      function renderPlaylist() {
+        if (!savedPlaylist.length) {
+          playlistContainer.innerHTML =
+            '<p style="color:var(--muted);font-size:0.9rem;">قائمتك فارغة حالياً. الصق أي رابط كليب واضغط "حفظ في القائمة".</p>';
+          return;
+        }
+        playlistContainer.innerHTML = savedPlaylist
+          .map(function (item, idx) {
+            return (
+              '<div class="playlist-item">' +
+              '<div class="playlist-info"><strong>' + escapeHtml(item.title) + "</strong><small>" + escapeHtml(item.artist) + "</small></div>" +
+              '<div style="display:flex;gap:6px;">' +
+              '<button type="button" class="btn btn-small" data-pl-action="play" data-pl-idx="' + idx + '">تشغيل</button>' +
+              '<button type="button" class="btn btn-secondary btn-small" data-pl-action="delete" data-pl-idx="' + idx + '">حذف</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      playlistContainer.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-pl-action]");
+        if (!btn) return;
+        var idx = parseInt(btn.dataset.plIdx, 10);
+        var action = btn.dataset.plAction;
+        if (action === "play") {
+          var item = savedPlaylist[idx];
+          if (!item) return;
+          clipUrlInput.value = item.url || "";
+          clipTitleInput.value = item.title || "";
+          clipArtistInput.value = item.artist || "";
+          if (item.ytId) playEmbeddedYouTube(item.ytId, item.title, item.artist);
+          else document.getElementById("playUrlBtn").click();
+        } else if (action === "delete") {
+          savedPlaylist.splice(idx, 1);
+          safeStorageSet("mymusic_playlist", savedPlaylist);
+          renderPlaylist();
+        }
+      });
+
+      renderPlaylist();
+
+      // التبويبات
+      document.querySelectorAll(".tab-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var group = btn.closest(".card");
+          group.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.remove("active"); });
+          group.querySelectorAll(".tab-panel").forEach(function (p) { p.classList.remove("active"); });
+          btn.classList.add("active");
+          var panel = group.querySelector("#" + btn.dataset.tab);
+          if (panel) panel.classList.add("active");
+        });
+      });
+
+      // ترجمة الصوت والفيديو بالذكاء الاصطناعي
+      var aiMediaBtn = document.getElementById("aiTranslateMediaBtn");
+      var aiMediaStatus = document.getElementById("aiMediaStatus");
+      var aiTranscriptOut = document.getElementById("aiTranscriptOut");
+      var aiTranslationOut = document.getElementById("aiTranslationOut");
+
+      aiMediaBtn.addEventListener("click", async function () {
+        var file = (aiMediaFileInput.files && aiMediaFileInput.files[0]) || activeLocalFile;
+        var targetLang = document.getElementById("aiTargetLang").value;
+        if (!file) {
+          setStatus(aiMediaStatus, "اختر ملف صوت أو فيديو أولاً (أو شغّل ملفاً من جهازك).", "error");
+          return;
+        }
+        aiMediaBtn.disabled = true;
+        setStatus(aiMediaStatus, "جاري رفع الملف وتحليله وترجمته بالذكاء الاصطناعي... يرجى الانتظار.", "");
+        try {
+          var formData = new FormData();
+          formData.append("file", file);
+          formData.append("targetLang", targetLang);
+          var data = await safeFetchJson("/api/ai", { method: "POST", body: formData });
+          aiTranscriptOut.textContent = data.transcript || "لم يتم استخراج نص.";
+          aiTranslationOut.textContent = data.translation || "لم تتوفر ترجمة.";
+          setStatus(aiMediaStatus, "تمت الترجمة بنجاح عبر: " + (data.provider || "AI"), "success");
+        } catch (err) {
+          setStatus(aiMediaStatus, err.message, "error");
+        } finally {
+          aiMediaBtn.disabled = false;
+        }
+      });
+
+      document.getElementById("copyTranslationBtn").addEventListener("click", function () {
+        var txt = aiTranslationOut.textContent.trim();
+        if (!txt || txt === "—") return;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(txt).then(function () {
+            setStatus(aiMediaStatus, "تم نسخ الترجمة بنجاح.", "success");
+          });
+        }
+      });
+
+      document.getElementById("speakAiTranslationBtn").addEventListener("click", function () {
+        var txt = aiTranslationOut.textContent.trim();
+        if (!txt || txt === "—") return;
+        speakText(txt, "ar");
+      });
+
+      // الاستماع الفوري بالميكروفون
+      var recognition = null;
+      var micBtn = document.getElementById("micLiveBtn");
+      var liveTranscriptBox = document.getElementById("liveTranscriptBox");
+      var liveTranslateBox = document.getElementById("liveTranslateBox");
+
+      micBtn.addEventListener("click", function () {
+        var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+          alert("متصفحك لا يدعم ميزة التعرف الصوتي الفوري. استخدم Chrome أو Edge أو استخدم مترجم الملفات.");
+          return;
+        }
+        if (recognition) {
+          recognition.stop();
+          recognition = null;
+          micBtn.textContent = "بدء الاستماع والترجمة الفورية";
+          return;
+        }
+        var srcLang = document.getElementById("liveSrcLang").value;
+        var dstLang = document.getElementById("liveDstLang").value;
+        recognition = new SpeechRecognition();
+        recognition.lang = srcLang;
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.onresult = async function (event) {
+          var last = event.results[event.results.length - 1][0].transcript;
+          liveTranscriptBox.textContent = last;
+          liveTranslateBox.textContent = await translateTextMyMemory(last, srcLang.split("-")[0], dstLang);
+        };
+        recognition.onerror = function () {
+          micBtn.textContent = "بدء الاستماع والترجمة الفورية";
+          recognition = null;
+        };
+        recognition.start();
+        micBtn.textContent = "إيقاف الاستماع الفوري";
+      });
+
+      // القاموس المترجم الموثوق
+      var dictSearchBtn = document.getElementById("dictSearchBtn");
+      var dictInput = document.getElementById("dictQuery");
+      var dictOutput = document.getElementById("dictOutput");
+      var vocabListEl = document.getElementById("vocabList");
+
+      async function translateTextMyMemory(text, from, to) {
+        if (!text) return "";
+        if (from === to) return text;
+        var res = await fetch(
+          "https://api.mymemory.translated.net/get?q=" +
+            encodeURIComponent(text) +
+            "&langpair=" +
+            encodeURIComponent(from) +
+            "|" +
+            encodeURIComponent(to)
+        );
+        var data = await res.json();
+        return (data && data.responseData && data.responseData.translatedText) || "تعذرت الترجمة حالياً.";
+      }
+
+      function speakText(text, lang) {
+        if (!("speechSynthesis" in window)) return;
+        var utter = new SpeechSynthesisUtterance(text);
+        utter.lang = lang === "ar" ? "ar-SA" : lang;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utter);
+      }
+
+      dictSearchBtn.addEventListener("click", async function () {
+        var query = dictInput.value.trim();
+        var fromLang = document.getElementById("dictFromLang").value;
+        var toLang = document.getElementById("dictToLang").value;
+        if (!query) return;
+        dictOutput.textContent = "جاري البحث والترجمة من المصادر الموثوقة...";
+
+        try {
+          var translated = await translateTextMyMemory(query, fromLang, toLang);
+          var dictDetailsHtml = "";
+
+          if (fromLang === "en" && query.indexOf(" ") === -1) {
+            var dRes = await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(query));
+            if (dRes.ok) {
+              var dData = await dRes.json();
+              var entry = dData[0];
+              var phonetic = (entry && entry.phonetic) || "";
+              var meaning = entry && entry.meanings && entry.meanings[0];
+              var def = meaning && meaning.definitions && meaning.definitions[0] ? meaning.definitions[0].definition : "";
+              var ex = meaning && meaning.definitions && meaning.definitions[0] ? meaning.definitions[0].example : "";
+              dictDetailsHtml =
+                '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border-soft);">' +
+                "<div><strong>النطق الصوتي:</strong> " + escapeHtml(phonetic || "متاح عبر الزر") + " (" + escapeHtml((meaning && meaning.partOfSpeech) || "") + ")</div>" +
+                (def ? "<div><strong>التعريف الموثوق:</strong> " + escapeHtml(def) + "</div>" : "") +
+                (ex ? "<div><strong>مثال:</strong> <em>" + escapeHtml(ex) + "</em></div>" : "") +
+                "</div>";
+            }
+          }
+
+          dictOutput.innerHTML =
+            "<div><strong>النص:</strong> " + escapeHtml(query) + "</div>" +
+            '<div style="font-size:1.1rem;color:var(--accent);margin-top:6px;"><strong>الترجمة:</strong> ' + escapeHtml(translated) + "</div>" +
+            dictDetailsHtml +
+            '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">' +
+            '<button type="button" class="btn btn-secondary btn-small" id="speakSrcBtn">نطق النص</button>' +
+            '<button type="button" class="btn btn-secondary btn-small" id="speakDstBtn">نطق الترجمة</button>' +
+            '<button type="button" class="btn btn-small" id="saveWordBtn">حفظ في قاموسي</button>' +
+            "</div>";
+
+          document.getElementById("speakSrcBtn").addEventListener("click", function () {
+            speakText(query, fromLang);
+          });
+          document.getElementById("speakDstBtn").addEventListener("click", function () {
+            speakText(translated, toLang);
+          });
+          document.getElementById("saveWordBtn").addEventListener("click", function () {
+            savedWords.unshift({ word: query, translation: translated });
+            savedWords = savedWords.slice(0, 40);
+            safeStorageSet("mymusic_vocab", savedWords);
+            renderVocab();
+          });
+        } catch (e) {
+          dictOutput.textContent = "حدث خطأ أثناء الاتصال بالقاموس. تأكد من الاتصال بالإنترنت.";
+        }
+      });
+
+      function renderVocab() {
+        if (!savedWords.length) {
+          vocabListEl.innerHTML = '<small style="color:var(--muted);">لم تحفظ أي كلمات بعد.</small>';
+          return;
+        }
+        vocabListEl.innerHTML = savedWords
+          .map(function (w, i) {
+            return (
+              '<div class="playlist-item" style="margin-bottom:6px;">' +
+              "<span><strong>" + escapeHtml(w.word) + "</strong> — " + escapeHtml(w.translation) + "</span>" +
+              '<button type="button" class="btn btn-secondary btn-small" data-remove-vocab="' + i + '">×</button>' +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      vocabListEl.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-remove-vocab]");
+        if (!btn) return;
+        var idx = parseInt(btn.dataset.removeVocab, 10);
+        savedWords.splice(idx, 1);
+        safeStorageSet("mymusic_vocab", savedWords);
+        renderVocab();
+      });
+
+      renderVocab();
+
+      // نبذة الكليب والفنان وفريق العمل والأخبار
+      document.getElementById("fetchInfoBtn").addEventListener("click", function () {
+        loadFullArtistAndClipInfo(clipTitleInput.value.trim(), clipArtistInput.value.trim());
+      });
+
+      async function loadFullArtistAndClipInfo(title, artist) {
+        var bioBox = document.getElementById("artistBioBox");
+        var creditsBox = document.getElementById("creditsBox");
+        var aiInsightsBox = document.getElementById("aiInsightsBox");
+
+        if (!title && !artist) {
+          alert("أدخل اسم الكليب أو اسم الفنان لعرض النبذة وفريق العمل والأخبار.");
+          return;
+        }
+
+        bioBox.textContent = "جاري جلب السيرة الذاتية من Wikipedia...";
+        creditsBox.textContent = "جاري البحث عن بيانات العمل والفريق في MusicBrainz...";
+        aiInsightsBox.textContent = "جاري إعداد تحليل الذكاء الاصطناعي للكليب والأخبار...";
+
+        var wikiTarget = artist || title;
+        try {
+          var wRes = await fetch("https://ar.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(wikiTarget));
+          if (!wRes.ok) {
+            wRes = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(wikiTarget));
+          }
+          if (wRes.ok) {
+            var wData = await wRes.json();
+            bioBox.innerHTML =
+              "<strong>" + escapeHtml(wData.title || wikiTarget) + '</strong><p style="margin-top:6px;">' + escapeHtml(wData.extract || "لا يوجد ملخص.") + "</p>";
+          } else {
+            bioBox.textContent = "لم يتم العثور على صفحة ويكيبيديا مطابقة تماماً للاسم المدخل.";
+          }
+        } catch (e) {
+          bioBox.textContent = "تعذر الاتصال بـ Wikipedia حالياً.";
+        }
+
+        try {
+          var parts = [];
+          if (title) parts.push('recording:"' + title + '"');
+          if (artist) parts.push('artist:"' + artist + '"');
+          var q = parts.join(" AND ") || wikiTarget;
+          var mbRes = await fetch("https://musicbrainz.org/ws/2/recording/?query=" + encodeURIComponent(q) + "&fmt=json&limit=3");
+          if (mbRes.ok) {
+            var mbData = await mbRes.json();
+            var recs = mbData.recordings || [];
+            if (recs.length) {
+              creditsBox.innerHTML = recs
+                .map(function (r) {
+                  var artists = (r["artist-credit"] || []).map(function (a) { return a.name; }).join("، ");
+                  var release = (r.releases && r.releases[0] && r.releases[0].title) || "إصدار مفرد";
+                  var date = r["first-release-date"] || "غير محدد";
+                  return (
+                    '<div style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border-soft);">' +
+                    "<strong>" + escapeHtml(r.title) + "</strong><br>" +
+                    "<small>الفنانون: " + escapeHtml(artists) + " | الألبوم: " + escapeHtml(release) + " | السنة: " + escapeHtml(date) + "</small>" +
+                    "</div>"
+                  );
+                })
+                .join("");
+            } else {
+              creditsBox.textContent = "لا توجد بيانات مسجلة مطابقة في قاعدة بيانات MusicBrainz.";
+            }
+          }
+        } catch (e) {
+          creditsBox.textContent = "تعذر الاتصال بقاعدة بيانات MusicBrainz.";
+        }
+
+        try {
+          var aiData = await safeFetchJson("/api/ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "clip_insights", title: title, artist: artist })
+          });
+          aiInsightsBox.textContent = aiData.insights || "لم تتوفر نتيجة.";
+        } catch (err) {
+          aiInsightsBox.textContent = err.message;
+        }
+      }
+
+      // الدعاية والمشاركة المجانية
+      document.getElementById("shareNativeBtn").addEventListener("click", async function () {
+        var shareData = {
+          title: (clipTitleInput.value || "MyMusic AI") + " — استمع وترجم الكليبات بالذكاء الاصطناعي",
+          text: "شاهد وترجم الكليبات والأغاني بالذكاء الاصطناعي والقاموس الفوري مجاناً:",
+          url: window.location.href
+        };
+        if (navigator.share) {
+          await navigator.share(shareData).catch(function () {});
+        } else if (navigator.clipboard) {
+          navigator.clipboard.writeText(window.location.href);
+          alert("تم نسخ رابط الموقع لمشاركته مجاناً!");
+        }
+      });
+
+      document.getElementById("shareWhatsappBtn").addEventListener("click", function () {
+        var text = encodeURIComponent("استمع وترجم الأغاني والكليبات بالذكاء الاصطناعي مجاناً: " + window.location.href);
+        window.open("https://wa.me/?text=" + text, "_blank");
+      });
+
+      document.getElementById("shareTelegramBtn").addEventListener("click", function () {
+        var u = encodeURIComponent(window.location.href);
+        var t = encodeURIComponent("منصة MyMusic AI لترجمة الكليبات والصوتيات بالذكاء الاصطناعي");
+        window.open("https://t.me/share/url?url=" + u + "&text=" + t, "_blank");
+      });
+
+      // الصفحات القانونية لقبول AdSense
+      var legalModal = document.getElementById("legalModal");
+      var legalTitle = document.getElementById("legalTitle");
+      var legalBody = document.getElementById("legalBody");
+
+      var legalPages = {
+        privacy: {
+          title: "سياسة الخصوصية",
+          body: "نحن نحترم خصوصية زوارنا. يستخدم الموقع التخزين المحلي (Local Storage) لحفظ قائمة التشغيل والكلمات على جهازك فقط، وقد تستخدم شبكات الإعلان الخارجية مثل Google AdSense ملفات تعريف الارتباط لعرض إعلانات ملائمة."
+        },
+        terms: {
+          title: "شروط الاستخدام وحقوق الملكية",
+          body: "يعمل الموقع كمنصة مساعدة لتشغيل الوسائط المدمجة رسمياً وترجمة الملفات التي يرفعها المستخدم لأغراض تعليمية وشخصية. جميع الحقوق التجارية والعلامات الصوتية والمرئية تعود لأصحابها الأصليين."
+        },
+        about: {
+          title: "من نحن",
+          body: "منصة MyMusic AI منصة تجمع بين تشغيل الكليبات المدمجة داخل الموقع، والترجمة الصوتية والمرئية بالذكاء الاصطناعي، والقاموس اللغوي الموثوق، وتقديم نبذات ومعلومات موسيقية غنية."
+        },
+        contact: {
+          title: "اتصل بنا",
+          body: "للتواصل بخصوص الإعلانات أو الرعاية أو حقوق الملكية أو الدعم الفني، يمكنك مراسلتنا عبر البريد الإلكتروني الخاص بإدارة الموقع."
+        }
+      };
+
+      document.querySelectorAll("[data-legal]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var page = legalPages[btn.dataset.legal];
+          if (!page) return;
+          legalTitle.textContent = page.title;
+          legalBody.textContent = page.body;
+          legalModal.classList.add("open");
+        });
+      });
+
+      document.getElementById("closeLegalModal").addEventListener("click", function () {
+        legalModal.classList.remove("open");
+      });
+    })();
+  </script>
+</body>
+</html>
