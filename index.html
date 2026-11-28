@@ -662,6 +662,7 @@
               <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
                 <button type="button" class="btn btn-secondary btn-small" id="copyTranslationBtn">نسخ الترجمة</button>
                 <button type="button" class="btn btn-secondary btn-small" id="speakAiTranslationBtn">نطق الترجمة</button>
+                <button type="button" class="btn btn-secondary btn-small" id="downloadSrtBtn">تنزيل الترجمة SRT</button>
               </div>
             </div>
             <div class="result-box" id="dubStudio" style="margin-top:12px;border:1px solid rgba(255,176,74,.35);">
@@ -686,6 +687,8 @@
                 <button type="button" class="btn btn-secondary" id="stopDubBtn" disabled>إيقاف الدبلجة</button>
                 <button type="button" class="btn btn-secondary" id="downloadDubBtn" disabled>تنزيل مسار الدبلجة WAV</button>
               </div>
+              <div class="progress-track" role="progressbar" aria-label="تقدم إنشاء الدبلجة" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="dubProgressFill"></div></div>
+              <div class="progress-meta"><span id="dubProgressLabel">جاهز لإنشاء الدبلجة</span><strong id="dubProgressPercent">0%</strong></div>
               <div class="status-msg" id="dubStatus">ابدأ أولاً باستخراج الصوت وترجمة الحوار. يدعم الدبلجة إلى اللغات الموجودة في قائمة الترجمة.</div>
               <audio id="dubPreviewAudio" controls style="display:none;width:100%;margin-top:10px;"></audio>
             </div>
@@ -1120,10 +1123,17 @@
         for(var i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
         return bytes.buffer;
       }
+      function updateDubProgress(percent,label){
+        var value=Math.max(0,Math.min(100,Math.round(percent||0)));
+        document.getElementById("dubProgressFill").style.width=value+"%";
+        document.getElementById("dubProgressPercent").textContent=value+"%";
+        document.getElementById("dubProgressLabel").textContent=label||"";
+        document.getElementById("dubProgressFill").parentElement.setAttribute("aria-valuenow",String(value));
+      }
       async function generateDubbingTrack() {
         if(!subtitleCues.length) throw new Error("استخرج الترجمة أولاً قبل إنشاء الدبلجة.");
         var total=subtitleCues.length, made=[];
-        dubSegments=[]; dubScheduled.clear();
+        dubSegments=[]; dubScheduled.clear(); updateDubProgress(0,"بدء إنشاء الصوت...");
         if(!dubAudioContext) dubAudioContext=new (window.AudioContext||window.webkitAudioContext)();
         for(var offset=0;offset<total;offset+=4) {
           var batch=subtitleCues.slice(offset,offset+4).map(function(c){return {startMs:c.start,endMs:c.end,text:c.text};});
@@ -1147,16 +1157,18 @@
             made.push({startMs:item.startMs,endMs:item.endMs,buffer:buffer});
           }
           dubSegments=made.slice();
+          updateDubProgress(made.length/total*100,"تم إنشاء "+made.length+" من "+total+" مقطع صوتي");
           setStatus(dubStatus,"تم توليد "+made.length+" من "+total+" مقطع صوتي ("+Math.round(made.length/total*100)+"%).","");
         }
         dubSegments=made;
         playDubBtn.disabled=false; stopDubBtn.disabled=false; downloadDubBtn.disabled=false;
-        setStatus(dubStatus,"اكتملت الدبلجة الصوتية الحقيقية باستخدام Gemini TTS. يمكنك تشغيلها متزامنة مع الفيديو أو تنزيلها كملف WAV.","success");
+        updateDubProgress(100,"اكتملت الدبلجة 100%");
+        setStatus(dubStatus,"اكتملت الدبلجة الصوتية باستخدام Gemini TTS. يمكنك تشغيلها متزامنة مع الفيديو أو تنزيل مسار WAV.","success");
       }
       generateDubBtn.addEventListener("click",async function(){
         var btn=this; btn.disabled=true; playDubBtn.disabled=true; downloadDubBtn.disabled=true;
         try { await generateDubbingTrack(); }
-        catch(e){setStatus(dubStatus,e.message,"error");}
+        catch(e){updateDubProgress(0,"تعذر إكمال الدبلجة");setStatus(dubStatus,e.message,"error");}
         finally{btn.disabled=false;}
       });
 
@@ -1445,6 +1457,14 @@
         var txt = aiTranslationOut.textContent.trim();
         if (!txt || txt === "—") return;
         speakText(txt, "ar");
+      });
+      document.getElementById("downloadSrtBtn").addEventListener("click",function(){
+        var txt=aiTranslationOut.textContent.trim();
+        if(!txt||txt==="—"){setStatus(aiMediaStatus,"أنشئ الترجمة أولاً قبل تنزيل ملف SRT.","error");return;}
+        var blob=new Blob([txt.replace(/\\n/g,"\n")],{type:"application/x-subrip;charset=utf-8"});
+        var url=URL.createObjectURL(blob),a=document.createElement("a");
+        a.href=url;a.download="MyMusic-translation.srt";a.click();
+        setTimeout(function(){URL.revokeObjectURL(url);},30000);
       });
 
       // الاستماع الفوري بالميكروفون
