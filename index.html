@@ -589,9 +589,11 @@
           <select id="socialTargetLang" aria-label="لغة الترجمة">
             <option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="tr">Türkçe</option><option value="hi">हिन्दी</option><option value="ur">اردو</option><option value="pt">Português</option><option value="ru">Русский</option><option value="ja">日本語</option><option value="zh">中文</option>
           </select>
-          <textarea id="socialTextToTranslate" rows="5" placeholder="الصق وصف المنشور أو النص الذي تريد ترجمته..."></textarea>
-          <button type="button" class="btn" id="socialTranslateBtn">ترجمة النص بالذكاء الاصطناعي</button>
-          <div id="socialTranslationResult" class="result-box" aria-live="polite">ستظهر الترجمة هنا.</div>
+          <label class="social-small" for="socialTranslationMode" style="display:block;margin:9px 0 5px">طريقة الترجمة</label>
+          <select id="socialTranslationMode" aria-label="طريقة الترجمة"><option value="auto" selected>تلقائي عند إدخال النص</option><option value="manual">يدوي عند الضغط فقط</option></select>
+          <textarea id="socialTextToTranslate" rows="5" placeholder="الصق وصف المنشور أو الكلام/النص الظاهر في الريلز أو الفيديو هنا..."></textarea>
+          <button type="button" class="btn" id="socialTranslateBtn">ترجمة الآن</button>
+          <div id="socialTranslationResult" class="result-box" aria-live="polite">في الوضع التلقائي ستبدأ الترجمة عند إدخال النص. في الوضع اليدوي اضغط «ترجمة الآن».</div>
         </div>
       </div>
       <div class="social-panel" style="margin-top:14px">
@@ -1837,13 +1839,21 @@
           }catch(e){publicStatus.textContent=e.message;publicStatus.classList.add("error");}
           finally{loadBtn.disabled=false;}
         });
-        document.getElementById("socialTranslateBtn").addEventListener("click",async function(){
-          var text=document.getElementById("socialTextToTranslate").value.trim(),lang=document.getElementById("socialTargetLang").value,out=document.getElementById("socialTranslationResult"),btn=this;
-          if(!text){out.textContent="الصق النص المراد ترجمته أولاً.";return;}
-          btn.disabled=true;out.textContent="جارٍ الترجمة بالذكاء الاصطناعي...";
-          try{var r=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"ترجم النص التالي ترجمة دقيقة وطبيعية إلى اللغة ذات الرمز "+lang+". أعد الترجمة فقط مع الحفاظ على المعنى والنبرة. النص:\n"+text})});var d=await r.json();if(!r.ok)throw new Error(d.error||"تعذرت الترجمة.");out.textContent=d.text||"لم تصل نتيجة ترجمة.";}
-          catch(e){out.textContent=e.message;}finally{btn.disabled=false;}
-        });
+        var socialTranslateTimer=null,socialLastTranslationKey="",socialTranslationBusy=false;
+        async function translateSocialText(){
+          var text=document.getElementById("socialTextToTranslate").value.trim(),lang=document.getElementById("socialTargetLang").value,out=document.getElementById("socialTranslationResult"),btn=document.getElementById("socialTranslateBtn");
+          if(!text){out.textContent="أدخل أو الصق نص المنشور أو الكلام المراد ترجمته.";return;}
+          if(text.length>3500){out.textContent="النص طويل جدًا للترجمة السريعة. قسّمه إلى أجزاء أقصر.";return;}
+          var key=lang+"|"+text;if(key===socialLastTranslationKey||socialTranslationBusy)return;
+          socialTranslationBusy=true;btn.disabled=true;out.textContent="جارٍ ترجمة النص تلقائيًا بالذكاء الاصطناعي...";
+          try{var r=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"ترجم النص التالي ترجمة دقيقة وطبيعية إلى اللغة ذات الرمز "+lang+". أعد الترجمة فقط دون شرح، مع الحفاظ على المعنى والنبرة. النص:\\n"+text})});var d=await r.json();if(!r.ok)throw new Error(d.error||"تعذرت الترجمة.");out.textContent=d.text||"لم تصل نتيجة ترجمة.";socialLastTranslationKey=key;}
+          catch(e){out.textContent=e.message;}finally{socialTranslationBusy=false;btn.disabled=false;}
+        }
+        function scheduleSocialAutoTranslation(){clearTimeout(socialTranslateTimer);if(document.getElementById("socialTranslationMode").value!=="auto")return;socialTranslateTimer=setTimeout(translateSocialText,650);}
+        document.getElementById("socialTextToTranslate").addEventListener("input",function(){socialLastTranslationKey="";scheduleSocialAutoTranslation();});
+        document.getElementById("socialTargetLang").addEventListener("change",function(){socialLastTranslationKey="";scheduleSocialAutoTranslation();});
+        document.getElementById("socialTranslationMode").addEventListener("change",function(){socialLastTranslationKey="";if(this.value==="auto")scheduleSocialAutoTranslation();else{clearTimeout(socialTranslateTimer);document.getElementById("socialTranslationResult").textContent="الوضع اليدوي: اضغط «ترجمة الآن» لبدء الترجمة.";}});
+        document.getElementById("socialTranslateBtn").addEventListener("click",function(){clearTimeout(socialTranslateTimer);socialLastTranslationKey="";translateSocialText();});
         async function refreshAuthorizedFeed(){
           var status=document.getElementById("socialAccountStatus"),feed=document.getElementById("socialAccountFeed"),btn=document.getElementById("socialRefreshAccountBtn");
           btn.disabled=true;status.textContent="جارٍ التحقق من الحسابات والصلاحيات المصرح بها...";feed.replaceChildren();
