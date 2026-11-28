@@ -1809,7 +1809,31 @@
         function tickSubtitle(){if(!subtitleRunning)return;var now=performance.now();subtitleClock+=(now-subtitleLastTick)/1000;subtitleLastTick=now;paintSubtitle();subtitleTimer=requestAnimationFrame(tickSubtitle);}
         document.getElementById("socialSrtFile").addEventListener("change",async function(){var file=this.files&&this.files[0];if(!file)return;document.getElementById("socialSrtText").value=await file.text();subtitleStatus.textContent="تم تحميل الملف. اضغط عرض الترجمة على الشاشة أو ترجم التوقيتات." ;});
         document.getElementById("socialApplySrtBtn").addEventListener("click",function(){subtitleCues=parseSocialSrt(document.getElementById("socialSrtText").value);subtitleClock=0;paintSubtitle();subtitleStatus.textContent=subtitleCues.length?"تم تجهيز "+subtitleCues.length+" سطر ترجمة بالتوقيت. اضبط ساعة المزامنة لتوافق بداية الفيديو.":"لم يتم العثور على توقيتات SRT صحيحة.";});
-        document.getElementById("socialTranslateSrtBtn").addEventListener("click",async function(){var raw=document.getElementById("socialSrtText").value.trim(),lang=document.getElementById("socialTargetLang").value,btn=this;if(!raw){subtitleStatus.textContent="حمّل أو الصق ملف SRT أولاً.";return;}btn.disabled=true;subtitleStatus.textContent="جارٍ ترجمة النص مع الإبقاء على أرقام الأسطر والتوقيتات...";try{var r=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"Translate only the subtitle dialogue in this SRT file into language code "+lang+". Preserve every sequence number, timestamp line, blank line, and SRT structure exactly. Do not add explanations or markdown fences. SRT:\n"+raw})});var d=await r.json();if(!r.ok)throw new Error(d.error||"تعذرت ترجمة ملف التوقيتات.");document.getElementById("socialSrtText").value=d.text||"";subtitleCues=parseSocialSrt(d.text||"");subtitleClock=0;paintSubtitle();subtitleStatus.textContent="اكتملت ترجمة "+subtitleCues.length+" سطر مع الاحتفاظ بالتوقيتات. اضغط بدء ساعة الترجمة عند بداية الفيديو."; }catch(e){subtitleStatus.textContent=e.message;}finally{btn.disabled=false;}});
+        document.getElementById("socialTranslateSrtBtn").addEventListener("click",async function(){
+          var raw=document.getElementById("socialSrtText").value.trim(),lang=document.getElementById("socialTargetLang").value,btn=this;
+          if(!raw){subtitleStatus.textContent="حمّل أو الصق ملف SRT أولاً.";return;}
+          var blocks=raw.replace(/\\r/g,"").split(/\\n\\s*\\n/).map(function(x){return x.trim();}).filter(Boolean),batches=[],batch="",batchCount=0;
+          blocks.forEach(function(block){if(batch&&(batch.length+block.length+2>2800||batchCount>=12)){batches.push(batch);batch="";batchCount=0;}batch+=(batch?"\\n\\n":"")+block;batchCount++;});
+          if(batch)batches.push(batch);
+          var translated=[],totalCues=parseSocialSrt(raw).length;
+          btn.disabled=true;
+          try{
+            for(var i=0;i<batches.length;i++){
+              subtitleStatus.textContent="جارٍ ترجمة الجزء "+(i+1)+" من "+batches.length+" مع تثبيت التوقيتات...";
+              var prompt="Translate only the dialogue text in this SRT segment into language code "+lang+". Preserve every cue number and every timestamp character-for-character. Keep the same number and order of cues. Return only valid SRT, no markdown or explanations.\\n\\n"+batches[i];
+              var r=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:prompt,maxOutputTokens:4096})});
+              var d=await r.json();if(!r.ok)throw new Error(d.error||"تعذرت ترجمة الجزء "+(i+1)+".");
+              var originalCues=parseSocialSrt(batches[i]),translatedCues=parseSocialSrt(d.text||"");
+              if(!originalCues.length||translatedCues.length!==originalCues.length)throw new Error("تعذر التحقق من توقيتات الجزء "+(i+1)+"؛ احتفظنا بالنص الأصلي دون استبداله.");
+              for(var j=0;j<originalCues.length;j++)if(originalCues[j].start!==translatedCues[j].start||originalCues[j].end!==translatedCues[j].end)throw new Error("غيّر النموذج توقيتًا في الجزء "+(i+1)+"؛ لم نعتمد الترجمة لحماية المزامنة.");
+              translated.push(String(d.text).replace(/^\\uFEFF/,"").trim());
+            }
+            var finalSrt=translated.join("\\n\\n");
+            document.getElementById("socialSrtText").value=finalSrt;subtitleCues=parseSocialSrt(finalSrt);subtitleClock=0;paintSubtitle();
+            subtitleStatus.textContent="اكتملت ترجمة "+subtitleCues.length+" سطر مع التحقق من ثبات التوقيتات. اضغط بدء ساعة الترجمة عند بداية الفيديو.";
+          }catch(e){subtitleStatus.textContent=e.message;}
+          finally{btn.disabled=false;}
+        });
         document.getElementById("socialSyncPlayBtn").addEventListener("click",function(){if(subtitleRunning)return;subtitleRunning=true;subtitleLastTick=performance.now();subtitleTimer=requestAnimationFrame(tickSubtitle);});
         document.getElementById("socialSyncPauseBtn").addEventListener("click",function(){subtitleRunning=false;if(subtitleTimer)cancelAnimationFrame(subtitleTimer);});
         document.getElementById("socialSyncResetBtn").addEventListener("click",function(){subtitleRunning=false;if(subtitleTimer)cancelAnimationFrame(subtitleTimer);subtitleClock=0;paintSubtitle();});
