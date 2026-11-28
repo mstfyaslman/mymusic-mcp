@@ -669,6 +669,17 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
               <button type="button" class="btn btn-secondary" id="socialLiveAudioStop" disabled>إيقاف الاستقبال</button>
             </div>
             <div id="socialLiveAudioStatus" class="status-msg" role="status">جاهز. يتطلب Chrome حديثاً وموافقتك على مشاركة صوت تبويب Facebook.</div>
+            <div class="social-subtitle-settings" id="socialDubPanel">
+              <strong>🎙️ دبلجة فورية للنص المترجم داخل المشغل</strong>
+              <p class="social-note">بعد استقبال صوت الفيديو وترجمته، أنشئ صوتاً عربياً أو باللغة المختارة عبر Google Gemini TTS. شغّل الدبلجة أو أوقفها متى شئت. قد يوجد تأخير قصير لأن الصوت يُعالج على أجزاء.</p>
+              <div class="social-sync-row">
+                <select id="socialDubVoice" aria-label="صوت الدبلجة"><option value="Kore">صوت نسائي واضح</option><option value="Aoede">صوت نسائي هادئ</option><option value="Puck">صوت رجالي حيوي</option><option value="Charon">صوت رجالي عميق</option><option value="Fenrir">صوت رجالي قوي</option><option value="Leda">صوت نسائي دافئ</option><option value="Orus">صوت رجالي ثابت</option><option value="Zephyr">صوت محايد</option></select>
+                <button type="button" class="btn" id="socialDubStart">إنشاء وتشغيل الدبلجة</button>
+                <button type="button" class="btn btn-secondary" id="socialDubStop" disabled>إيقاف الدبلجة</button>
+              </div>
+              <div id="socialDubStatus" class="status-msg" role="status">ابدأ استقبال الصوت أولاً حتى تتوفر جمل مترجمة.</div>
+              <audio id="socialDubAudio" controls style="width:100%;margin-top:8px;display:none"></audio>
+            </div>
           </div>
           <div class="social-subtitle-settings">
             <strong>ترجمة مرئية ومتزامنة على الشاشة</strong>
@@ -2091,6 +2102,36 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
         var socialLiveActive=false,socialDisplayStream=null,socialAudioStream=null,socialLiveRecorder=null,socialLiveStartedAt=0,socialLiveQueue=Promise.resolve(),socialLivePending=0;
         var socialLiveStartBtn=document.getElementById("socialLiveAudioStart"),socialLiveMicBtn=document.getElementById("socialLiveMicStart"),socialLiveStopBtn=document.getElementById("socialLiveAudioStop"),socialLiveStatus=document.getElementById("socialLiveAudioStatus");
         function socialLiveStatusText(message,isError){socialLiveStatus.textContent=message;socialLiveStatus.classList.toggle("error",!!isError);}
+        // Gemini TTS dubbing for the translated live Facebook/Instagram audio captions.
+        var socialDubQueue=[],socialDubRunning=false,socialDubStopRequested=false,socialDubAudio=document.getElementById("socialDubAudio"),socialDubStatus=document.getElementById("socialDubStatus"),socialDubStart=document.getElementById("socialDubStart"),socialDubStop=document.getElementById("socialDubStop");
+        function socialDubStatusText(message,isError){socialDubStatus.textContent=message;socialDubStatus.classList.toggle("error",!!isError);}
+        function socialBase64Blob(base64,mime){var raw=atob(base64),bytes=new Uint8Array(raw.length);for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return new Blob([bytes],{type:mime||"audio/wav"});}
+        async function socialCreateAndPlayDub(){
+          if(socialDubRunning)return;
+          var cues=subtitleCues.filter(function(c){return c.text&&c.end>c.start;}).slice(-4);
+          if(!cues.length){socialDubStatusText("لا توجد جمل مترجمة بعد. شغّل استقبال صوت الفيديو أولاً.",true);return;}
+          socialDubRunning=true;socialDubStopRequested=false;socialDubStart.disabled=true;socialDubStop.disabled=false;
+          try{
+            for(var i=0;i<cues.length&&!socialDubStopRequested;i+=4){
+              var batch=cues.slice(i,i+4).map(function(c){return{text:c.text,startMs:Math.max(0,Math.round(c.start)),endMs:Math.max(Math.round(c.start)+250,Math.round(c.end))};});
+              socialDubStatusText("ينشئ Gemini الصوت المترجم ("+Math.min(i+4,cues.length)+" من "+cues.length+")...");
+              var response=await fetch("/api/dub-speech",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cues:batch,targetLanguage:document.getElementById("socialTargetLang").value==="ar"?"العربية":document.getElementById("socialTargetLang").selectedOptions[0].textContent,voiceName:document.getElementById("socialDubVoice").value})});
+              var data=await response.json().catch(function(){return{};});if(!response.ok)throw new Error(data.error||"تعذر إنشاء الدبلجة.");
+              for(var j=0;j<(data.audio||[]).length&&!socialDubStopRequested;j++){
+                var item=data.audio[j],blob=socialBase64Blob(item.audioBase64,item.mimeType),objectUrl=URL.createObjectURL(blob);
+                socialDubAudio.src=objectUrl;socialDubAudio.style.display="block";
+                socialDubStatusText("تشغيل الدبلجة الصوتية — المقطع "+(i+j+1)+".");
+                await new Promise(function(resolve){var done=false;function finish(){if(done)return;done=true;socialDubAudio.removeEventListener("ended",finish);socialDubAudio.removeEventListener("error",finish);resolve();}socialDubAudio.addEventListener("ended",finish);socialDubAudio.addEventListener("error",finish);socialDubAudio.play().catch(finish);});
+                URL.revokeObjectURL(objectUrl);
+              }
+            }
+            if(!socialDubStopRequested)socialDubStatusText("انتهت دفعة الدبلجة. أعد الإنشاء بعد وصول جمل جديدة.");
+          }catch(error){socialDubStatusText(error.message||"حدث خطأ في الدبلجة.",true);}
+          finally{socialDubRunning=false;socialDubStart.disabled=false;socialDubStop.disabled=true;}
+        }
+        socialDubStart.addEventListener("click",socialCreateAndPlayDub);
+        socialDubStop.addEventListener("click",function(){socialDubStopRequested=true;socialDubAudio.pause();socialDubAudio.removeAttribute("src");socialDubStop.disabled=true;socialDubStatusText("تم إيقاف الدبلجة.");});
+
         function socialSrtTimestamp(ms){ms=Math.max(0,Math.round(ms));var h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000),v=ms%1000;return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")+","+String(v).padStart(3,"0");}
         async function socialProcessAudioChunk(blob,offsetMs){
           if(!blob||blob.size<500)return;
