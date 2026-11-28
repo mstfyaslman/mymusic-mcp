@@ -50,7 +50,7 @@ export async function onRequest({ request, env }) {
             contents: [{
               role: "user",
               parts: [
-                { fileData: { mimeType: "video/mp4", fileUri: videoUrl } },
+                { fileData: { mimeType: "video/*", fileUri: videoUrl } },
                 { text: prompt }
               ]
             }],
