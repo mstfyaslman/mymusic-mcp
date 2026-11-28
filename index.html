@@ -619,7 +619,8 @@
                 <option value="हिन्दी">الترجمة إلى: الهندية</option>
                 <option value="فارسی">الترجمة إلى: الفارسية</option>
               </select>
-              <button type="button" class="btn" id="aiTranslateMediaBtn">استخراج صوت الفيديو/الصوت وترجمته</button>
+              <button type="button" class="btn" id="aiTranslateMediaBtn">استخراج الكلام وترجمة الملف</button>
+              <button type="button" class="btn btn-secondary" id="extractAudioBtn">تحويل الفيديو إلى صوت ثم ترجمته</button>
               <button type="button" class="btn btn-secondary" id="translateCurrentVideoBtn">ترجمة الفيديو الجاري</button>
             </div>
             <div class="status-msg" id="aiMediaStatus"></div>
@@ -1208,23 +1209,67 @@
         var url=URL.createObjectURL(new Blob([vtt],{type:"text/vtt"}));
         var track=document.createElement("track"); track.kind="subtitles"; track.label="الترجمة"; track.srclang="ar"; track.src=url; track.default=true; video.appendChild(track);
       }
-      aiMediaBtn.addEventListener("click", async function () {
+      async function transcribeAndTranslateFile(file) {
+        if(!file) throw new Error("اختر ملف صوت أو فيديو أولاً.");
+        setStatus(aiMediaStatus,"جاري استخراج الكلام والصوت من الملف عبر Gemini...", "");
+        var formData=new FormData(); formData.append("file",file,file.name||"mymusic-media");
+        var data=await safeFetchJson("/api/transcribe",{method:"POST",body:formData});
+        aiTranscriptOut.textContent=data.text||"لم يتم استخراج نص.";
+        setStatus(aiMediaStatus,"تم استخراج الصوت والكلام. جاري الترجمة مع الاستعانة بقاموسك المحفوظ...", "");
+        var translated=await translateSrtText(data.text||"",document.getElementById("aiTargetLang").value);
+        aiTranslationOut.textContent=translated||"لم تتوفر ترجمة.";
+        subtitleCues=parseSrtCues(translated); attachLocalSubtitleTrack(translated);
+        setStatus(aiMediaStatus,"اكتمل استخراج الصوت والترجمة. عدد المقاطع: "+(data.cueCount||subtitleCues.length||"—")+". يمكنك الآن إنشاء الدبلجة الصوتية.","success");
+      }
+      aiMediaBtn.addEventListener("click",async function(){
         var file=(aiMediaFileInput.files&&aiMediaFileInput.files[0])||activeLocalFile;
-        var targetLang=document.getElementById("aiTargetLang").value;
-        if(!file){setStatus(aiMediaStatus,"اختر ملف صوت أو فيديو أولاً.","error");return;}
-        aiMediaBtn.disabled=true; setStatus(aiMediaStatus,"جاري استخراج الكلام والتوقيتات من الملف...","");
-        try {
-          var formData=new FormData(); formData.append("file",file);
-          var data=await safeFetchJson("/api/transcribe",{method:"POST",body:formData});
-          aiTranscriptOut.textContent=data.text||"لم يتم استخراج نص.";
-          setStatus(aiMediaStatus,"تم استخراج النص. جاري ترجمة المقاطع...","");
-          var translated=await translateSrtText(data.text||"",targetLang);
-          aiTranslationOut.textContent=translated||"لم تتوفر ترجمة.";
-          subtitleCues=parseSrtCues(translated); attachLocalSubtitleTrack(translated);
-          setStatus(aiMediaStatus,"اكتمل استخراج النص وترجمته. عدد المقاطع: "+(data.cueCount||"—"),"success");
-        } catch(err){setStatus(aiMediaStatus,err.message,"error");}
-        finally{aiMediaBtn.disabled=false;}
+        this.disabled=true;
+        try{await transcribeAndTranslateFile(file);}
+        catch(err){setStatus(aiMediaStatus,err.message,"error");}
+        finally{this.disabled=false;}
       });
+      document.getElementById("extractAudioBtn").addEventListener("click",async function(){
+        var btn=this, file=(aiMediaFileInput.files&&aiMediaFileInput.files[0])||activeLocalFile;
+        if(!file){setStatus(aiMediaStatus,"اختر فيديو أو صوتاً أولاً.","error");return;}
+        btn.disabled=true;
+        try{
+          if(!file.type.startsWith("video/")) {
+            setStatus(aiMediaStatus,"الملف صوتي بالفعل؛ جاري إرساله إلى Gemini مباشرة...","");
+            await transcribeAndTranslateFile(file); return;
+          }
+          var video=playerStage.querySelector("video");
+          var capture=video&&(video.captureStream||video.mozCaptureStream);
+          if(!capture) {
+            setStatus(aiMediaStatus,"المتصفح لا يدعم استخراج مسار الصوت محلياً؛ سيرسل MyMusic الفيديو نفسه إلى Gemini ليستخرج الصوت داخلياً...","");
+            await transcribeAndTranslateFile(file); return;
+          }
+          var stream=capture.call(video), audioTracks=stream.getAudioTracks();
+          if(!audioTracks.length) {
+            setStatus(aiMediaStatus,"لم يُعثر على مسار صوت قابل للاستخراج؛ سيرسل الفيديو إلى Gemini لتحليل الصوت داخلياً...","");
+            await transcribeAndTranslateFile(file); return;
+          }
+          var audioStream=new MediaStream(audioTracks), mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":"audio/webm";
+          var recorder=new MediaRecorder(audioStream,{mimeType:mimeType}), chunks=[];
+          setStatus(aiMediaStatus,"جاري تشغيل الفيديو واستخراج مسار الصوت فقط. لا تغلق الصفحة حتى ينتهي الاستخراج...","");
+          var extractedBlob=await new Promise(function(resolve,reject){
+            recorder.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data);};
+            recorder.onerror=function(){reject(new Error("تعذر تسجيل مسار الصوت من الفيديو."));};
+            recorder.onstop=function(){resolve(new Blob(chunks,{type:"audio/webm"}));};
+            video.currentTime=0;
+            recorder.start(500);
+            video.play().catch(function(err){recorder.stop();reject(err);});
+            video.onended=function(){if(recorder.state!=="inactive")recorder.stop();};
+          });
+          if(!extractedBlob.size)throw new Error("لم يتم استخراج صوت من الفيديو.");
+          var extractedFile=new File([extractedBlob],"MyMusic-extracted-audio.webm",{type:"audio/webm"});
+          activeLocalFile=extractedFile;
+          try{var dt=new DataTransfer();dt.items.add(extractedFile);aiMediaFileInput.files=dt.files;}catch(e){}
+          setStatus(aiMediaStatus,"تم تحويل مسار صوت الفيديو إلى ملف صوتي. جاري تمريره إلى Gemini للترجمة...","");
+          await transcribeAndTranslateFile(extractedFile);
+        }catch(err){setStatus(aiMediaStatus,"تعذر استخراج الصوت محلياً: "+err.message+" — يمكنك استخدام زر ترجمة الملف لإرسال الفيديو مباشرة إلى Gemini.","error");}
+        finally{btn.disabled=false;}
+      });
+
       document.getElementById("translateCurrentVideoBtn").addEventListener("click",async function(){
         if(!currentYouTubeId){setStatus(aiMediaStatus,"شغّل فيديو YouTube/VEVO أولاً أو ارفع ملفاً من جهازك.","error");return;}
         var btn=this;btn.disabled=true;
