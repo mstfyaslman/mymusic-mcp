@@ -481,6 +481,22 @@
         grid-template-columns: 1fr;
       }
     }
+  
+    /* Social World: keep the existing black / navy / burgundy / white palette */
+    .social-world-card{margin:18px 0;background:#0b1830;border:1px solid #65172b;border-radius:16px;padding:16px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+    .social-world-card .social-note{color:#fff;opacity:.82;font-size:.88rem;margin:5px 0 12px}
+    .social-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.8fr);gap:14px}
+    .social-panel{background:#10213d;border:1px solid #65172b;border-radius:12px;padding:12px;min-width:0}
+    .social-platforms{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .social-platforms button{background:#0b1830;color:#fff;border:1px solid #65172b;border-radius:9px;padding:7px 12px;font:inherit;cursor:pointer}
+    .social-platforms button.active{background:#65172b;border-color:#fff}
+    .social-embed-stage{min-height:180px;background:#050608;border:1px solid #65172b;border-radius:10px;padding:10px;overflow:auto;display:grid;place-items:center}
+    .social-embed-stage blockquote{max-width:100%!important}
+    .social-account-item{background:#0b1830;border:1px solid #65172b;border-radius:10px;padding:10px;margin:8px 0}
+    .social-account-item img,.social-account-item video{width:100%;max-height:260px;object-fit:contain;border-radius:8px;background:#050608}
+    .social-small{font-size:.8rem;opacity:.8}
+    @media(max-width:760px){.social-grid{grid-template-columns:1fr}.social-world-card{padding:12px}}
+
   </style>
 </head>
 <body>
@@ -521,6 +537,40 @@
         <div class="workshop-tile">⚙️<strong>ورشة المهندسين</strong><small>مصطلحات تقنية وهندسية وترجمة الشروحات</small></div>
         <div class="workshop-tile">🩺<strong>ورشة الأطباء</strong><small>مصطلحات طبية ومحاضرات علمية</small></div>
         <div class="workshop-tile">💡<strong>ورشة الجميع</strong><small>تعلم اللغات والمهارات والمحتوى العام</small></div>
+      </div>
+    </section>
+
+
+    <section class="social-world-card" id="socialWorldSection">
+      <div class="card-title"><span>🌐 Social World — عالم التواصل</span><small>Facebook • Instagram • ترجمة متعددة اللغات</small></div>
+      <p class="social-note">شاهد المنشورات والريلز العامة داخل MyMusic، أو اربط حساباً احترافياً تملكه أو لديك تصريح لإدارته. المحتوى يظل داخل هذه الصفحة قدر الإمكان.</p>
+      <div class="social-grid">
+        <div class="social-panel">
+          <strong>عرض منشور عام داخل الموقع</strong>
+          <div class="social-platforms"><button type="button" class="active" data-social-platform="facebook">Facebook</button><button type="button" data-social-platform="instagram">Instagram</button></div>
+          <div class="input-row"><input id="socialPublicUrl" type="url" placeholder="الصق رابط منشور أو Reel عام من Facebook أو Instagram"></div>
+          <button type="button" class="btn" id="socialLoadBtn">عرض داخل MyMusic</button>
+          <div id="socialPublicStatus" class="status-msg" role="status">يدعم المنشورات والريلز العامة. قصص Instagram والحسابات الخاصة لا يدعمها التضمين العام.</div>
+          <div id="socialEmbedStage" class="social-embed-stage"><span class="social-small">سيظهر المحتوى هنا داخل الموقع بعد إدخال رابطه.</span></div>
+        </div>
+        <div class="social-panel">
+          <strong>ترجمة محتوى التواصل</strong>
+          <p class="social-note">اختر لغة الترجمة والصق وصف المنشور أو التعليق أو النص الظاهر. لا يمكن قراءة صوت iframe المضمّن تلقائياً.</p>
+          <select id="socialTargetLang" aria-label="لغة الترجمة">
+            <option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="tr">Türkçe</option><option value="hi">हिन्दी</option><option value="ur">اردو</option><option value="pt">Português</option><option value="ru">Русский</option><option value="ja">日本語</option><option value="zh">中文</option>
+          </select>
+          <textarea id="socialTextToTranslate" rows="5" placeholder="الصق وصف المنشور أو النص الذي تريد ترجمته..."></textarea>
+          <button type="button" class="btn" id="socialTranslateBtn">ترجمة النص بالذكاء الاصطناعي</button>
+          <div id="socialTranslationResult" class="result-box" aria-live="polite">ستظهر الترجمة هنا.</div>
+        </div>
+      </div>
+      <div class="social-panel" style="margin-top:14px">
+        <div class="card-title"><span>ربط حساب تملكه أو لديك تصريح باستخدامه</span><small>تسجيل دخول رسمي من Meta</small></div>
+        <p class="social-note">يدعم هذا المسار صفحات Facebook وحسابات Instagram الاحترافية (Business/Creator) المرتبطة بصفحة Facebook. الحسابات الشخصية العادية لا تتيحها واجهة Instagram Graph API بهذا المسار.</p>
+        <button type="button" class="btn" id="socialConnectBtn">ربط حساب Facebook / Instagram</button>
+        <button type="button" class="btn btn-secondary" id="socialRefreshAccountBtn">تحديث المحتوى المصرح به</button>
+        <div id="socialAccountStatus" class="status-msg" role="status">يلزم إعداد تطبيق Meta ومفاتيحه وربط KV في Cloudflare قبل تفعيل تسجيل الدخول.</div>
+        <div id="socialAccountFeed"></div>
       </div>
     </section>
 
@@ -1711,6 +1761,65 @@
           aiInsightsBox.textContent = err.message;
         }
       }
+
+
+      // Social World: public Meta embeds + owner-authorized Meta account connection
+      (function initSocialWorld(){
+        var loadBtn=document.getElementById("socialLoadBtn");
+        if(!loadBtn)return;
+        var embedStage=document.getElementById("socialEmbedStage");
+        var publicStatus=document.getElementById("socialPublicStatus");
+        var platformButtons=[...document.querySelectorAll("[data-social-platform]")];
+        var platform="facebook";
+        platformButtons.forEach(function(b){b.addEventListener("click",function(){platform=b.dataset.socialPlatform;platformButtons.forEach(x=>x.classList.toggle("active",x===b));});});
+        var loadedMetaScripts={};
+        function loadEmbedScript(provider){
+          var src=provider==="Instagram"?"https://www.instagram.com/embed.js":"https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v27.0";
+          if(loadedMetaScripts[provider]){try{if(provider==="Instagram"&&window.instgrm)window.instgrm.Embeds.process();if(provider==="Facebook"&&window.FB)window.FB.XFBML.parse(embedStage);}catch(e){}return;}
+          loadedMetaScripts[provider]=true;var s=document.createElement("script");s.async=true;s.defer=true;s.src=src;s.onload=function(){try{if(provider==="Instagram"&&window.instgrm)window.instgrm.Embeds.process();if(provider==="Facebook"&&window.FB)window.FB.XFBML.parse(embedStage);}catch(e){}};document.head.appendChild(s);
+        }
+        loadBtn.addEventListener("click",async function(){
+          var url=document.getElementById("socialPublicUrl").value.trim();
+          if(!url){publicStatus.textContent="الصق رابط المنشور أولاً.";return;}
+          loadBtn.disabled=true;publicStatus.textContent="جارٍ التحقق من الرابط وجلب التضمين الرسمي من Meta...";
+          embedStage.replaceChildren();
+          try{
+            var res=await fetch("/api/social-embed",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:url})});
+            var data=await res.json();if(!res.ok)throw new Error(data.error||"تعذر عرض المنشور.");
+            embedStage.innerHTML=data.html;loadEmbedScript(data.provider);
+            publicStatus.textContent="تم تحميل كود التضمين الرسمي من "+data.provider+". إذا لم يظهر المنشور، فقد يكون خاصاً أو محذوفاً أو غير متاح في بلدك.";
+          }catch(e){publicStatus.textContent=e.message;publicStatus.classList.add("error");}
+          finally{loadBtn.disabled=false;}
+        });
+        document.getElementById("socialTranslateBtn").addEventListener("click",async function(){
+          var text=document.getElementById("socialTextToTranslate").value.trim(),lang=document.getElementById("socialTargetLang").value,out=document.getElementById("socialTranslationResult"),btn=this;
+          if(!text){out.textContent="الصق النص المراد ترجمته أولاً.";return;}
+          btn.disabled=true;out.textContent="جارٍ الترجمة بالذكاء الاصطناعي...";
+          try{var r=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"ترجم النص التالي ترجمة دقيقة وطبيعية إلى اللغة ذات الرمز "+lang+". أعد الترجمة فقط مع الحفاظ على المعنى والنبرة. النص:\n"+text})});var d=await r.json();if(!r.ok)throw new Error(d.error||"تعذرت الترجمة.");out.textContent=d.text||"لم تصل نتيجة ترجمة.";}
+          catch(e){out.textContent=e.message;}finally{btn.disabled=false;}
+        });
+        async function refreshAuthorizedFeed(){
+          var status=document.getElementById("socialAccountStatus"),feed=document.getElementById("socialAccountFeed"),btn=document.getElementById("socialRefreshAccountBtn");
+          btn.disabled=true;status.textContent="جارٍ التحقق من الحسابات والصلاحيات المصرح بها...";feed.replaceChildren();
+          try{
+            var r=await fetch("/api/social-account",{credentials:"same-origin"});var d=await r.json();
+            if(!r.ok)throw new Error(d.error||"الحساب غير متصل أو إعداد الربط غير مكتمل.");
+            if(!d.connected){status.textContent=d.expired?"انتهت صلاحية جلسة Meta. أعد ربط الحساب.":"لم يتم ربط حساب بعد. اضغط زر الربط بعد إعداد تطبيق Meta.";return;}
+            status.textContent="تم الاتصال باسم "+(d.name||"حساب Meta")+". العناصر المسترجعة: "+(d.items||[]).length;
+            (d.items||[]).forEach(function(item){
+              var card=document.createElement("article");card.className="social-account-item";
+              var heading=document.createElement("strong");heading.textContent=item.source+" · "+(item.account||"حساب مصرح به");card.appendChild(heading);
+              if(item.mediaUrl){try{var mediaUrl=new URL(item.mediaUrl);if(mediaUrl.protocol==="https:"){var media;if(String(item.mediaType).toUpperCase().includes("VIDEO")){media=document.createElement("video");media.controls=true;media.playsInline=true;}else{media=document.createElement("img");media.alt="محتوى من الحساب المصرح به";}media.src=mediaUrl.href;card.appendChild(media);}}catch(e){}}
+              if(item.caption){var p=document.createElement("p");p.textContent=item.caption;p.style.marginTop="8px";card.appendChild(p);}
+              if(item.permalink){var a=document.createElement("a");a.href=item.permalink;a.target="_blank";a.rel="noopener noreferrer";a.textContent="فتح المنشور الأصلي";card.appendChild(a);}
+              feed.appendChild(card);
+            });
+          }catch(e){status.textContent=e.message;}finally{btn.disabled=false;}
+        }
+        document.getElementById("socialConnectBtn").addEventListener("click",function(){window.location.href="/api/meta-connect";});
+        document.getElementById("socialRefreshAccountBtn").addEventListener("click",refreshAuthorizedFeed);
+        if(new URLSearchParams(location.search).get("social")==="connected")refreshAuthorizedFeed();
+      })();
 
       // الدعاية والمشاركة المجانية
       document.getElementById("shareNativeBtn").addEventListener("click", async function () {
