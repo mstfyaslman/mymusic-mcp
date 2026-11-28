@@ -573,7 +573,6 @@
               <button type="button" class="btn btn-secondary" id="socialLiveAudioStop" disabled>إيقاف الاستقبال</button>
             </div>
             <div id="socialLiveAudioStatus" class="status-msg" role="status">جاهز. يتطلب Chrome حديثاً وموافقتك على مشاركة صوت تبويب Facebook.</div>
-            <label class="social-small" style="display:block;margin-top:8px"><input type="checkbox" id="socialLiveShowOriginal" checked> إظهار النص الأصلي مع الترجمة</label>
           </div>
           <div class="social-subtitle-settings">
             <strong>ترجمة مرئية ومتزامنة على الشاشة</strong>
@@ -1903,6 +1902,82 @@
         document.getElementById("socialTargetLang").addEventListener("change",function(){socialTranslationRevision++;socialLastTranslationKey="";scheduleSocialAutoTranslation();});
         document.getElementById("socialTranslationMode").addEventListener("change",function(){socialTranslationRevision++;socialLastTranslationKey="";if(this.value==="auto")scheduleSocialAutoTranslation();else{clearTimeout(socialTranslateTimer);socialTranslationPending=false;document.getElementById("socialTranslationResult").textContent="الوضع اليدوي: اضغط «ترجمة الآن» لبدء الترجمة.";}});
         document.getElementById("socialTranslateBtn").addEventListener("click",function(){socialTranslationRevision++;socialLastTranslationKey="";clearTimeout(socialTranslateTimer);translateSocialText();});
+        // Live Facebook tab-audio capture: user-authorized browser sharing only.
+        var socialLiveActive=false,socialDisplayStream=null,socialAudioStream=null,socialLiveRecorder=null,socialLiveStartedAt=0,socialLiveSegmentStart=0;
+        var socialLiveStartBtn=document.getElementById("socialLiveAudioStart"),socialLiveStopBtn=document.getElementById("socialLiveAudioStop"),socialLiveStatus=document.getElementById("socialLiveAudioStatus");
+        function socialLiveStatusText(message,isError){socialLiveStatus.textContent=message;socialLiveStatus.classList.toggle("error",!!isError);}
+        function socialSrtTimestamp(ms){ms=Math.max(0,Math.round(ms));var h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000),v=ms%1000;return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")+","+String(v).padStart(3,"0");}
+        async function socialProcessAudioChunk(blob,offsetMs){
+          if(!blob||blob.size<500)return;
+          var form=new FormData();form.append("audio",blob,"facebook-tab-audio.webm");form.append("language",document.getElementById("socialTargetLang").value);form.append("offsetMs",String(Math.max(0,Math.round(offsetMs))));
+          socialLiveStatusText("يرسل المساعد مقطع الصوت إلى Google Gemini للتعرّف والترجمة...");
+          var response=await fetch("/api/social-live-translate",{method:"POST",body:form});
+          var data=await response.json().catch(()=>({}));
+          if(!response.ok)throw new Error(data.error||"تعذر تحليل صوت Facebook.");
+          var raw=String(data.text||"").replace(/```(?:srt)?/gi,"").trim();
+          if(!raw||raw==="NO_SPEECH")return;
+          var parsed=parseSocialSrt(raw),base=Number(data.offsetMs)||offsetMs;
+          if(!parsed.length){socialLiveStatusText("وصل الصوت، لكن لم تصل ترجمة بتوقيتات صالحة لهذا المقطع.",true);return;}
+          parsed.forEach(function(cue){cue.start+=base;cue.end+=base;subtitleCues.push(cue);});
+          subtitleCues.sort(function(a,b){return a.start-b.start;});
+          subtitleClock=Math.max(subtitleClock,(performance.now()-socialLiveStartedAt)/1000);
+          paintSubtitle();
+          socialLiveStatusText("المساعد يعمل — تمت إضافة "+parsed.length+" مقطع مترجم. قد يظهر تأخير بسيط بسبب معالجة الذكاء الاصطناعي.");
+        }
+        async function socialLiveCaptureLoop(){
+          var audioTracks=socialDisplayStream.getAudioTracks();
+          if(!audioTracks.length)throw new Error("لم يصل صوت من التبويب. أعد المحاولة واختر مشاركة تبويب Facebook مع تفعيل خيار مشاركة الصوت.");
+          socialAudioStream=new MediaStream(audioTracks);
+          var mimeOptions=["audio/webm;codecs=opus","audio/webm","audio/mp4"];
+          var mime=mimeOptions.find(function(x){return MediaRecorder.isTypeSupported(x);})||"";
+          while(socialLiveActive){
+            var chunks=[],recorder=mime?new MediaRecorder(socialAudioStream,{mimeType:mime}):new MediaRecorder(socialAudioStream);
+            socialLiveRecorder=recorder;
+            var segmentStart=performance.now()-socialLiveStartedAt;
+            var stopped=new Promise(function(resolve){recorder.addEventListener("stop",resolve,{once:true});});
+            recorder.addEventListener("dataavailable",function(event){if(event.data&&event.data.size)chunks.push(event.data);});
+            recorder.start();
+            await Promise.race([new Promise(function(resolve){setTimeout(resolve,8000);}),stopped]);
+            if(recorder.state!=="inactive")recorder.stop();
+            await stopped;
+            socialLiveRecorder=null;
+            if(chunks.length){
+              var blob=new Blob(chunks,{type:recorder.mimeType||"audio/webm"});
+              try{await socialProcessAudioChunk(blob,segmentStart);}
+              catch(error){socialLiveStatusText(error.message||"حدث خطأ أثناء ترجمة الصوت.",true);if(!socialLiveActive)break;await new Promise(function(resolve){setTimeout(resolve,1200);});}
+            }
+          }
+        }
+        async function startSocialLiveAudio(){
+          if(socialLiveActive)return;
+          if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia||typeof MediaRecorder==="undefined"){socialLiveStatusText("هذا المتصفح لا يدعم استقبال صوت التبويب. جرّب Chrome حديثاً على الكمبيوتر، أو استخدم رفع ملف الفيديو/الصوت من أداة الترجمة.",true);return;}
+          socialLiveStartBtn.disabled=true;socialLiveStatusText("افتح نافذة المشاركة واختر تبويب Facebook وفعّل مشاركة صوت التبويب...");
+          try{
+            socialDisplayStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
+            if(!socialDisplayStream.getAudioTracks().length){socialDisplayStream.getTracks().forEach(function(t){t.stop();});socialDisplayStream=null;throw new Error("لم يتم اختيار مشاركة الصوت. أعد المحاولة وفعّل مشاركة صوت التبويب في نافذة المتصفح.");}
+            socialLiveActive=true;socialLiveStartedAt=performance.now();subtitleCues=[];subtitleClock=0;
+            if(subtitleRunning&&subtitleTimer)cancelAnimationFrame(subtitleTimer);
+            subtitleRunning=true;subtitleLastTick=performance.now();subtitleTimer=requestAnimationFrame(tickSubtitle);
+            socialLiveStopBtn.disabled=false;
+            socialDisplayStream.getVideoTracks().forEach(function(track){track.addEventListener("ended",stopSocialLiveAudio,{once:true});});
+            socialLiveStatusText("بدأ استقبال صوت التبويب. اترك تبويب Facebook يعمل وسيعرض المساعد الترجمة هنا.");
+            await socialLiveCaptureLoop();
+          }catch(error){socialLiveStatusText(error.message||"تعذر بدء استقبال الصوت.",true);}
+          finally{
+            if(!socialLiveActive){socialLiveStartBtn.disabled=false;socialLiveStopBtn.disabled=true;}
+          }
+        }
+        function stopSocialLiveAudio(){
+          socialLiveActive=false;
+          if(socialLiveRecorder&&socialLiveRecorder.state!=="inactive"){try{socialLiveRecorder.stop();}catch(e){}}
+          if(socialDisplayStream){socialDisplayStream.getTracks().forEach(function(track){track.stop();});socialDisplayStream=null;}
+          if(socialAudioStream){socialAudioStream.getTracks().forEach(function(track){track.stop();});socialAudioStream=null;}
+          subtitleRunning=false;if(subtitleTimer)cancelAnimationFrame(subtitleTimer);
+          socialLiveStartBtn.disabled=false;socialLiveStopBtn.disabled=true;
+          socialLiveStatusText("تم إيقاف استقبال الصوت. يمكنك بدء جلسة جديدة متى شئت.");
+        }
+        socialLiveStartBtn.addEventListener("click",startSocialLiveAudio);
+        socialLiveStopBtn.addEventListener("click",stopSocialLiveAudio);
         async function refreshAuthorizedFeed(){
           var status=document.getElementById("socialAccountStatus"),feed=document.getElementById("socialAccountFeed"),btn=document.getElementById("socialRefreshAccountBtn");
           btn.disabled=true;status.textContent="جارٍ التحقق من الحسابات والصلاحيات المصرح بها...";feed.replaceChildren();
