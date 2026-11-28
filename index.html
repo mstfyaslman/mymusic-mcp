@@ -569,7 +569,8 @@
             <strong>🎧 مساعد الاستماع والترجمة المباشرة — Google Gemini</strong>
             <p class="social-note">اضغط استقبال الصوت، ثم اختر تبويب Facebook نفسه وفعّل مشاركة صوت التبويب من نافذة المتصفح. سيستقبل المساعد مقاطع صوت قصيرة، ويتعرف على الكلام ويترجمه إلى اللغة المختارة ويعرضه فوق مساحة الفيديو. لا يبدأ التسجيل إلا بموافقتك ويمكنك إيقافه في أي وقت.</p>
             <div class="social-sync-row">
-              <button type="button" class="btn" id="socialLiveAudioStart">🎙 استقبال صوت الفيديو وترجمته</button>
+              <button type="button" class="btn" id="socialLiveAudioStart">🎙 استقبال صوت تبويب Facebook</button>
+              <button type="button" class="btn btn-secondary" id="socialLiveMicStart">استخدام ميكروفون الهاتف</button>
               <button type="button" class="btn btn-secondary" id="socialLiveAudioStop" disabled>إيقاف الاستقبال</button>
             </div>
             <div id="socialLiveAudioStatus" class="status-msg" role="status">جاهز. يتطلب Chrome حديثاً وموافقتك على مشاركة صوت تبويب Facebook.</div>
@@ -1904,7 +1905,7 @@
         document.getElementById("socialTranslateBtn").addEventListener("click",function(){socialTranslationRevision++;socialLastTranslationKey="";clearTimeout(socialTranslateTimer);translateSocialText();});
         // Live Facebook tab-audio capture: user-authorized browser sharing only.
         var socialLiveActive=false,socialDisplayStream=null,socialAudioStream=null,socialLiveRecorder=null,socialLiveStartedAt=0,socialLiveQueue=Promise.resolve(),socialLivePending=0;
-        var socialLiveStartBtn=document.getElementById("socialLiveAudioStart"),socialLiveStopBtn=document.getElementById("socialLiveAudioStop"),socialLiveStatus=document.getElementById("socialLiveAudioStatus");
+        var socialLiveStartBtn=document.getElementById("socialLiveAudioStart"),socialLiveMicBtn=document.getElementById("socialLiveMicStart"),socialLiveStopBtn=document.getElementById("socialLiveAudioStop"),socialLiveStatus=document.getElementById("socialLiveAudioStatus");
         function socialLiveStatusText(message,isError){socialLiveStatus.textContent=message;socialLiveStatus.classList.toggle("error",!!isError);}
         function socialSrtTimestamp(ms){ms=Math.max(0,Math.round(ms));var h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000),v=ms%1000;return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")+","+String(v).padStart(3,"0");}
         async function socialProcessAudioChunk(blob,offsetMs){
@@ -1960,7 +1961,7 @@
         async function startSocialLiveAudio(){
           if(socialLiveActive)return;
           if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia||typeof MediaRecorder==="undefined"){socialLiveStatusText("هذا المتصفح لا يدعم استقبال صوت التبويب. جرّب Chrome حديثاً على الكمبيوتر، أو استخدم رفع ملف الفيديو/الصوت من أداة الترجمة.",true);return;}
-          socialLiveStartBtn.disabled=true;socialLiveStatusText("افتح نافذة المشاركة واختر تبويب Facebook وفعّل مشاركة صوت التبويب...");
+          socialLiveStartBtn.disabled=true;socialLiveMicBtn.disabled=true;socialLiveStatusText("افتح نافذة المشاركة واختر تبويب Facebook وفعّل مشاركة صوت التبويب...");
           try{
             socialDisplayStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
             if(!socialDisplayStream.getAudioTracks().length){socialDisplayStream.getTracks().forEach(function(t){t.stop();});socialDisplayStream=null;throw new Error("لم يتم اختيار مشاركة الصوت. أعد المحاولة وفعّل مشاركة صوت التبويب في نافذة المتصفح.");}
@@ -1971,10 +1972,27 @@
             socialDisplayStream.getVideoTracks().forEach(function(track){track.addEventListener("ended",stopSocialLiveAudio,{once:true});});
             socialLiveStatusText("بدأ استقبال صوت التبويب. اترك تبويب Facebook يعمل وسيعرض المساعد الترجمة هنا.");
             await socialLiveCaptureLoop();
-          }catch(error){socialLiveStatusText(error.message||"تعذر بدء استقبال الصوت.",true);}
+          }catch(error){if(socialLiveActive)stopSocialLiveAudio();socialLiveStatusText(error.message||"تعذر بدء استقبال الصوت.",true);}
           finally{
-            if(!socialLiveActive){socialLiveStartBtn.disabled=false;socialLiveStopBtn.disabled=true;}
+            if(!socialLiveActive){socialLiveStartBtn.disabled=false;socialLiveMicBtn.disabled=false;socialLiveStopBtn.disabled=true;}
           }
+        }
+        async function startSocialLiveMicrophone(){
+          if(socialLiveActive)return;
+          if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||typeof MediaRecorder==="undefined"){socialLiveStatusText("الميكروفون غير متاح في هذا المتصفح. استخدم Chrome حديثاً أو ارفع ملف الفيديو.",true);return;}
+          socialLiveStartBtn.disabled=true;socialLiveMicBtn.disabled=true;socialLiveStatusText("اطلب إذن الميكروفون. شغّل فيديو Facebook على مكبر صوت الهاتف وارفع الصوت.");
+          try{
+            socialDisplayStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+            if(!socialDisplayStream.getAudioTracks().length)throw new Error("لم يتم تشغيل الميكروفون.");
+            socialLiveActive=true;socialLiveStartedAt=performance.now();subtitleCues=[];subtitleClock=0;
+            if(subtitleRunning&&subtitleTimer)cancelAnimationFrame(subtitleTimer);
+            subtitleRunning=true;subtitleLastTick=performance.now();subtitleTimer=requestAnimationFrame(tickSubtitle);
+            socialLiveStopBtn.disabled=false;
+            socialDisplayStream.getAudioTracks().forEach(function(track){track.addEventListener("ended",stopSocialLiveAudio,{once:true});});
+            socialLiveStatusText("الميكروفون يستقبل الصوت الآن. شغّل فيديو Facebook على مكبر الصوت؛ تجنّب سماعات الرأس في هذا الوضع.");
+            await socialLiveCaptureLoop();
+          }catch(error){if(socialLiveActive)stopSocialLiveAudio();socialLiveStatusText(error.message||"تعذر تشغيل الميكروفون.",true);}
+          finally{if(!socialLiveActive){socialLiveStartBtn.disabled=false;socialLiveMicBtn.disabled=false;socialLiveStopBtn.disabled=true;}}
         }
         function stopSocialLiveAudio(){
           socialLiveActive=false;
@@ -1985,6 +2003,7 @@
           socialLiveStatusText("تم إيقاف الالتقاط. جارٍ إنهاء ترجمة المقاطع التي وصلت بالفعل...");
         }
         socialLiveStartBtn.addEventListener("click",startSocialLiveAudio);
+        socialLiveMicBtn.addEventListener("click",startSocialLiveMicrophone);
         socialLiveStopBtn.addEventListener("click",stopSocialLiveAudio);
         async function refreshAuthorizedFeed(){
           var status=document.getElementById("socialAccountStatus"),feed=document.getElementById("socialAccountFeed"),btn=document.getElementById("socialRefreshAccountBtn");
