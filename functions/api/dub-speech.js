@@ -10,7 +10,7 @@ const LANGUAGE_CODES = {
 };
 const VOICES = new Set(["Kore","Puck","Charon","Fenrir","Aoede","Leda","Orus","Zephyr"]);
 
-async function synthesize(apiKey, text, language, voice) {
+async function synthesize(apiKey, text, language, voice, durationMs) {
   const models = ["gemini-2.5-flash-preview-tts", "gemini-2.5-pro-preview-tts"];
   let lastMessage = "لم يُرجع نموذج الصوت ملفاً صوتياً.";
   for (const model of models) {
@@ -19,7 +19,7 @@ async function synthesize(apiKey, text, language, voice) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: "Speak the following translated movie dialogue naturally and clearly in " + language + ". Use a consistent dubbing voice, natural conversational pacing, and expressive delivery appropriate to the scene. Speak only the supplied dialogue, without adding explanations or introductions:\n" + text }] }],
+          contents: [{ role: "user", parts: [{ text: "Speak the following translated movie dialogue naturally and clearly in " + language + ". Use a consistent dubbing voice, natural conversational pacing, and expressive delivery appropriate to the scene. Aim to fit the dialogue into approximately " + Math.max(500, Math.round(durationMs || 2500)) + " milliseconds when natural speech allows; do not omit words or speak unnaturally fast. Speak only the supplied dialogue, without adding explanations or introductions:\n" + text }] }],
           generationConfig: {
             responseModalities: ["AUDIO"],
             speechConfig: {
@@ -67,7 +67,7 @@ export async function onRequest({ request, env }) {
   try {
     const audio = [];
     for (const cue of cues) {
-      const result = await synthesize(apiKey, cue.text.trim(), language, voice);
+      const result = await synthesize(apiKey, cue.text.trim(), language, voice, cue.endMs - cue.startMs);
       audio.push({ startMs: cue.startMs, endMs: cue.endMs, text: cue.text, mimeType: result.mimeType, audioBase64: result.data });
     }
     return json({ audio, voice, targetLanguage: language, provider: "Gemini TTS" });
