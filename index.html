@@ -497,6 +497,19 @@
     .social-small{font-size:.8rem;opacity:.8}
     @media(max-width:760px){.social-grid{grid-template-columns:1fr}.social-world-card{padding:12px}}
 
+  
+    /* On-screen subtitle controls for Social World */
+    .social-embed-stage{position:relative;display:block}
+    .social-subtitle-overlay{position:absolute;z-index:20;left:5%;right:5%;bottom:18px;text-align:center;pointer-events:none;display:none}
+    .social-subtitle-overlay span{display:inline-block;max-width:95%;padding:7px 16px;border-radius:7px;color:#fff;background:rgba(0,0,0,.82);font-size:22px;line-height:1.45;font-weight:700;text-shadow:0 1px 3px #000;white-space:pre-wrap;overflow-wrap:anywhere}
+    .social-subtitle-settings{margin-top:12px;padding:12px;border:1px solid #65172b;border-radius:10px;background:#0b1830}
+    .social-setting-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .social-setting-grid label{display:grid;gap:5px;color:#fff;font-size:.85rem}
+    .social-setting-grid input,.social-setting-grid select{max-width:100%}
+    .social-sync-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+    .social-sync-row button{font:inherit}
+    @media(max-width:600px){.social-subtitle-overlay span{font-size:17px;padding:5px 9px}.social-setting-grid{grid-template-columns:1fr}}
+
   </style>
 </head>
 <body>
@@ -552,6 +565,23 @@
           <button type="button" class="btn" id="socialLoadBtn">عرض داخل MyMusic</button>
           <div id="socialPublicStatus" class="status-msg" role="status">يدعم المنشورات والريلز العامة. قصص Instagram والحسابات الخاصة لا يدعمها التضمين العام.</div>
           <div id="socialEmbedStage" class="social-embed-stage"><span class="social-small">سيظهر المحتوى هنا داخل الموقع بعد إدخال رابطه.</span></div>
+          <div class="social-subtitle-settings">
+            <strong>ترجمة مرئية ومتزامنة على الشاشة</strong>
+            <p class="social-note">ارفع ملف ترجمة SRT أو الصق نصه. ستظهر الأسطر فوق مساحة العرض حسب التوقيت. مع مشغلات Meta المضمّنة لا تسمح Meta بقراءة وقت الفيديو تلقائياً؛ استخدم ساعة المزامنة أدناه واضبطها مع بداية المقطع.</p>
+            <div class="input-row"><label for="socialSrtFile" class="social-small">تحميل ملف ترجمة SRT</label><input id="socialSrtFile" type="file" accept=".srt,.txt,text/plain"></div>
+            <textarea id="socialSrtText" rows="4" placeholder="الصق محتوى ملف SRT هنا مع التوقيتات..."></textarea>
+            <div class="input-row"><button type="button" class="btn" id="socialTranslateSrtBtn">ترجمة ملف التوقيتات مع الحفاظ على المزامنة</button><button type="button" class="btn btn-secondary" id="socialApplySrtBtn">عرض الترجمة على الشاشة</button></div>
+            <div class="social-setting-grid">
+              <label>حجم الخط <input id="socialSubtitleSize" type="range" min="14" max="36" value="22"></label>
+              <label>موضع الترجمة <select id="socialSubtitlePosition"><option value="bottom">أسفل الشاشة</option><option value="middle">منتصف الشاشة</option><option value="top">أعلى الشاشة</option></select></label>
+              <label>لون النص <select id="socialSubtitleColor"><option value="#ffffff">أبيض</option><option value="#ffdf70">ذهبي فاتح</option><option value="#ff7777">أحمر فاتح</option></select></label>
+              <label>شفافية الخلفية <input id="socialSubtitleOpacity" type="range" min="0" max="100" value="82"></label>
+              <label>إزاحة التوقيت (مللي ثانية) <input id="socialSubtitleOffset" type="number" value="0" step="100"></label>
+              <label>اللغة المعروضة <select id="socialSubtitleDirection"><option value="auto">تلقائي</option><option value="rtl">من اليمين لليسار</option><option value="ltr">من اليسار لليمين</option></select></label>
+            </div>
+            <div class="social-sync-row"><button type="button" class="btn" id="socialSyncPlayBtn">▶ بدء ساعة الترجمة</button><button type="button" class="btn btn-secondary" id="socialSyncPauseBtn">إيقاف مؤقت</button><label class="social-small">الوقت: <input id="socialSyncTime" type="number" min="0" step="0.1" value="0" style="width:90px"> ثانية</label><button type="button" class="btn btn-secondary" id="socialSyncResetBtn">إعادة ضبط</button></div>
+            <div id="socialSubtitleStatus" class="status-msg" role="status">لم يتم تحميل ملف توقيتات بعد.</div>
+          </div>
         </div>
         <div class="social-panel">
           <strong>ترجمة محتوى التواصل</strong>
@@ -1768,6 +1798,22 @@
         var loadBtn=document.getElementById("socialLoadBtn");
         if(!loadBtn)return;
         var embedStage=document.getElementById("socialEmbedStage");
+        var subtitleLayer=document.createElement("div");subtitleLayer.className="social-subtitle-overlay";subtitleLayer.id="socialSubtitleOverlay";var subtitleText=document.createElement("span");subtitleLayer.appendChild(subtitleText);embedStage.appendChild(subtitleLayer);
+        var subtitleCues=[],subtitleClock=0,subtitleRunning=false,subtitleLastTick=0,subtitleTimer=null;
+        var subtitleStatus=document.getElementById("socialSubtitleStatus");
+        function parseSocialSrt(raw){var normalized=raw.replace(/\\r/g,"").trim();var blocks=normalized.split(/\\n\\s*\\n/);var cues=[];blocks.forEach(function(block){var lines=block.split("\\n"),ti=lines.findIndex(function(line){return line.includes("-->");});if(ti<0)return;var m=lines[ti].match(/(\\d{1,}:\\d{2}:\\d{2}[,.]\\d{1,3})\\s*-->\\s*(\\d{1,}:\\d{2}:\\d{2}[,.]\\d{1,3})/);if(!m)return;function ms(v){var p=v.replace(",",".").split(":");return ((+p[0]*3600)+(+p[1]*60)+parseFloat(p[2]))*1000;}var text=lines.slice(ti+1).join("\\n").trim();if(text)cues.push({start:ms(m[1]),end:ms(m[2]),text:text});});return cues.sort(function(a,b){return a.start-b.start;});}
+        function paintSubtitle(){var offset=Number(document.getElementById("socialSubtitleOffset").value)||0,t=subtitleClock*1000-offset,cue=subtitleCues.find(function(c){return t>=c.start&&t<=c.end;});subtitleText.textContent=cue?cue.text:"";subtitleLayer.style.display=cue?"block":"none";document.getElementById("socialSyncTime").value=subtitleClock.toFixed(1);}
+        function applySubtitleSettings(){var size=document.getElementById("socialSubtitleSize").value,color=document.getElementById("socialSubtitleColor").value,opacity=Number(document.getElementById("socialSubtitleOpacity").value)/100,pos=document.getElementById("socialSubtitlePosition").value,dir=document.getElementById("socialSubtitleDirection").value;subtitleText.style.fontSize=size+"px";subtitleText.style.color=color;subtitleText.style.background="rgba(0,0,0,"+opacity+")";subtitleText.style.direction=dir;subtitleLayer.style.top=pos==="top"?"18px":pos==="middle"?"50%":"auto";subtitleLayer.style.bottom=pos==="bottom"?"18px":"auto";subtitleLayer.style.transform=pos==="middle"?"translateY(-50%)":"none";}
+        function tickSubtitle(){if(!subtitleRunning)return;var now=performance.now();subtitleClock+=(now-subtitleLastTick)/1000;subtitleLastTick=now;paintSubtitle();subtitleTimer=requestAnimationFrame(tickSubtitle);}
+        document.getElementById("socialSrtFile").addEventListener("change",async function(){var file=this.files&&this.files[0];if(!file)return;document.getElementById("socialSrtText").value=await file.text();subtitleStatus.textContent="تم تحميل الملف. اضغط عرض الترجمة على الشاشة أو ترجم التوقيتات." ;});
+        document.getElementById("socialApplySrtBtn").addEventListener("click",function(){subtitleCues=parseSocialSrt(document.getElementById("socialSrtText").value);subtitleClock=0;paintSubtitle();subtitleStatus.textContent=subtitleCues.length?"تم تجهيز "+subtitleCues.length+" سطر ترجمة بالتوقيت. اضبط ساعة المزامنة لتوافق بداية الفيديو.":"لم يتم العثور على توقيتات SRT صحيحة.";});
+        document.getElementById("socialTranslateSrtBtn").addEventListener("click",async function(){var raw=document.getElementById("socialSrtText").value.trim(),lang=document.getElementById("socialTargetLang").value,btn=this;if(!raw){subtitleStatus.textContent="حمّل أو الصق ملف SRT أولاً.";return;}btn.disabled=true;subtitleStatus.textContent="جارٍ ترجمة النص مع الإبقاء على أرقام الأسطر والتوقيتات...";try{var r=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"Translate only the subtitle dialogue in this SRT file into language code "+lang+". Preserve every sequence number, timestamp line, blank line, and SRT structure exactly. Do not add explanations or markdown fences. SRT:\\n"+raw})});var d=await r.json();if(!r.ok)throw new Error(d.error||"تعذرت ترجمة ملف التوقيتات.");document.getElementById("socialSrtText").value=d.text||"";subtitleCues=parseSocialSrt(d.text||"");subtitleClock=0;paintSubtitle();subtitleStatus.textContent="اكتملت ترجمة "+subtitleCues.length+" سطر مع الاحتفاظ بالتوقيتات. اضغط بدء ساعة الترجمة عند بداية الفيديو."; }catch(e){subtitleStatus.textContent=e.message;}finally{btn.disabled=false;}});
+        document.getElementById("socialSyncPlayBtn").addEventListener("click",function(){if(subtitleRunning)return;subtitleRunning=true;subtitleLastTick=performance.now();subtitleTimer=requestAnimationFrame(tickSubtitle);});
+        document.getElementById("socialSyncPauseBtn").addEventListener("click",function(){subtitleRunning=false;if(subtitleTimer)cancelAnimationFrame(subtitleTimer);});
+        document.getElementById("socialSyncResetBtn").addEventListener("click",function(){subtitleRunning=false;if(subtitleTimer)cancelAnimationFrame(subtitleTimer);subtitleClock=0;paintSubtitle();});
+        document.getElementById("socialSyncTime").addEventListener("change",function(){subtitleClock=Math.max(0,Number(this.value)||0);paintSubtitle();});
+        ["socialSubtitleSize","socialSubtitleColor","socialSubtitleOpacity","socialSubtitlePosition","socialSubtitleOffset","socialSubtitleDirection"].forEach(function(id){document.getElementById(id).addEventListener("input",applySubtitleSettings);document.getElementById(id).addEventListener("change",applySubtitleSettings);});
+        applySubtitleSettings();
         var publicStatus=document.getElementById("socialPublicStatus");
         var platformButtons=[...document.querySelectorAll("[data-social-platform]")];
         var platform="facebook";
