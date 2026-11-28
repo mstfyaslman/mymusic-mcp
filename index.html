@@ -1847,8 +1847,13 @@
         var loadedMetaScripts={};
         function loadEmbedScript(provider){
           var src=provider==="Instagram"?"https://www.instagram.com/embed.js":"https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v27.0";
-          if(loadedMetaScripts[provider]){try{if(provider==="Instagram"&&window.instgrm)window.instgrm.Embeds.process();if(provider==="Facebook"&&window.FB)window.FB.XFBML.parse(embedStage);}catch(e){}return;}
-          loadedMetaScripts[provider]=true;var s=document.createElement("script");s.async=true;s.defer=true;s.src=src;s.onload=function(){try{if(provider==="Instagram"&&window.instgrm)window.instgrm.Embeds.process();if(provider==="Facebook"&&window.FB)window.FB.XFBML.parse(embedStage);}catch(e){}};document.head.appendChild(s);
+          if(loadedMetaScripts[provider]==="loaded"){try{if(provider==="Instagram"&&window.instgrm)window.instgrm.Embeds.process();if(provider==="Facebook"&&window.FB)window.FB.XFBML.parse(embedStage);}catch(e){}return;}
+          if(loadedMetaScripts[provider]==="loading")return;
+          loadedMetaScripts[provider]="loading";
+          var s=document.createElement("script");s.async=true;s.defer=true;s.src=src;
+          s.onload=function(){loadedMetaScripts[provider]="loaded";try{if(provider==="Instagram"&&window.instgrm)window.instgrm.Embeds.process();if(provider==="Facebook"&&window.FB)window.FB.XFBML.parse(embedStage);}catch(e){publicStatus.textContent="تم تحميل المنشور، لكن تعذر تشغيل أداة التضمين. أعد تحميل الصفحة وحاول مرة أخرى.";}};
+          s.onerror=function(){delete loadedMetaScripts[provider];publicStatus.textContent="تعذر تحميل مشغل "+provider+" من Meta. تحقق من الاتصال ثم أعد المحاولة.";publicStatus.classList.add("error");};
+          document.head.appendChild(s);
         }
         loadBtn.addEventListener("click",async function(){
           var url=document.getElementById("socialPublicUrl").value.trim();
