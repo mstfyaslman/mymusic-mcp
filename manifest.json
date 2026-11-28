@@ -1,7 +1,7 @@
 {
   "name": "MyMusic AI",
   "short_name": "MyMusic",
-  "description": "اكتشف الأغاني والفنانين واستمع إلى المعاينات الموسيقية واستخدم أدوات MyMusic.",
+  "description": "MyMusic AI — منصة المشاهدة والتعلم والترجمة ومساحة تصفح متعددة المواقع. يدعم حفظ واجهة الموقع للعمل دون اتصال.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

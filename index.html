@@ -521,6 +521,21 @@
 #myToolsPanel .tools-empty{padding:25px;text-align:center;color:#fff}#myLearningLab{margin:20px 0;background:#0b1830;border:1px solid #65172b;border-radius:16px;padding:16px;color:#fff}#myLearningLab textarea{min-height:150px}#myLearningLab .learning-output{white-space:pre-wrap;overflow-wrap:anywhere;background:#10213d;border:1px solid #65172b;border-radius:10px;padding:12px;margin-top:12px;min-height:60px;max-height:420px;overflow:auto}#myLearningLab .learning-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}#myLearningLab .learning-progress{color:#fff;font-size:.85rem;margin-top:8px}
 @media(max-width:700px){#myToolsFab{left:10px;bottom:12px;padding:10px 13px}#myToolsPanel{inset:1vh 1vw;border-radius:12px}#myToolsPanel .tools-layout{grid-template-columns:1fr;grid-template-rows:minmax(145px,35%) 1fr}#myToolsPanel .tool-items{grid-template-columns:repeat(2,minmax(0,1fr))}#myToolsPanel .tool-view iframe{min-height:250px}#myLearningLab{padding:12px}}
 @media(min-width:1100px){#myToolsPanel{inset:3vh 5vw}}
+#myToolsFab{width:46px;height:46px;padding:0!important;border-radius:50%!important;background:#242622!important;border:1px solid #77796f!important;color:#eee!important;display:grid;place-items:center;font-size:0!important;box-shadow:0 5px 18px #0009}
+#myToolsFab:before{content:"◉";font-size:21px;color:#d6d2c7}
+#myToolsPanel{z-index:9999}
+#myToolsPanel .tools-urlbar{display:flex;gap:7px;padding:9px 12px;background:#11130f;border-bottom:1px solid rgba(184,151,89,.25)}
+#myToolsPanel .tools-urlbar input{flex:1;min-width:0;background:#191c19;color:#f3f0e8;border:1px solid #655b43;border-radius:8px;padding:9px}
+#myToolsPanel .tools-tabs{display:flex;gap:6px;padding:8px 10px;overflow-x:auto;background:#0b0d0b;border-bottom:1px solid rgba(184,151,89,.25)}
+#myToolsPanel .tools-tab{display:flex;align-items:center;gap:8px;white-space:nowrap;max-width:220px}
+#myToolsPanel .tools-tab.active{background:#594629!important;border-color:#c7a96b!important}
+#myToolsPanel .tools-tab .tab-name{overflow:hidden;text-overflow:ellipsis;max-width:150px}
+#myToolsPanel .tools-tab .tab-close{padding:1px 6px;border-radius:50%;background:#282a25}
+#myToolsPanel .tools-frames{position:relative;flex:1;min-height:0;background:#050608}
+#myToolsPanel .tools-frames iframe{position:absolute;inset:0;width:100%;height:100%;min-height:0;border:0;background:#fff;display:none}
+#myToolsPanel .tools-frames iframe.active{display:block}
+#myToolsPanel .tools-offline-note{font-size:.78rem;color:#b7b1a4;line-height:1.6;margin-top:12px}
+@media(max-width:700px){#myToolsPanel .tools-layout{grid-template-columns:1fr;grid-template-rows:minmax(110px,28%) 1fr}#myToolsPanel .tools-urlbar{flex-wrap:wrap}#myToolsPanel .tools-urlbar input{flex-basis:100%}}
 </style>
 
 <style id="mymusic-global-dark-refresh">
@@ -568,8 +583,37 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
 #memberCenter .mc-provider{background:#202119!important;border:1px solid #665638!important;color:#eee!important}
 @media(max-width:600px){#memberMenuButton{top:10px;left:10px;width:42px;height:42px}#memberCenter .mc-drawer{padding:15px}}
 </style>
+<style id="mymusic-multi-window-style">
+#mmwToggle{position:fixed;right:16px;bottom:18px;z-index:99990;width:48px;height:48px;border:1px solid rgba(199,169,107,.65);border-radius:50%;background:#24251f;color:#d8c18b;box-shadow:0 5px 22px #0009;font-size:20px;cursor:pointer}
+#mmwPanel{position:fixed;z-index:99989;right:12px;bottom:76px;width:min(460px,calc(100vw - 24px));height:min(720px,calc(100dvh - 100px));display:none;flex-direction:column;background:#10120f;color:#eee9dc;border:1px solid #75613b;border-radius:16px;box-shadow:0 14px 50px #000c;overflow:hidden}
+#mmwPanel.open{display:flex}#mmwHead{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#191b16;border-bottom:1px solid #55482f;gap:8px}
+#mmwHead strong{color:#d9bf83}#mmwHead button,#mmwPanel button{cursor:pointer}
+#mmwClose{background:transparent;color:#ddd;border:0;font-size:20px;padding:4px 9px}
+#mmwToolbar{display:flex;gap:6px;padding:9px;flex-wrap:wrap}
+#mmwToolbar input{flex:1;min-width:120px;background:#080a08;color:#eee;border:1px solid #55482f;border-radius:8px;padding:9px}
+#mmwToolbar button,.mmw-action{background:#292a23;color:#e5d2a5;border:1px solid #76613b;border-radius:8px;padding:8px 10px}
+#mmwTabs{display:flex;gap:6px;overflow-x:auto;padding:0 9px 9px}
+.mmw-tab{white-space:nowrap;background:#1d201a;color:#ddd;border:1px solid #45483d;border-radius:9px;padding:7px 9px}
+.mmw-tab.active{border-color:#d1ae68;color:#f2d99f;background:#302b1d}
+#mmwFrameHost{position:relative;flex:1;min-height:140px;background:#080908;border-top:1px solid #393a31}
+.mmw-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+.mmw-frame[hidden]{display:none}
+#mmwInfo{padding:9px 12px;color:#bdb6a5;font-size:12px;line-height:1.7;border-top:1px solid #393a31}
+#mmwSaved{max-height:110px;overflow:auto;padding:4px 10px 10px;display:flex;gap:6px;flex-wrap:wrap}
+.mmw-saved{font-size:12px;background:#1c211b;color:#d8c18b;border:1px solid #4f563f;border-radius:8px;padding:6px}
+@media(max-width:600px){#mmwToggle{right:12px;bottom:12px;width:44px;height:44px}#mmwPanel{right:6px;bottom:64px;width:calc(100vw - 12px);height:calc(100dvh - 80px)}}
+</style>
 </head>
 <body>
+<button id="mmwToggle" type="button" aria-label="فتح النوافذ المتعددة" aria-expanded="false" title="النوافذ المتعددة">▣</button>
+<section id="mmwPanel" aria-label="النوافذ والتبويبات المحفوظة">
+ <div id="mmwHead"><strong>MyMusic · النوافذ المتعددة</strong><button id="mmwClose" type="button" aria-label="إخفاء النافذة">×</button></div>
+ <div id="mmwToolbar"><input id="mmwUrl" type="url" placeholder="أدخل رابط موقع HTTPS"><button id="mmwAdd" type="button">فتح موقع</button><button id="mmwSaveAll" type="button">حفظ الجلسة</button></div>
+ <div id="mmwTabs" role="tablist" aria-label="المواقع المفتوحة"></div>
+ <div id="mmwFrameHost"><div id="mmwEmpty" style="padding:22px;color:#bbb;text-align:center">أضف موقعاً لفتحه هنا. بعض المواقع تمنع العرض داخل النوافذ المضمنة؛ استخدم زر الفتح الخارجي عند ظهور المنع.</div></div>
+ <div id="mmwInfo">تبقى الصفحات المفتوحة في هذه الجلسة مخفية عند التنقل بدلاً من حذفها، وقد يستمر تشغيل الصوت حسب دعم الموقع والمتصفح. لا يمكن ضمان استمرار التشغيل بعد إغلاق المتصفح أو تجاوز منع التضمين.</div>
+ <div id="mmwSaved" aria-label="المواقع المحفوظة"></div>
+</section>
 
   <button id="memberMenuButton" type="button" aria-label="فتح مركز العضوية" aria-expanded="false"><span>☰</span></button>
   <div id="memberCenter" aria-hidden="true">
@@ -669,6 +713,17 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
               <button type="button" class="btn btn-secondary" id="socialLiveAudioStop" disabled>إيقاف الاستقبال</button>
             </div>
             <div id="socialLiveAudioStatus" class="status-msg" role="status">جاهز. يتطلب Chrome حديثاً وموافقتك على مشاركة صوت تبويب Facebook.</div>
+            <div class="social-subtitle-settings" id="socialDubPanel">
+              <strong>🎙️ دبلجة فورية للنص المترجم داخل المشغل</strong>
+              <p class="social-note">بعد استقبال صوت الفيديو وترجمته، أنشئ صوتاً عربياً أو باللغة المختارة عبر Google Gemini TTS. شغّل الدبلجة أو أوقفها متى شئت. قد يوجد تأخير قصير لأن الصوت يُعالج على أجزاء.</p>
+              <div class="social-sync-row">
+                <select id="socialDubVoice" aria-label="صوت الدبلجة"><option value="Kore">صوت نسائي واضح</option><option value="Aoede">صوت نسائي هادئ</option><option value="Puck">صوت رجالي حيوي</option><option value="Charon">صوت رجالي عميق</option><option value="Fenrir">صوت رجالي قوي</option><option value="Leda">صوت نسائي دافئ</option><option value="Orus">صوت رجالي ثابت</option><option value="Zephyr">صوت محايد</option></select>
+                <button type="button" class="btn" id="socialDubStart">إنشاء وتشغيل الدبلجة</button>
+                <button type="button" class="btn btn-secondary" id="socialDubStop" disabled>إيقاف الدبلجة</button>
+              </div>
+              <div id="socialDubStatus" class="status-msg" role="status">ابدأ استقبال الصوت أولاً حتى تتوفر جمل مترجمة.</div>
+              <audio id="socialDubAudio" controls style="width:100%;margin-top:8px;display:none"></audio>
+            </div>
           </div>
           <div class="social-subtitle-settings">
             <strong>ترجمة مرئية ومتزامنة على الشاشة</strong>
@@ -709,6 +764,36 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
         <div id="socialAccountStatus" class="status-msg" role="status">يلزم إعداد تطبيق Meta ومفاتيحه وربط KV في Cloudflare قبل تفعيل تسجيل الدخول.</div>
         <div id="socialAccountFeed"></div>
       </div>
+      <section class="social-panel" id="socialGrowthHub" style="margin-top:14px">
+        <div class="card-title"><span>📈 مركز المشاهدة والمتابعة والشراكات</span><small>Social Growth & Creator Partners</small></div>
+        <p class="social-note">اكتشف الصفحات والحسابات العامة وتابعها من خلال إجراءات Meta الرسمية. فتح المحتوى داخل MyMusic متاح فقط عندما تسمح Meta بالتضمين؛ لا يمكن تجاوز تسجيل الدخول أو قيود الحسابات الخاصة.</p>
+        <div class="social-grid">
+          <div class="social-panel">
+            <strong>اكتشاف ومتابعة Facebook</strong>
+            <p class="social-note">افتح الصفحة العامة أو تابعها عبر Facebook الرسمي.</p>
+            <button type="button" class="btn" id="socialFacebookDiscover">استكشاف Facebook</button>
+          </div>
+          <div class="social-panel">
+            <strong>اكتشاف ومتابعة Instagram</strong>
+            <p class="social-note">افتح الحساب العام أو تابع عبر Instagram الرسمي.</p>
+            <button type="button" class="btn" id="socialInstagramDiscover">استكشاف Instagram</button>
+          </div>
+        </div>
+        <div class="social-subtitle-settings" style="margin-top:12px">
+          <strong>🤝 شراكات صناع المحتوى والإعلانات</strong>
+          <p class="social-note">أضف فقط صفحات يملكها الشريك أو فوّضك بإدارتها. يمكن تحقيق الدخل من إعلانات MyMusic والرعايات والإحالات المتفق عليها؛ مشاهدات أو متابعات Meta وحدها لا تضمن عمولة أو أرباحاً.</p>
+          <div class="input-row">
+            <input id="creatorPartnerName" type="text" maxlength="80" placeholder="اسم الصفحة أو صانع المحتوى">
+            <select id="creatorPartnerPlatform"><option value="facebook">Facebook</option><option value="instagram">Instagram</option></select>
+          </div>
+          <div class="input-row">
+            <input id="creatorPartnerUrl" type="url" placeholder="رابط الصفحة أو الحساب العام">
+            <button type="button" class="btn" id="creatorPartnerAdd">إضافة إلى دليل الشركاء</button>
+          </div>
+          <div id="creatorPartnerStatus" class="status-msg" role="status">الدليل محفوظ في هذا المتصفح فقط. لا تُضف حساباً دون إذن صاحبه.</div>
+          <div id="creatorPartnerList"></div>
+        </div>
+      </section>
     </section>
 
     <div class="main-grid">
@@ -982,7 +1067,11 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
   
 <section id="myLearningLab" aria-labelledby="myLearningTitle"><h2 id="myLearningTitle">📚 استوديو الترجمة والشرح التعليمي بالذكاء الاصطناعي</h2><p>الصق نصاً بأي طول؛ يقسمه الاستوديو تلقائياً إلى أجزاء متتابعة، ثم يترجمها أو يشرحها. لمعالجة ملفات الفيديو والصوت استخدم أدوات رفع الوسائط الموجودة بالفعل في قسم المترجم.</p><textarea id="myLearningInput" placeholder="الصق النص أو التفريغ الصوتي أو محتوى الدرس هنا..."></textarea><div class="input-row" style="margin-top:10px"><select id="myLearningLanguage" aria-label="لغة الترجمة"><option value="العربية">الترجمة إلى العربية</option><option value="English">English</option><option value="French">Français</option><option value="Spanish">Español</option><option value="German">Deutsch</option><option value="Turkish">Türkçe</option></select><select id="myLearningMode" aria-label="نوع العملية"><option value="translate">ترجمة دقيقة</option><option value="explain">شرح وتبسيط تعليمي</option><option value="both">ترجمة ثم شرح مبسط</option></select></div><div class="learning-actions"><button class="btn" id="myLearningRun">ابدأ المعالجة</button><button class="btn btn-secondary" id="myLearningCopy" type="button">نسخ النتيجة</button><button class="btn btn-secondary" id="myLearningClear" type="button">مسح</button><button class="btn btn-secondary" type="button" onclick="document.getElementById('translatorSection').scrollIntoView({behavior:'smooth'})">فتح مترجم ملفات الفيديو والصوت</button></div><div class="learning-progress" id="myLearningStatus" role="status">جاهز لاستقبال النص.</div><div class="learning-output" id="myLearningOutput" aria-live="polite"></div><small>المعالجة الطويلة تتم على دفعات، لكن السرعة والحجم النهائي يعتمدان على حصص Gemini وحدود الخادم والملفات؛ لا يمكن ضمان مدة أو حجم غير محدودين.</small></section>
 <button id="myToolsFab" type="button" aria-controls="myToolsPanel" aria-expanded="false">🌐 مواقع وأدوات AI</button>
-<aside id="myToolsPanel" role="dialog" aria-modal="true" aria-label="مكتبة المواقع والتطبيقات"><div class="tools-head"><h2>مكتبة أدوات الذكاء الاصطناعي والمواقع</h2><div class="tools-actions"><button id="myToolsBack" type="button">رجوع للقائمة</button><button id="myToolsOpenExternal" type="button">فتح خارجي عند الحظر</button><button id="myToolsClose" type="button">إغلاق ✕</button></div></div><div class="tools-layout"><div class="tools-list"><input id="myToolsSearch" type="search" placeholder="ابحث عن موقع أو تطبيق..."><div id="myToolsItems"></div></div><div class="tool-view"><div class="tool-hint" id="myToolsHint">اختر موقعاً من القائمة لعرضه هنا. بعض المواقع تمنع التضمين لأسباب أمنية؛ استخدم زر الفتح الخارجي عند الحاجة.</div><iframe id="myToolsFrame" title="عارض المواقع المدمج" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-downloads allow-presentation" allow="clipboard-read; clipboard-write; fullscreen"></iframe><div class="tool-fallback"><button id="myToolsRetry" type="button">إعادة تحميل</button><button id="myToolsExternal2" type="button">فتح الموقع في تبويب خارجي</button></div></div></div></aside>
+<aside id="myToolsPanel" role="dialog" aria-modal="false" aria-label="مساحة المواقع والتبويبات">
+<div class="tools-head"><h2>مساحة التصفح داخل MyMusic</h2><div class="tools-actions"><button id="myToolsBack" type="button">المكتبة</button><button id="myToolsOpenExternal" type="button">فتح خارجي عند الحظر</button><button id="myToolsClose" type="button">إخفاء النافذة</button></div></div>
+<div class="tools-urlbar"><input id="myToolsUrl" type="url" inputmode="url" placeholder="اكتب رابط الموقع https://..."><button id="myToolsGo" type="button">فتح داخل MyMusic</button><button id="myToolsSaveCurrent" type="button">حفظ</button></div>
+<div id="myToolsTabs" class="tools-tabs" role="tablist" aria-label="المواقع المفتوحة"></div>
+<div class="tools-layout"><div class="tools-list"><input id="myToolsSearch" type="search" placeholder="ابحث عن موقع أو تطبيق..."><div id="myToolsItems"></div><div class="tools-offline-note">تُحفظ قائمة المواقع وتُستعاد تلقائياً على هذا الجهاز. إتاحة الموقع دون إنترنت تعتمد على دعم الموقع نفسه والتخزين المسموح به.</div></div><div class="tool-view"><div class="tool-hint" id="myToolsHint">اختر موقعاً أو أدخل رابطاً. سيبقى كل تبويب محمّلاً عند الانتقال إلى تبويب آخر أو إخفاء هذه النافذة.</div><div id="myToolsFrames" class="tools-frames"></div><div class="tool-fallback"><button id="myToolsRetry" type="button">إعادة تحميل التبويب</button><button id="myToolsExternal2" type="button">فتح الموقع في تبويب خارجي</button></div></div></div></aside>
 </main>
 
   <footer class="footer">
@@ -2061,6 +2150,36 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
         var socialLiveActive=false,socialDisplayStream=null,socialAudioStream=null,socialLiveRecorder=null,socialLiveStartedAt=0,socialLiveQueue=Promise.resolve(),socialLivePending=0;
         var socialLiveStartBtn=document.getElementById("socialLiveAudioStart"),socialLiveMicBtn=document.getElementById("socialLiveMicStart"),socialLiveStopBtn=document.getElementById("socialLiveAudioStop"),socialLiveStatus=document.getElementById("socialLiveAudioStatus");
         function socialLiveStatusText(message,isError){socialLiveStatus.textContent=message;socialLiveStatus.classList.toggle("error",!!isError);}
+        // Gemini TTS dubbing for the translated live Facebook/Instagram audio captions.
+        var socialDubQueue=[],socialDubRunning=false,socialDubStopRequested=false,socialDubAudio=document.getElementById("socialDubAudio"),socialDubStatus=document.getElementById("socialDubStatus"),socialDubStart=document.getElementById("socialDubStart"),socialDubStop=document.getElementById("socialDubStop");
+        function socialDubStatusText(message,isError){socialDubStatus.textContent=message;socialDubStatus.classList.toggle("error",!!isError);}
+        function socialBase64Blob(base64,mime){var raw=atob(base64),bytes=new Uint8Array(raw.length);for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return new Blob([bytes],{type:mime||"audio/wav"});}
+        async function socialCreateAndPlayDub(){
+          if(socialDubRunning)return;
+          var cues=subtitleCues.filter(function(c){return c.text&&c.end>c.start;}).slice(-4);
+          if(!cues.length){socialDubStatusText("لا توجد جمل مترجمة بعد. شغّل استقبال صوت الفيديو أولاً.",true);return;}
+          socialDubRunning=true;socialDubStopRequested=false;socialDubStart.disabled=true;socialDubStop.disabled=false;
+          try{
+            for(var i=0;i<cues.length&&!socialDubStopRequested;i+=4){
+              var batch=cues.slice(i,i+4).map(function(c){return{text:c.text,startMs:Math.max(0,Math.round(c.start)),endMs:Math.max(Math.round(c.start)+250,Math.round(c.end))};});
+              socialDubStatusText("ينشئ Gemini الصوت المترجم ("+Math.min(i+4,cues.length)+" من "+cues.length+")...");
+              var response=await fetch("/api/dub-speech",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cues:batch,targetLanguage:({ar:"العربية",en:"English",fr:"Français",es:"Español",de:"Deutsch",it:"Italiano",tr:"Türkçe",pt:"Português",ru:"Русский",ja:"日本語",zh:"中文",hi:"हिन्दी"}[document.getElementById("socialTargetLang").value]||"العربية"),voiceName:document.getElementById("socialDubVoice").value})});
+              var data=await response.json().catch(function(){return{};});if(!response.ok)throw new Error(data.error||"تعذر إنشاء الدبلجة.");
+              for(var j=0;j<(data.audio||[]).length&&!socialDubStopRequested;j++){
+                var item=data.audio[j],blob=socialBase64Blob(item.audioBase64,item.mimeType),objectUrl=URL.createObjectURL(blob);
+                socialDubAudio.src=objectUrl;socialDubAudio.style.display="block";
+                socialDubStatusText("تشغيل الدبلجة الصوتية — المقطع "+(i+j+1)+".");
+                await new Promise(function(resolve){var done=false;function finish(){if(done)return;done=true;socialDubAudio.removeEventListener("ended",finish);socialDubAudio.removeEventListener("error",finish);resolve();}socialDubAudio.addEventListener("ended",finish);socialDubAudio.addEventListener("error",finish);socialDubAudio.play().catch(finish);});
+                URL.revokeObjectURL(objectUrl);
+              }
+            }
+            if(!socialDubStopRequested)socialDubStatusText("انتهت دفعة الدبلجة. أعد الإنشاء بعد وصول جمل جديدة.");
+          }catch(error){socialDubStatusText(error.message||"حدث خطأ في الدبلجة.",true);}
+          finally{socialDubRunning=false;socialDubStart.disabled=false;socialDubStop.disabled=true;}
+        }
+        socialDubStart.addEventListener("click",socialCreateAndPlayDub);
+        socialDubStop.addEventListener("click",function(){socialDubStopRequested=true;socialDubAudio.pause();socialDubAudio.removeAttribute("src");socialDubStop.disabled=true;socialDubStatusText("تم إيقاف الدبلجة.");});
+
         function socialSrtTimestamp(ms){ms=Math.max(0,Math.round(ms));var h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000),v=ms%1000;return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")+","+String(v).padStart(3,"0");}
         async function socialProcessAudioChunk(blob,offsetMs){
           if(!blob||blob.size<500)return;
@@ -2250,12 +2369,33 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
 
 <script>
 (function(){
+'use strict';
 const catalog=[['المساعدون العامون',['Perplexity','https://www.perplexity.ai/'],['ChatGPT','https://chatgpt.com/'],['Claude','https://claude.ai/']],['التطوير والبرمجة',['Base44','https://base44.com/'],['Replit','https://replit.com/'],['Lovable','https://lovable.dev/'],['Cursor','https://cursor.com/']],['صناعة المحتوى',['Beehiiv','https://www.beehiiv.com/'],['Opus Clip','https://www.opus.pro/'],['Descript','https://www.descript.com/'],['Synthesia','https://www.synthesia.io/'],['HeyGen','https://www.heygen.com/'],['Manus AI','https://manus.im/']],['الإنتاجية',['Wispr Flow','https://wisprflow.ai/'],['Superhuman','https://superhuman.com/'],['Granola','https://www.granola.ai/'],['Gamma','https://gamma.app/'],['Otio AI','https://otio.ai/'],['NotebookLM','https://notebooklm.google/'],['Grammarly','https://www.grammarly.com/']],['الإبداع',['Higgsfield','https://higgsfield.ai/'],['Google Veo','https://deepmind.google/models/veo/'],['Canva','https://www.canva.com/'],['Figma','https://www.figma.com/'],['Pika Labs','https://pika.art/'],['Kling','https://klingai.com/'],['Runway','https://runwayml.com/'],['Midjourney','https://www.midjourney.com/'],['Suno','https://suno.com/'],['ElevenLabs','https://elevenlabs.io/']],['الأتمتة والتكامل',['Clay','https://www.clay.com/'],['Apify','https://apify.com/'],['Notion AI','https://www.notion.so/product/ai'],['Gemini','https://gemini.google.com/'],['Chatbase','https://www.chatbase.co/'],['Claude Code','https://www.anthropic.com/claude-code'],['Lindy AI','https://www.lindy.ai/'],['Zapier','https://zapier.com/'],['n8n','https://n8n.io/'],['Softr','https://www.softr.io/']]];
-const panel=document.getElementById('myToolsPanel'),fab=document.getElementById('myToolsFab'),frame=document.getElementById('myToolsFrame'),hint=document.getElementById('myToolsHint');let current='';
-function show(open){panel.classList.toggle('open',open);fab.setAttribute('aria-expanded',String(open));if(open)document.getElementById('myToolsSearch').focus();else frame.src='about:blank'}
-function loadTool(name,url){current=url;hint.textContent='جارٍ محاولة عرض '+name+' داخل MyMusic. إذا منع الموقع التضمين، استخدم زر الفتح الخارجي.';frame.src=url;document.querySelectorAll('[data-tool-url]').forEach(b=>b.classList.toggle('active',b.dataset.toolUrl===url))}
-function render(q=''){let host=document.getElementById('myToolsItems');host.replaceChildren();catalog.forEach(group=>{let matches=group.slice(1).filter(x=>x[0].toLowerCase().includes(q.toLowerCase()));if(!matches.length)return;let section=document.createElement('section');section.className='tool-group';let h=document.createElement('h3');h.textContent=group[0];section.append(h);let items=document.createElement('div');items.className='tool-items';matches.forEach(([name,url])=>{let b=document.createElement('button');b.type='button';b.textContent=name;b.dataset.toolUrl=url;b.addEventListener('click',()=>loadTool(name,url));items.append(b)});section.append(items);host.append(section)})}
-document.getElementById('myToolsSearch').addEventListener('input',e=>render(e.target.value));fab.addEventListener('click',()=>show(!panel.classList.contains('open')));document.getElementById('myToolsClose').addEventListener('click',()=>show(false));document.getElementById('myToolsBack').addEventListener('click',()=>{frame.src='about:blank';current='';hint.textContent='اختر موقعاً من القائمة لعرضه هنا.'});function external(){if(current)window.open(current,'_blank','noopener,noreferrer')}document.getElementById('myToolsOpenExternal').addEventListener('click',external);document.getElementById('myToolsExternal2').addEventListener('click',external);document.getElementById('myToolsRetry').addEventListener('click',()=>{if(current)frame.src=current});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))show(false)});render();
+const panel=document.getElementById('myToolsPanel'),fab=document.getElementById('myToolsFab'),frames=document.getElementById('myToolsFrames'),tabs=document.getElementById('myToolsTabs'),hint=document.getElementById('myToolsHint'),storageKey='mymusic.workspace.tabs.v2';
+let items=[],activeId=null,serial=0;
+function save(){try{localStorage.setItem(storageKey,JSON.stringify({items:items.map(x=>({id:x.id,name:x.name,url:x.url})),activeId:activeId}))}catch(e){}}
+function show(open){panel.classList.toggle('open',open);fab.setAttribute('aria-expanded',String(open));if(open)document.getElementById('myToolsSearch').focus()}
+function validUrl(raw){let u;try{u=new URL(raw)}catch(e){throw new Error('اكتب رابطاً صحيحاً يبدأ بـ https://')}if(!['http:','https:'].includes(u.protocol))throw new Error('يسمح بروابط HTTP وHTTPS فقط');return u.href}
+function activate(id){activeId=id;items.forEach(x=>{x.frame.classList.toggle('active',x.id===id)});renderTabs();let item=items.find(x=>x.id===id);if(item){hint.textContent='التبويب النشط: '+item.name+' — سيظل محمّلاً في الخلفية عند الانتقال إلى تبويب آخر أو إخفاء النافذة.';document.getElementById('myToolsUrl').value=item.url}save()}
+function addTab(name,url,restore){url=validUrl(url);let found=items.find(x=>x.url===url);if(found){activate(found.id);show(true);return}
+if(items.length>=8){alert('يمكن فتح 8 مواقع في نفس الوقت. أغلق تبويباً أولاً.');return}
+let id='site-'+(++serial),frame=document.createElement('iframe');frame.title=name;frame.loading='eager';frame.referrerPolicy='strict-origin-when-cross-origin';frame.setAttribute('sandbox','allow-forms allow-scripts allow-same-origin allow-popups allow-downloads allow-presentation');frame.setAttribute('allow','autoplay; clipboard-read; clipboard-write; fullscreen; picture-in-picture');frame.src=url;frames.append(frame);items.push({id,name,url,frame});activate(id);show(true);if(!restore)save()}
+function closeTab(id){let i=items.findIndex(x=>x.id===id);if(i<0)return;items[i].frame.remove();items.splice(i,1);if(activeId===id)activeId=items[Math.max(0,i-1)]?.id||null;if(activeId)activate(activeId);else{hint.textContent='لا توجد مواقع مفتوحة. اختر موقعاً من المكتبة أو أدخل رابطاً.';document.getElementById('myToolsUrl').value='';renderTabs();save()}}
+function renderTabs(){tabs.replaceChildren();items.forEach(x=>{let b=document.createElement('button');b.type='button';b.className='tools-tab'+(x.id===activeId?' active':'');b.setAttribute('role','tab');let label=document.createElement('span');label.className='tab-name';label.textContent=x.name;b.append(label);let close=document.createElement('span');close.className='tab-close';close.textContent='×';close.title='إغلاق التبويب';close.addEventListener('click',e=>{e.stopPropagation();closeTab(x.id)});b.append(close);b.addEventListener('click',()=>activate(x.id));tabs.append(b)})}
+function render(q=''){let host=document.getElementById('myToolsItems');host.replaceChildren();catalog.forEach(group=>{let matches=group.slice(1).filter(x=>x[0].toLowerCase().includes(q.toLowerCase()));if(!matches.length)return;let section=document.createElement('section');section.className='tool-group';let h=document.createElement('h3');h.textContent=group[0];section.append(h);let list=document.createElement('div');list.className='tool-items';matches.forEach(([name,url])=>{let b=document.createElement('button');b.type='button';b.textContent=name;b.addEventListener('click',()=>addTab(name,url));list.append(b)});section.append(list);host.append(section)})}
+function openCurrentExternal(){let x=items.find(x=>x.id===activeId);if(x)window.open(x.url,'_blank','noopener,noreferrer')}
+document.getElementById('myToolsSearch').addEventListener('input',e=>render(e.target.value));
+document.getElementById('myToolsGo').addEventListener('click',()=>{try{let url=validUrl(document.getElementById('myToolsUrl').value);addTab(new URL(url).hostname,url)}catch(e){hint.textContent=e.message}});
+document.getElementById('myToolsUrl').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('myToolsGo').click()});
+document.getElementById('myToolsSaveCurrent').addEventListener('click',()=>{let x=items.find(x=>x.id===activeId);if(!x)return;let saved;try{saved=JSON.parse(localStorage.getItem('mymusic.workspace.saved.v1')||'[]')}catch(e){saved=[]}if(!saved.some(y=>y.url===x.url))saved.push({name:x.name,url:x.url});localStorage.setItem('mymusic.workspace.saved.v1',JSON.stringify(saved));hint.textContent='تم حفظ الموقع في قائمة المواقع المحفوظة على هذا الجهاز.'});
+fab.addEventListener('click',()=>show(!panel.classList.contains('open')));document.getElementById('myToolsClose').addEventListener('click',()=>show(false));
+document.getElementById('myToolsBack').addEventListener('click',()=>{render();hint.textContent='اختر موقعاً من المكتبة أو افتح رابطاً جديداً. تبويباتك الحالية باقية.'});
+document.getElementById('myToolsOpenExternal').addEventListener('click',openCurrentExternal);document.getElementById('myToolsExternal2').addEventListener('click',openCurrentExternal);
+document.getElementById('myToolsRetry').addEventListener('click',()=>{let x=items.find(x=>x.id===activeId);if(x)x.frame.src=x.url});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))show(false)});
+render();
+try{let prior=JSON.parse(localStorage.getItem(storageKey)||'null');if(prior&&Array.isArray(prior.items)){prior.items.slice(0,8).forEach(x=>{try{addTab(x.name||new URL(x.url).hostname,x.url,true)}catch(e){}});if(prior.activeId&&items.some(x=>x.id===prior.activeId))activate(prior.activeId);if(items.length)hint.textContent='تمت استعادة قائمة مواقعك تلقائياً. أعد تسجيل الدخول للمواقع التي تطلب ذلك.'}}catch(e){}
+if('serviceWorker' in navigator&&location.protocol==='https:'){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}))}
 const input=document.getElementById('myLearningInput'),status=document.getElementById('myLearningStatus'),output=document.getElementById('myLearningOutput'),run=document.getElementById('myLearningRun');function splitText(t,n){let a=[];for(let i=0;i<t.length;i+=n){let end=Math.min(i+n,t.length);if(end<t.length){let p=t.lastIndexOf(' ',end);if(p>i+n*.65)end=p+1}a.push(t.slice(i,end));i=end-1}return a}
 run.addEventListener('click',async()=>{let source=input.value.trim();if(!source){status.textContent='اكتب أو الصق النص أولاً.';return}let mode=document.getElementById('myLearningMode').value,lang=document.getElementById('myLearningLanguage').value,chunks=splitText(source,3300);run.disabled=true;output.textContent='';let results=[];try{for(let i=0;i<chunks.length;i++){status.textContent='جارٍ تنفيذ الجزء '+(i+1)+' من '+chunks.length+'...';let task=mode==='translate'?'ترجم النص التالي ترجمة دقيقة إلى '+lang+' مع الحفاظ على المعنى والتنسيق والمصطلحات.':mode==='explain'?'اشرح وبسّط النص التالي بالعربية الواضحة للمتعلمين، وعرّف المصطلحات الصعبة دون اختلاق معلومات.':'ترجم النص التالي إلى '+lang+' ثم أضف شرحاً تعليمياً مبسطاً بالعربية.';let response=await fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:task+'\n\n'+chunks[i],maxOutputTokens:4096})});let data=await response.json();if(!response.ok)throw new Error(data.error||'تعذر إتمام الطلب');results.push(data.text||'');output.textContent=results.join('\n\n');}status.textContent='اكتملت معالجة '+chunks.length+' جزءاً.'}catch(e){status.textContent='توقفت المعالجة: '+e.message+' — يمكنك إعادة المحاولة؛ النتيجة الجزئية محفوظة بالأسفل.'}finally{run.disabled=false}});
 document.getElementById('myLearningCopy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(output.textContent);status.textContent='تم نسخ النتيجة.'}catch(e){status.textContent='تعذر النسخ التلقائي؛ حدد النص وانسخه.'}});document.getElementById('myLearningClear').addEventListener('click',()=>{input.value='';output.textContent='';status.textContent='تم مسح النص والنتيجة.'});
@@ -2311,9 +2451,73 @@ document.getElementById('myLearningCopy').addEventListener('click',async()=>{try
   document.getElementById('mcSavePage').addEventListener('click',function(){var a=read(keys.saved,[]),url=location.href;if(!a.some(function(x){return x.url===url}))a.unshift({url:url,title:document.title||url});write(keys.saved,a.slice(0,100));renderSaved();log('حفظ الصفحة: '+(document.title||url))});
   document.getElementById('mcClearActivity').addEventListener('click',function(){write(keys.activity,[]);renderActivity()});
   document.addEventListener('click',function(e){var el=e.target.closest('button,a');if(!el||root.contains(el)||el===toggle)return;var label=(el.innerText||el.getAttribute('aria-label')||el.title||'تفاعل داخل الموقع').trim().slice(0,100);if(label)log(label)});
+  // Social discovery and locally managed creator directory (no fabricated Meta permissions or earnings)
+  (function initSocialGrowthHub(){
+    var fb=document.getElementById('socialFacebookDiscover'),ig=document.getElementById('socialInstagramDiscover');
+    if(fb)fb.addEventListener('click',function(){window.open('https://www.facebook.com/watch/','_blank','noopener,noreferrer')});
+    if(ig)ig.addEventListener('click',function(){window.open('https://www.instagram.com/explore/','_blank','noopener,noreferrer')});
+    var key='mymusic_creator_partners_v1',name=document.getElementById('creatorPartnerName'),platform=document.getElementById('creatorPartnerPlatform'),url=document.getElementById('creatorPartnerUrl'),add=document.getElementById('creatorPartnerAdd'),list=document.getElementById('creatorPartnerList'),status=document.getElementById('creatorPartnerStatus');
+    if(!add||!list)return;
+    function read(){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}}
+    function render(){
+      list.replaceChildren();read().forEach(function(item,index){
+        var card=document.createElement('div');card.className='social-account-item';
+        var title=document.createElement('strong');title.textContent=item.name+' · '+(item.platform==='facebook'?'Facebook':'Instagram');card.appendChild(title);
+        var link=document.createElement('a');link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='فتح الحساب الرسمي';card.appendChild(link);
+        var remove=document.createElement('button');remove.type='button';remove.className='btn btn-secondary btn-small';remove.textContent='حذف من الدليل';remove.addEventListener('click',function(){var rows=read();rows.splice(index,1);localStorage.setItem(key,JSON.stringify(rows));render()});card.appendChild(remove);list.appendChild(card);
+      });
+      if(!list.children.length){var empty=document.createElement('p');empty.className='social-note';empty.textContent='لا توجد صفحات مضافة بعد.';list.appendChild(empty)}
+    }
+    add.addEventListener('click',function(){
+      var n=(name.value||'').trim(),u=(url.value||'').trim();
+      if(!n||!u){status.textContent='أدخل اسم الصفحة والرابط أولاً.';return}
+      try{var parsed=new URL(u);if(parsed.protocol!=='https:'||!(parsed.hostname==='facebook.com'||parsed.hostname.endsWith('.facebook.com')||parsed.hostname==='instagram.com'||parsed.hostname.endsWith('.instagram.com')))throw new Error('استخدم رابط HTTPS رسمي من facebook.com أو instagram.com.');var rows=read();if(rows.length>=50)throw new Error('وصل الدليل إلى الحد الأقصى (50 صفحة).');if(rows.some(function(x){return x.url===parsed.href}))throw new Error('هذا الحساب موجود بالفعل.');rows.push({name:n,platform:platform.value,url:parsed.href});localStorage.setItem(key,JSON.stringify(rows));name.value='';url.value='';status.textContent='تمت إضافة الصفحة إلى دليل هذا المتصفح.';render()}catch(e){status.textContent=e.message||'تعذر التحقق من الرابط.'}
+    });
+    render();
+  })();
   renderActivity();renderSaved();
 })();
 </script>
 
+<script id="mymusic-multi-window-script">
+(function(){
+ const KEY="mymusic_multi_windows_v1",toggle=document.getElementById("mmwToggle"),panel=document.getElementById("mmwPanel"),close=document.getElementById("mmwClose"),urlInput=document.getElementById("mmwUrl"),add=document.getElementById("mmwAdd"),saveAll=document.getElementById("mmwSaveAll"),tabs=document.getElementById("mmwTabs"),host=document.getElementById("mmwFrameHost"),saved=document.getElementById("mmwSaved"),empty=document.getElementById("mmwEmpty");
+ if(!toggle||!panel)return;
+ let entries=[],active=null;
+ try{entries=JSON.parse(localStorage.getItem(KEY)||"[]");if(!Array.isArray(entries))entries=[];}catch(e){entries=[];}
+ entries=entries.filter(x=>x&&typeof x.url==="string"&&/^https:\/\//i.test(x.url)).slice(0,12);
+ function persist(){try{localStorage.setItem(KEY,JSON.stringify(entries.map(({id,title,url,closed})=>({id,title,url,closed:!!closed}))));}catch(e){info("تعذر حفظ الجلسة: مساحة التخزين ممتلئة.");}}
+ function info(msg){const el=document.getElementById("mmwInfo");if(el)el.textContent=msg;}
+ function render(){
+  tabs.replaceChildren();host.querySelectorAll(".mmw-frame").forEach(x=>x.remove());
+  entries.filter(x=>!x.closed).forEach(item=>{
+   const wrap=document.createElement("span");wrap.style.display="inline-flex";wrap.style.gap="3px";
+   const b=document.createElement("button");b.type="button";b.className="mmw-tab"+(item.id===active?" active":"");b.textContent=item.title;b.title=item.url;b.addEventListener("click",()=>activate(item.id));wrap.appendChild(b);
+   const ext=document.createElement("button");ext.type="button";ext.className="mmw-tab";ext.textContent="↗";ext.title="فتح في تبويب المتصفح";ext.addEventListener("click",()=>window.open(item.url,"_blank","noopener,noreferrer"));wrap.appendChild(ext);
+   const x=document.createElement("button");x.type="button";x.className="mmw-tab";x.textContent="×";x.title="إغلاق الصفحة مع الاحتفاظ بها";x.addEventListener("click",()=>{item.closed=true;if(active===item.id){active=(entries.find(z=>!z.closed)||{}).id||null;}persist();render();info("أُغلقت الصفحة من مساحة العمل وحُفظ رابطها لاستعادتها.");});wrap.appendChild(x);tabs.appendChild(wrap);
+   const frame=document.createElement("iframe");frame.className="mmw-frame";frame.dataset.id=item.id;frame.title=item.title;frame.loading="lazy";frame.referrerPolicy="strict-origin-when-cross-origin";frame.src=item.url;frame.hidden=item.id!==active;host.appendChild(frame);
+  });
+  empty.style.display=entries.some(x=>!x.closed)?"none":"block";renderSaved();
+ }
+ function renderSaved(){saved.replaceChildren();entries.forEach(item=>{const b=document.createElement("button");b.type="button";b.className="mmw-saved";b.textContent="★ "+item.title;b.addEventListener("click",()=>{item.closed=false;if(!host.querySelector('[data-id="'+item.id+'"]')){active=item.id;render();}activate(item.id);persist();panel.classList.add("open");toggle.setAttribute("aria-expanded","true");});saved.appendChild(b);});}
+ function activate(id){const item=entries.find(x=>x.id===id);if(!item)return;item.closed=false;active=id;host.querySelectorAll(".mmw-frame").forEach(f=>f.hidden=f.dataset.id!==id);Array.from(tabs.children).forEach((wrap)=>{const b=wrap.querySelector(".mmw-tab");if(b)b.classList.toggle("active",b.textContent===item.title);});persist();info("الموقع النشط: "+item.title+" — إذا منع الموقع التضمين فافتحه خارجياً من زر ↗.");}
+ function addSite(raw){
+  let u;try{u=new URL(raw);}catch(e){info("اكتب رابطاً صحيحاً يبدأ بـ https://");return;}
+  if(u.protocol!=="https:"){info("لأمانك، النوافذ المتعددة تقبل روابط HTTPS فقط.");return;}
+  if(entries.some(x=>x.url===u.href)){const old=entries.find(x=>x.url===u.href);activate(old.id);return;}
+  if(entries.length>=12){info("يمكن فتح 12 موقعاً في الجلسة. احذف موقعاً من القائمة أولاً.");return;}
+  const title=u.hostname.replace(/^www\./,"");const item={id:"w"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,url:u.href,closed:false};entries.push(item);active=item.id;persist();render();
+ }
+ toggle.addEventListener("click",()=>{const open=!panel.classList.contains("open");panel.classList.toggle("open",open);toggle.setAttribute("aria-expanded",String(open));});
+ close.addEventListener("click",()=>{panel.classList.remove("open");toggle.setAttribute("aria-expanded","false");});
+ add.addEventListener("click",()=>{if(urlInput.value.trim())addSite(urlInput.value.trim());});
+ urlInput.addEventListener("keydown",e=>{if(e.key==="Enter")add.click();});
+ saveAll.addEventListener("click",()=>{persist();info("تم حفظ قائمة المواقع. ستُستعاد عند فتح MyMusic مرة أخرى؛ إعادة تشغيل الصوت تلقائياً قد تتطلب نقرة بسبب قيود المتصفح.");});
+ render();
+ if(entries.length){active=(entries.find(x=>!x.closed)||{}).id||null;render();info("تمت استعادة "+entries.length+" موقعاً محفوظاً. قد تحتاج بعض المواقع إلى تسجيل الدخول أو إعادة التحميل.");}
+ // PWA shell caching: this does not make third-party websites available offline.
+ if("serviceWorker" in navigator && location.protocol==="https:"){navigator.serviceWorker.register("/service-worker.js").catch(()=>{});}
+})();
+</script>
 </body>
   </html>
