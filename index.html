@@ -1262,42 +1262,54 @@
         var btn=this, file=(aiMediaFileInput.files&&aiMediaFileInput.files[0])||activeLocalFile;
         if(!file){setStatus(aiMediaStatus,"اختر فيديو أو صوتاً أولاً.","error");return;}
         btn.disabled=true;
+        var video=null, objectUrl=null, recorder=null;
         try{
           if(!file.type.startsWith("video/")) {
-            setStatus(aiMediaStatus,"الملف صوتي بالفعل؛ جاري إرساله إلى Gemini مباشرة...","");
+            setStatus(aiMediaStatus,"الملف صوتي بالفعل؛ جاري تقسيمه إلى أجزاء للترجمة الطويلة...","");
             await transcribeAndTranslateFile(file); return;
           }
-          var video=playerStage.querySelector("video");
-          var capture=video&&(video.captureStream||video.mozCaptureStream);
+          if(typeof MediaRecorder==="undefined") throw new Error("متصفحك لا يدعم استخراج الصوت. استخدم Chrome حديثاً أو ارفع ملف MP3/M4A.");
+          video=document.createElement("video"); video.preload="auto"; video.muted=true; video.playsInline=true;
+          objectUrl=URL.createObjectURL(file); video.src=objectUrl;
+          await new Promise(function(resolve,reject){
+            video.onloadedmetadata=resolve; video.onerror=function(){reject(new Error("تعذر فتح ملف الفيديو لاستخراج الصوت."));};
+          });
+          var duration=video.duration;
+          if(!Number.isFinite(duration)||duration<=0) throw new Error("تعذر قراءة مدة الفيديو.");
+          var capture=video.captureStream||video.mozCaptureStream;
           if(!capture) {
-            setStatus(aiMediaStatus,"المتصفح لا يدعم استخراج مسار الصوت محلياً؛ سيرسل MyMusic الفيديو نفسه إلى Gemini ليستخرج الصوت داخلياً...","");
+            if(duration>3600) throw new Error("استخراج الصوت من فيديو أطول من ساعة يحتاج متصفحاً يدعم captureStream. افتح MyMusic في Chrome حديث أو ارفع ملفاً صوتياً.");
             await transcribeAndTranslateFile(file); return;
           }
           var stream=capture.call(video), audioTracks=stream.getAudioTracks();
-          if(!audioTracks.length) {
-            setStatus(aiMediaStatus,"لم يُعثر على مسار صوت قابل للاستخراج؛ سيرسل الفيديو إلى Gemini لتحليل الصوت داخلياً...","");
-            await transcribeAndTranslateFile(file); return;
-          }
+          if(!audioTracks.length) throw new Error("لم يتم العثور على مسار صوت داخل الفيديو.");
           var audioStream=new MediaStream(audioTracks), mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":"audio/webm";
-          var recorder=new MediaRecorder(audioStream,{mimeType:mimeType}), chunks=[];
-          setStatus(aiMediaStatus,"جاري تشغيل الفيديو واستخراج مسار الصوت فقط. لا تغلق الصفحة حتى ينتهي الاستخراج...","");
+          recorder=new MediaRecorder(audioStream,{mimeType:mimeType,audioBitsPerSecond:48000});
+          var chunks=[];
+          setStatus(aiMediaStatus,"جاري استخراج الصوت من الفيديو بسرعة التشغيل الفعلية ("+Math.floor(duration/3600)+" ساعة و"+Math.floor((duration%3600)/60)+" دقيقة). اترك الصفحة مفتوحة حتى ينتهي...","");
           var extractedBlob=await new Promise(function(resolve,reject){
             recorder.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data);};
             recorder.onerror=function(){reject(new Error("تعذر تسجيل مسار الصوت من الفيديو."));};
             recorder.onstop=function(){resolve(new Blob(chunks,{type:"audio/webm"}));};
-            video.currentTime=0;
-            recorder.start(500);
-            video.play().catch(function(err){recorder.stop();reject(err);});
             video.onended=function(){if(recorder.state!=="inactive")recorder.stop();};
+            recorder.start(5000);
+            video.play().catch(function(err){if(recorder.state!=="inactive")recorder.stop();reject(err);});
           });
-          if(!extractedBlob.size)throw new Error("لم يتم استخراج صوت من الفيديو.");
+          if(!extractedBlob.size) throw new Error("لم يتم استخراج صوت من الفيديو.");
+          if(extractedBlob.size>90*1024*1024) throw new Error("الصوت المستخرج تجاوز 90 ميجابايت. استخرج الصوت بجودة أقل أو قسّمه إلى أجزاء أقصر.");
           var extractedFile=new File([extractedBlob],"MyMusic-extracted-audio.webm",{type:"audio/webm"});
+          extractedFile.mymusicDurationSeconds=duration;
           activeLocalFile=extractedFile;
           try{var dt=new DataTransfer();dt.items.add(extractedFile);aiMediaFileInput.files=dt.files;}catch(e){}
-          setStatus(aiMediaStatus,"تم تحويل مسار صوت الفيديو إلى ملف صوتي. جاري تمريره إلى Gemini للترجمة...","");
+          setStatus(aiMediaStatus,"تم استخراج الصوت ("+Math.round(extractedBlob.size/1024/1024)+" ميجابايت). جاري تفريغه وترجمته على أجزاء متتابعة...","");
           await transcribeAndTranslateFile(extractedFile);
-        }catch(err){setStatus(aiMediaStatus,"تعذر استخراج الصوت محلياً: "+err.message+" — يمكنك استخدام زر ترجمة الملف لإرسال الفيديو مباشرة إلى Gemini.","error");}
-        finally{btn.disabled=false;}
+        }catch(err){setStatus(aiMediaStatus,"تعذر استخراج الصوت: "+err.message,"error");}
+        finally{
+          if(recorder&&recorder.state!=="inactive"){try{recorder.stop();}catch(e){}}
+          if(video){try{video.pause();video.removeAttribute("src");video.load();}catch(e){}}
+          if(objectUrl)URL.revokeObjectURL(objectUrl);
+          btn.disabled=false;
+        }
       });
 
       document.getElementById("translateCurrentVideoBtn").addEventListener("click",async function(){
