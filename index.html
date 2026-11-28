@@ -663,6 +663,16 @@
             </div>
           </div>
 
+          <section class="social-world-card" id="videoAssistantPanel" aria-label="مساعد الفيديو والفنان">
+            <strong>مساعد MyMusic AI للفيديو والفنان</strong>
+            <p class="social-note">اسأل عن معنى الأغنية أو معلومات الفنان أو تفاصيل الكليب أثناء المشاهدة. سيبقى المشغّل يعمل ولن يتوقف عند إرسال السؤال.</p>
+            <div class="input-row">
+              <input type="text" id="videoAssistantQuestion" maxlength="700" placeholder="مثلاً: ما معنى كلمات هذا المقطع؟ ومن كتب الأغنية؟" />
+              <button type="button" class="btn" id="videoAssistantAskBtn">اسأل المساعد</button>
+            </div>
+            <div class="result-box" id="videoAssistantAnswer" aria-live="polite">اختر فيديو ثم اكتب سؤالك. عند توفر معلومات عامة سيحاول المساعد الاستناد إلى بحث Google.</div>
+          </section>
+
           <div class="share-bar">
             <button type="button" class="btn btn-small" id="shareNativeBtn">مشاركة مجانية</button>
             <button type="button" class="btn btn-secondary btn-small" id="shareWhatsappBtn">نشر عبر واتساب</button>
@@ -1283,7 +1293,39 @@
         if(frame && window.myMusicYTPlayer) { try{return window.myMusicYTPlayer.getPlayerState()===1;}catch(e){} }
         var media=playerStage.querySelector("video,audio");
         return !!(media && !media.paused && !media.ended);
+      }      
+      // In-player AI Q&A. Requests never pause or replace the currently playing media.
+      var videoAssistantHistory=[];
+      var videoAssistantQuestion=document.getElementById("videoAssistantQuestion");
+      var videoAssistantAskBtn=document.getElementById("videoAssistantAskBtn");
+      var videoAssistantAnswer=document.getElementById("videoAssistantAnswer");
+      async function askVideoAssistant(){
+        var question=videoAssistantQuestion.value.trim();
+        if(!question){videoAssistantAnswer.textContent="اكتب سؤالك أولاً.";return;}
+        var title=clipTitleInput.value.trim()||"غير معروف";
+        var artist=clipArtistInput.value.trim()||"غير معروف";
+        var media=playerStage.querySelector("video,audio");
+        var currentTime=0;
+        try{if(window.myMusicYTPlayer)currentTime=window.myMusicYTPlayer.getCurrentTime()||0;else if(media)currentTime=media.currentTime||0;}catch(e){}
+        var sourceUrl=clipUrlInput.value.trim();
+        var translation=(document.getElementById("aiTranslationOut")?.textContent||"").trim().slice(0,900);
+        var history=videoAssistantHistory.slice(-4).map(function(item){return "سؤال: "+item.q+"\nإجابة: "+item.a;}).join("\n\n");
+        var prompt="أنت مساعد MyMusic AI للمعلومات الموسيقية وتحليل الفيديو الجاري. أجب بالعربية الواضحة. استخدم البحث المتاح للتحقق من الحقائق العامة عن الفنان والأغنية وفريق العمل. لا تخترع أسماء أو تواريخ أو كلمات أغنية؛ إذا لم تجد دليلاً واضحاً فقل إن المعلومة غير مؤكدة. ميّز بين المعلومة الموثقة والتحليل أو الرأي. لا تنقل كلمات أغنية محمية طويلة؛ اشرح معناها بدلاً من ذلك.\n\nسياق المشاهدة:\nعنوان الفيديو: "+title+"\nالفنان/القناة: "+artist+"\nرابط الفيديو: "+sourceUrl+"\nموضع التشغيل التقريبي بالثواني: "+Math.floor(currentTime)+"\nالنص/الترجمة الظاهرة في MyMusic إن وجدت: "+(translation||"غير متاح")+"\n\nسياق المحادثة السابق:\n"+(history||"لا يوجد")+"\n\nسؤال المستخدم: "+question+"\n\nأجب بإيجاز مفيد، واذكر مصادر أو روابط موثوقة عند توفرها.";
+        videoAssistantAskBtn.disabled=true;
+        videoAssistantAnswer.textContent="جارٍ البحث والتحقق والإجابة… يمكنك متابعة مشاهدة الفيديو أثناء ذلك.";
+        try{
+          var result=await safeFetchJson("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:prompt,enableSearch:true,maxOutputTokens:1600})});
+          var answer=String(result.text||"لم تصل إجابة.").trim();
+          videoAssistantAnswer.textContent=answer;
+          videoAssistantHistory.push({q:question,a:answer});
+          videoAssistantHistory=videoAssistantHistory.slice(-6);
+          videoAssistantQuestion.value="";
+        }catch(error){videoAssistantAnswer.textContent=error.message||"تعذر الحصول على إجابة الآن.";}
+        finally{videoAssistantAskBtn.disabled=false;}
       }
+      videoAssistantAskBtn.addEventListener("click",askVideoAssistant);
+      videoAssistantQuestion.addEventListener("keydown",function(event){if(event.key==="Enter"){event.preventDefault();askVideoAssistant();}});
+
       function stopDubSources() {
         dubActiveSources.forEach(function(source){try{source.stop();}catch(e){}});
         dubActiveSources=[];
