@@ -1,1410 +1,411 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MyMusic AI | ترجمة الفيديو والصوت بالذكاء الاصطناعي والتعليم</title>
-<meta name="description" content="MyMusic AI منصة MyMusic AI لرفع الفيديو والصوت إلى Gemini وترجمة الكلام إلى لغات متعددة مع ترجمة مصاحبة للفيديو، ومساعد ذكي للتعليم والبحث والموسيقى.">
-<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-<link rel="canonical" href="https://mymusic-3k6.pages.dev/">
-<link rel="icon" type="image/svg+xml" href="/icon.svg">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0a0a0a">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="MyMusic">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="MyMusic AI">
-<meta property="og:title" content="MyMusic AI | ترجمة الفيديو والصوت والتعليم">
-<meta property="og:description" content="ارفع الفيديو والصوت إلى Gemini وترجم المحتوى داخل MyMusic، واستخدم أدوات التعليم والبحث والموسيقى.">
-<meta property="og:url" content="https://mymusic-3k6.pages.dev/">
-<meta property="og:image" content="https://mymusic-3k6.pages.dev/cover.jpg">
-<meta property="og:locale" content="ar_EG">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="MyMusic AI – اكتشف الموسيقى">
-<meta name="twitter:description" content="ابحث عن الأغاني والفنانين واستمع إلى المعاينات الموسيقية مع MyMusic.">
-<meta name="twitter:image" content="https://mymusic-3k6.pages.dev/cover.jpg">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "MyMusic AI",
-  "url": "https://mymusic-3k6.pages.dev/",
-  "inLanguage": "ar",
-  "description": "منصة ذكاء اصطناعي لترجمة الفيديو والصوت والنصوص، ومساعد للتعليم والبحث والموسيقى."
+:root {
+  --bg: #0b0f19;
+  --surface: #131a2a;
+  --surface-2: #1b2438;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #f3f6fc;
+  --muted: #9aa7c0;
+  --primary: #7c3aed;
+  --accent: #06b6d4;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --radius: 16px;
 }
-</script>
-<style>
-:root{color-scheme:dark;--bg:#091522;--surface:#10263a;--surface-2:#17334a;--line:#28516a;--text:#f3f9ff;--muted:#b4c9d8;--purple:#7865e8;--cyan:#19a6ad;--gold:#f0bd58}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse at top,#15394a 0%,var(--bg) 62%);color:var(--text);padding-bottom:0;line-height:1.6}
-.top{background:linear-gradient(120deg,#33266f 0%,#185477 55%,#087f91 100%);padding:22px 16px;text-align:center;border-radius:0 0 25px 25px;box-shadow:0 8px 28px #0005}
-.top h1{letter-spacing:.3px}
-.box{background:linear-gradient(145deg,rgba(24,37,62,.96),rgba(17,27,47,.96));margin:14px 12px;padding:16px;border-radius:18px;border:1px solid var(--line);box-shadow:0 8px 24px #0002}
-h2{margin:5px 0 12px;font-size:18px;color:#dce8ff}
-input,select,textarea{max-width:100%;padding:12px;border-radius:12px;border:1px solid #405477;text-align:center;font-size:15px;margin:6px 0;color:var(--text);background:#101a2d}
-input::placeholder,textarea::placeholder{color:#91a1bd}
-button{padding:11px 15px;border-radius:12px;border:1px solid transparent;background:linear-gradient(135deg,#6750d8,#4938a8);color:#fff;font-weight:700;margin:4px;cursor:pointer;transition:filter .15s,transform .15s}
-button:hover,.ai-btn:hover{filter:brightness(1.13)}
-button:active{transform:translateY(1px)}
-button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #68d5e8;outline-offset:2px}
-.btn-green{background:linear-gradient(135deg,#159b83,#08745f)}.btn-white{background:#e6edfa;color:#17233a}.btn-dark{background:#34435e;color:#fff}.btn-gold{background:linear-gradient(135deg,#e9b949,#bd8124);color:#171b28}.btn-blue{background:linear-gradient(135deg,#258fc5,#315ac1)}
-.ai-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-.ai-btn{display:block;text-align:center;padding:13px;border-radius:13px;color:#edf5ff;text-decoration:none;font-weight:700;font-size:14px;background:#20314f;border:1px solid #354a6e}
-.card{background:linear-gradient(145deg,#1a2944,#142139);margin:9px 0;padding:13px;border-radius:14px;border:1px solid #2b3d5d}
-#clock{font-size:clamp(32px,8vw,44px);font-weight:800;text-align:center;color:#a9dcf5;font-variant-numeric:tabular-nums}
-#player{display:none!important}
-audio,video{width:100%;max-width:100%}
-.progress{height:7px;background:#30415f;border-radius:10px;overflow:hidden;margin:8px 0}
-#progressBar{height:100%;background:linear-gradient(90deg,#7657e8,#22b8c7);width:0%}
-#floatBtn{display:none;position:fixed;bottom:18px;left:12px;z-index:999;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#7865e8,#087f91);font-size:26px;box-shadow:0 5px 22px #0008}
-#floatMenu{position:fixed;bottom:88px;left:12px;z-index:999;background:#111d32;border:1px solid var(--line);border-radius:16px;padding:10px;display:none;width:min(320px,calc(100vw - 24px));max-height:70vh;overflow:auto;box-shadow:0 10px 30px #0009}
-#floatMenu button{display:block;width:100%;margin:5px 0}
-#floatMenu .floatLink{display:block;background:#20314f;color:#edf5ff;text-decoration:none;padding:9px 10px;margin:5px 0;border-radius:11px;font-size:13px;line-height:1.5;border:1px solid #354a6e}
-#floatMenu .floatLink:active{background:#344b70}
-#floatMenu b{display:block;margin:8px 2px 4px;color:#f1cb70;font-size:13px}
-#geminiPanel{position:fixed;right:12px;left:12px;bottom:88px;z-index:1002;background:#111d32;border:1px solid #42577b;border-radius:16px;padding:12px;max-height:65vh;overflow:auto;box-shadow:0 8px 28px #000b;text-align:right;display:none}
-#geminiPanel textarea{width:100%;min-height:90px;resize:vertical;padding:10px;border-radius:10px;border:1px solid #405477;background:#101a2d;color:#fff;font:inherit}
-#geminiReply{white-space:pre-wrap;overflow-wrap:anywhere;background:#1b2944;padding:10px;border:1px solid #304361;border-radius:10px;margin-top:8px;min-height:35px;max-height:30vh;overflow:auto;line-height:1.7}
-#liveTranslate{background:#1b2944;border:1px solid #354a6e;border-radius:12px;padding:10px;margin:8px 0;text-align:right}
-#liveTranslatePanel{position:fixed;right:12px;left:12px;bottom:88px;z-index:1001;background:#111d32;border:1px solid #42577b;border-radius:16px;padding:12px;max-height:55vh;overflow:auto;box-shadow:0 8px 28px #000b;text-align:right}
-#liveTranslatePanel button{max-width:100%}
-#liveTranslatePanel select,#liveTranslate select{width:100%;margin:4px 0;padding:9px;border-radius:10px}
-#liveOriginal,#liveResult{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:7px 0;color:#fff}
-#liveResult{color:#75e0bd}
-#transcriptOutput textarea{direction:auto;text-align:start;unicode-bidi:plaintext;white-space:pre;overflow:auto}#transcriptOutput pre{direction:auto;text-align:start;unicode-bidi:plaintext}#ocrOutput{display:block;white-space:pre-wrap;overflow-wrap:anywhere;background:#17243b;padding:8px;border-radius:8px;margin-top:8px;color:#fff;font-size:13px}
-#liveTranslate .small{line-height:1.6}
-#ytBox iframe{width:100%;height:220px;border-radius:14px}
-.small{font-size:12px;color:var(--muted)}
-#inAppBrowser{position:fixed;inset:0;z-index:3000;background:#080f1d;display:none;flex-direction:column}
-#inAppBrowser .browserBar{display:flex;gap:6px;align-items:center;padding:9px;background:#17243b;border-bottom:1px solid var(--line)}
-#inAppBrowser .browserBar button{margin:0;padding:9px 12px}
-#inAppBrowser iframe{width:100%;height:100%;border:0;background:#fff}
-#inAppBrowser .browserHint{font-size:11px;color:#dbe6f7;padding:6px 10px;background:#20314f}
-body.light-theme{color-scheme:light;background:#edf2fa;color:#18243a}
-body.light-theme .box{background:#fff;border-color:#d5deed;box-shadow:0 5px 18px #1b315015}
-body.light-theme .card{background:#f4f7fc;border-color:#dce4f0}
-body.light-theme h2{color:#263b5d}
-body.light-theme .small{color:#586a85}
-body.light-theme input,body.light-theme select,body.light-theme textarea{background:#f8faff;color:#18243a;border-color:#c6d2e4}
-body.light-theme #geminiPanel,body.light-theme #liveTranslatePanel{background:#fff;color:#18243a;border-color:#c6d2e4}
-body.light-theme #geminiReply,body.light-theme #liveTranslate,body.light-theme #ocrOutput{background:#f1f5fb;color:#18243a}
-@media(max-width:480px){.box{margin:10px;padding:13px}.ai-grid{gap:7px}.ai-btn{font-size:12px;padding:11px}}
 
-/* MyMusic AI premium black & gold theme */
-:root{
- color-scheme:dark;
- --bg:#050505;--surface:#101010;--surface-2:#181818;--line:#8a681d;
- --text:#f7f4eb;--muted:#c9c1ad;--purple:#d4af37;--cyan:#e5bd50;--gold:#d4af37;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-html,body{background:#050505!important;color:#f7f4eb!important}
-body{background:radial-gradient(ellipse at top,#201909 0%,#080808 42%,#030303 100%)!important}
-.top{background:linear-gradient(135deg,#050505 0%,#17120a 55%,#050505 100%)!important;border:1px solid #8a681d;border-top:0;box-shadow:0 8px 28px #d4af3722}
-.top h1,h1,h2{color:#f3d477}
-.box,.card,#geminiPanel,#liveTranslatePanel,#floatMenu,#liveTranslate,#geminiReply,#ocrOutput{
- background:linear-gradient(145deg,#151515,#090909)!important;
- border-color:#76591c!important;color:#f7f4eb;
- box-shadow:0 8px 24px #0009,0 0 12px #d4af3710;
+
+body {
+  font-family: "Cairo", "Segoe UI", Tahoma, sans-serif;
+  background: radial-gradient(circle at top right, #1b1438 0%, var(--bg) 45%);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
 }
-#aiTranslationHub{background:linear-gradient(145deg,#15120b,#080808)!important;border-color:#d4af37!important}
-input,select,textarea,#geminiPanel textarea{
- background:#101010!important;color:#fff!important;border:1px solid #8a681d!important;
+
+a {
+  color: var(--accent);
+  text-decoration: none;
 }
-input::placeholder,textarea::placeholder{color:#b9ad91!important}
-button,.btn-green,.btn-white,.btn-dark,.btn-gold,.btn-blue{
- background:linear-gradient(135deg,#f5d778 0%,#d4af37 48%,#a87917 100%)!important;
- color:#100d06!important;border:1px solid #f4d77b!important;
- font-weight:800;box-shadow:0 3px 12px #d4af3728;
+
+.container {
+  width: min(1280px, 94%);
+  margin: 0 auto;
 }
-button:hover,.ai-btn:hover{filter:brightness(1.12);box-shadow:0 4px 18px #d4af3750}
-button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #f5d778!important;outline-offset:3px}
-.ai-btn,#floatMenu .floatLink{
- background:linear-gradient(145deg,#17130a,#090909)!important;color:#f4d36d!important;
- border:1px solid #bd922e!important;
+
+/* Header */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(11, 15, 25, 0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
 }
-#floatBtn{background:linear-gradient(135deg,#f5d778,#b88620)!important;color:#100d06!important;border:1px solid #f5d778!important}
-#clock{color:#f3d477!important}
-.small{color:#c9c1ad!important}
-#progressBar{background:linear-gradient(90deg,#a87917,#f5d778)!important}
-.progress{background:#292216!important}
-#liveResult{color:#f3d477!important}
-#inAppBrowser{background:#050505!important}
-#inAppBrowser .browserBar{background:#111!important;border-color:#76591c!important}
-body.light-theme{color-scheme:dark!important;background:#050505!important;color:#f7f4eb!important}
-body.light-theme .box,body.light-theme .card,body.light-theme #geminiPanel,body.light-theme #liveTranslatePanel,
-body.light-theme #geminiReply,body.light-theme #liveTranslate,body.light-theme #ocrOutput{
- background:linear-gradient(145deg,#151515,#090909)!important;color:#f7f4eb!important;border-color:#76591c!important
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  flex-wrap: wrap;
 }
-body.light-theme h2{color:#f3d477!important}
-body.light-theme .small{color:#c9c1ad!important}
-body.light-theme input,body.light-theme select,body.light-theme textarea{background:#101010!important;color:#fff!important;border-color:#8a681d!important}
-@media(max-width:480px){.top{padding:20px 12px}.box{border-radius:16px}}
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-/* MyMusic AI — VEVO in-page experience (additive; existing styles preserved) */
-#vevoAiHub{background:linear-gradient(145deg,#17130a,#090909);border:1px solid #8c6a25}
-#vevoAiHub h2,#vevoAiHub h3{color:#e8bd55}
-#vevoAiHub .vevo-field{width:min(100%,680px);text-align:right;background:#101010;border:1px solid #806222;color:#fff}
-#vevoAiHub .vevo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px}
-#vevoAiHub .vevo-result{background:#111;border:1px solid #57451f;border-radius:14px;padding:10px;display:flex;gap:10px;align-items:center;min-width:0}
-#vevoAiHub .vevo-result img{width:112px;aspect-ratio:16/9;object-fit:cover;border-radius:8px}
-#vevoAiHub .vevo-result b{display:block;color:#f4e4b8;font-size:13px}
-#vevoAiHub .vevo-result small{color:#b9aa86}
-#vevoAiHub .vevo-player{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;border:1px solid #70551d;margin-top:12px}
-#vevoAiHub .vevo-player iframe{width:100%;height:100%;border:0;position:absolute;inset:0}
-#vevoAiHub .vevo-status{background:#101010;border:1px solid #55451f;border-radius:10px;padding:10px;color:#e8d9b4;white-space:pre-wrap}
-#vevoAiHub .vevo-lyrics{width:100%;min-height:110px;text-align:start;direction:auto;background:#101010;color:#fff;border:1px solid #806222}
-#vevoAiHub .vevo-output{white-space:pre-wrap;direction:auto;text-align:start;max-height:360px;overflow:auto;background:#090909;border:1px solid #5d4b25;padding:12px;border-radius:12px;color:#f4e7c7}
+.brand-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
+}
 
-/* Premium streaming workspace polish */
-#vevoAiHub{padding:clamp(16px,3vw,30px);box-shadow:0 18px 55px #0008}
-#vevoAiHub>h2{font-size:clamp(21px,3vw,30px);letter-spacing:.1px;margin-bottom:8px}
-#vevoAiHub>p{max-width:900px;color:#c8bea6;line-height:1.8}
-#vevoAiHub input.vevo-field,#vevoAiHub select.vevo-field{min-height:48px;padding:11px 14px;border-radius:12px}
-#vevoAiHub button{min-height:44px;border-radius:11px;font-weight:700;transition:transform .18s ease,filter .18s ease}
-#vevoAiHub button:hover{filter:brightness(1.12);transform:translateY(-1px)}
-#vevoAiHub .vevo-result{transition:border-color .18s ease,transform .18s ease;box-shadow:0 8px 24px #0005}
-#vevoAiHub .vevo-result:hover{border-color:#d4af37;transform:translateY(-2px)}
-#vevoAiHub .vevo-player{border-radius:18px;box-shadow:0 14px 36px #0009}
-#vevoAiHub .vevo-status{margin-top:12px;line-height:1.7}
-#vevoAiHub .vevo-output{min-height:90px;line-height:1.85;border-radius:14px}
-#vevoAiHub label{display:block;margin:14px 0 7px;color:#e8bd55}
-@media(max-width:600px){#vevoAiHub .vevo-result img{width:96px}#vevoAiHub .vevo-player{border-radius:12px}}
+.brand h1 {
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
 
+.brand small {
+  color: var(--muted);
+  font-size: 0.8rem;
+  display: block;
+}
 
+.nav-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
-/* VEVO AI companion — stays outside the iframe so chat never reloads playback */
-#vevoAiChatToggle{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin:12px 0 8px;padding:14px 16px;border-radius:16px;background:linear-gradient(120deg,#f5d778,#d4af37 55%,#9c7018)!important;color:#100d06!important;border:1px solid #ffe59a!important;font-size:16px;box-shadow:0 8px 28px #d4af3733}
-#vevoAiChatToggle .vevo-key-icon{font-size:25px;filter:drop-shadow(0 2px 2px #0005)}
-#vevoAiChat{display:none;background:linear-gradient(145deg,#17130a,#080808);border:1px solid #bd922e;border-radius:16px;padding:14px;margin:8px 0 14px;box-shadow:0 12px 34px #0009}
-#vevoAiChat.open{display:block}
-#vevoAiChat h3{color:#f3d477;margin:0 0 4px}
-#vevoAiChatMessages{display:flex;flex-direction:column;gap:9px;max-height:340px;overflow:auto;padding:8px 2px;scroll-behavior:smooth}
-.vevo-chat-msg{white-space:pre-wrap;overflow-wrap:anywhere;padding:10px 12px;border-radius:13px;line-height:1.75;max-width:96%}
-.vevo-chat-user{align-self:flex-start;background:#2a2110;border:1px solid #8b6b28;color:#fff2cf}
-.vevo-chat-ai{align-self:flex-end;background:#151515;border:1px solid #57451f;color:#f7f4eb}
-#vevoAiChatInput{width:100%;min-height:58px;text-align:right;resize:vertical}
-#vevoAiChat .vevo-chat-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-#vevoAiChat .vevo-chat-actions button{flex:1;min-width:125px}
-#vevoAiChatHint{color:#c9c1ad;font-size:12px;line-height:1.7}
-@media(max-width:520px){#vevoAiChat{padding:10px}#vevoAiChatMessages{max-height:280px}}
+.nav-btn {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
 
-</style>
-</head>
-<body>
+.nav-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
-<div style="text-align:center">
-<img src="cover.jpg" onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1200&q=80'" style="width:100%;height:260px;object-fit:cover;display:block" alt="MyMusic AI">
-</div>
+/* Ad Slots */
+.ad-slot {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(6, 182, 212, 0.08));
+  border: 1px dashed rgba(154, 167, 192, 0.35);
+  border-radius: var(--radius);
+  padding: 14px;
+  text-align: center;
+  color: var(--muted);
+  margin: 18px 0;
+}
 
-<div class="top">
-<h1 style="margin:0">🎧 MyMusic AI</h1>
-<p style="margin:5px">اسمع - اتفرج - ترجم - اشتغل على الذكاء الاصطناعي<br>كل حاجة جوه الموقع</p>
-<button class="btn-green" onclick="alert('الأزرار شغالة ✅')">✅ جرب الزرار</button>
-<button class="btn-white" onclick="toggleNight()">🌙 وضع ليلي</button>
-<button class="btn-gold" onclick="toggleFloat()">👁️ إظهار / إخفاء الزر العائم</button>
-</div>
+.ad-slot span {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  color: var(--warning);
+}
 
-<nav class="box" aria-label="التنقل الرئيسي" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px">
-  <a class="ai-btn" href="#vevoAiHub">🎬 VEVO الرئيسية</a>
-  <a class="ai-btn" href="#aiTranslationHub">🤖 الذكاء الاصطناعي</a>
-  <a class="ai-btn" href="#mediaTranslationTools">🎞️ ترجمة الفيديو والصوت</a>
-  <a class="ai-btn" href="#trText">🌐 ترجمة النصوص</a>
-</nav>
+/* Main Grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 20px;
+  margin-top: 16px;
+}
 
-<section class="box" id="vevoAiHub" aria-labelledby="vevoAiTitle">
-  <h2 id="vevoAiTitle">🎬 MyMusic AI — الواجهة الرئيسية للموسيقى وVEVO</h2>
-  <p class="small">ابحث عن فيديوهات YouTube العامة القابلة للتضمين أو قنوات VEVO، وشغّلها داخل الموقع. يمكن لـ Gemini محاولة استخراج الكلام والكلمات من الفيديوهات العامة المدعومة، ثم ترجمتها وإعداد ملف SRT. قد لا تتاح المعالجة لبعض الفيديوهات بحسب إمكانية الوصول والقيود.</p>
-  <div>
-    <input id="vevoSearchInput" class="vevo-field" type="search" maxlength="120" placeholder="ابحث في YouTube — مثال: Adele Hello">
-    <select id="vevoSearchMode" class="vevo-field" aria-label="نطاق البحث"><option value="all">كل فيديوهات YouTube المتاحة</option><option value="vevo">قنوات VEVO فقط</option></select>
-    <button class="btn-gold" type="button" onclick="searchVevoVideos()">🔎 ابحث عن فيديو</button>
-  </div>
-  <div id="vevoStatus" class="vevo-status" role="status" aria-live="polite">ابحث في YouTube أو اختر قنوات VEVO فقط. البحث يحتاج YOUTUBE_API_KEY في Cloudflare، وتحليل الفيديو يحتاج GEMINI_API_KEY.</div>
-  <div id="vevoResults" class="vevo-grid"></div>
-  <div id="vevoNowPlaying" class="small" style="margin-top:10px;color:#e8bd55">لم يتم اختيار فيديو بعد.</div>
-  <div id="vevoPlayer" class="vevo-player"><div style="position:absolute;inset:0;display:grid;place-items:center;color:#c8aa65">سيظهر الفيديو هنا داخل الموقع بعد اختياره</div></div>
-  <button id="vevoAiChatToggle" type="button" aria-expanded="false" aria-controls="vevoAiChat" onclick="toggleVevoAiChat()">
-    <span class="vevo-key-icon" aria-hidden="true">🔑</span><span>اسأل MyMusic AI عن الفيديو والفنان</span><span aria-hidden="true">✨</span>
-  </button>
-  <section id="vevoAiChat" aria-label="مساعد الذكاء الاصطناعي الخاص بالفيديو">
-    <h3>🤖 مساعد VEVO الذكي</h3>
-    <p id="vevoAiChatHint">اسأل عن الفنان، الأغنية، معنى الكلمات، الألبوم، خلفية الفيديو أو أي سؤال آخر. ستظل المشاهدة مستمرة أثناء المحادثة.</p>
-    <div id="vevoAiChatMessages" role="log" aria-live="polite"><div class="vevo-chat-msg vevo-chat-ai">أهلًا بك! اختر فيديو ثم اسألني عنه. أستطيع استخدام عنوان الفيديو والقناة والنص المستخرج إن توفر.</div></div>
-    <textarea id="vevoAiChatInput" class="vevo-field" maxlength="1000" placeholder="اكتب سؤالك عن الفيديو أو الفنان..."></textarea>
-    <div class="vevo-chat-actions">
-      <button class="btn-gold" id="vevoAiChatSend" type="button" onclick="sendVevoAiQuestion()">إرسال السؤال</button>
-      <button class="btn-dark" type="button" onclick="clearVevoAiChat()">مسح المحادثة</button>
-      <button class="btn-dark" type="button" onclick="toggleVevoAiChat(false)">إخفاء المساعد</button>
-    </div>
-    <p class="small">ملاحظة: المساعد لا يلتقط صوت YouTube مباشرة من المشغل المحمي. دقة الإجابة عن تفاصيل المشهد أو كلمات الأغنية تتحسن بعد استخراج النص من الفيديو.</p>
-  </section>
-  <div class="vevo-grid">
-    <button class="btn-gold" type="button" onclick="transcribeVevoVideo()">🎤 استخراج الكلام والكلمات من الفيديو</button>
-    <button class="btn-dark" type="button" onclick="downloadVevoSrt()" id="vevoDownloadBtn" disabled>⬇️ تنزيل SRT المترجم</button>
-  </div>
-  <label class="small" for="vevoTargetLanguage">لغة الترجمة</label>
-  <select id="vevoTargetLanguage" class="vevo-field">
-    <option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="de">Deutsch</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="hi">हिन्दी</option><option value="pt">Português</option><option value="ja">日本語</option>
-  </select>
-  <label class="small" for="vevoLyricsInput">أو الصق كلمات الأغنية / نص الترجمة هنا</label>
-  <textarea id="vevoLyricsInput" class="vevo-lyrics" maxlength="4500" placeholder="الصق الكلمات أو النص هنا، وسيترجمها Gemini داخل MyMusic AI..."></textarea>
-  <button class="btn-gold" type="button" onclick="translateVevoLyrics()">✨ ترجم الكلمات بالذكاء الاصطناعي</button>
-  <h3>النص الأصلي المستخرج</h3>
-  <div id="vevoOriginalOutput" class="vevo-output">سيظهر النص الأصلي هنا بعد التحليل.</div>
-  <h3>الترجمة</h3>
-  <div id="vevoTranslatedOutput" class="vevo-output">ستظهر الترجمة هنا مع الحفاظ على توقيتات SRT عند توفرها.</div>
-</section>
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 20px;
+}
 
+.card-title {
+  font-size: 1.1rem;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
 
-<section class="box" id="aiTranslationHub" style="border:2px solid #7c3aed;background:linear-gradient(135deg,#17102c,#101827);margin-top:16px">
-<h2 style="font-size:22px;color:#facc15">🤖 مركز الذكاء الاصطناعي والترجمة</h2>
-<p class="small">الأدوات هنا ظاهرة مباشرة في الصفحة، من غير الحاجة للبحث داخل الزر العائم.</p>
-<div class="ai-grid">
-<button class="btn-blue" onclick="openGeminiPanel()">✨ مساعد Gemini داخل الموقع</button>
-<button class="btn-green" onclick="document.getElementById('mediaTranslationTools').scrollIntoView({behavior:'smooth'})">🎬 ترجمة الفيديو والصوت</button>
-<button class="btn-gold" onclick="chooseMediaForTranslation()">📂 اختر فيديو أو أغنية</button>
-<button class="btn-dark" onclick="document.getElementById('textTranslationHub').scrollIntoView({behavior:'smooth'})">🌐 ترجمة النصوص</button>
-</div>
-<div class="card" style="background:#101010">
-<b>🎬 ترجمة الفيديو والأغاني بالذكاء الاصطناعي</b>
-<p class="small">اختر ملف MP4 أو MP3 من هاتفك. سيُرفع الملف مباشرة إلى Gemini من خلال خادم MyMusic، ليستخرج الكلام مع التوقيت، ثم يترجم النص إلى اللغة المختارة. الحد الحالي 25 ميجابايت لكل ملف. الملفات الأكبر لن تُرفع؛ اختر مقطعًا أقصر أو اضغط الملف قبل الرفع.</p>
-<label class="small" for="mediaSpeechTarget">لغة الترجمة</label>
-<select id="mediaSpeechTarget" aria-label="لغة الترجمة"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option></select>
-<label class="small" for="mediaSpeechSource">لغة الصوت الأصلي (اختياري)</label>
-<select id="mediaSpeechSource" aria-label="لغة الصوت الأصلي"><option value="auto">اكتشاف تلقائي</option><option value="en-US">English</option><option value="ar">العربية</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="tr">Türkçe</option></select>
-<button class="btn-green" onclick="chooseMediaForTranslation()">اختيار ملف للترجمة</button>
-</div>
-<div class="card">
-<b>🌍 مواقع ترجمة الفيديو والترجمة النصية</b>
-<div class="ai-grid">
-<a class="ai-btn" href="https://amara.org/" target="_blank" rel="noopener noreferrer">Amara – ترجمة وترجمة字幕 الفيديو</a>
-<a class="ai-btn" href="https://amara.org/subtitling-platform/" target="_blank" rel="noopener noreferrer">Amara Subtitle Editor</a>
-<a class="ai-btn" href="https://www.veed.io/tools/video-translator" target="_blank" rel="noopener noreferrer">VEED Video Translator</a>
-<a class="ai-btn" href="https://www.kapwing.com/tools/translate-video" target="_blank" rel="noopener noreferrer">Kapwing Video Translator</a>
-<a class="ai-btn" href="https://translate.google.com/" target="_blank" rel="noopener noreferrer">Google Translate</a>
-<a class="ai-btn" href="https://www.deepl.com/translator" target="_blank" rel="noopener noreferrer">DeepL Translator</a>
-</div>
-<p class="small">المواقع الخارجية تفتح في صفحة مستقلة وقد تتطلب حسابًا أو اشتراكًا لبعض الميزات.</p>
-</div>
-</section>
+/* Controls */
+.input-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
 
-<div class="box" style="text-align:center">
-<div id="clock">00:00:00</div>
-<div id="date">--</div>
-<div>🌤️ <span id="weatherDesc">الطقس</span> | <b id="weatherTemp">--°</b> | <span id="weatherCity">القاهرة</span></div>
-<button class="btn-white" onclick="getWeatherCairo()">🔄 تحديث الطقس</button>
-</div>
+input[type="text"],
+input[type="url"],
+select,
+textarea {
+  width: 100%;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+}
 
-<div class="box">
-<h2>🔍 محركات البحث - جوجل و Manus والذكاء الاصطناعي</h2>
-<input id="gSearch" placeholder="اكتب أي حاجة... أغنية، فيديو، موقع">
-<button class="btn-blue" onclick="openSearch('google')">بحث جوجل</button>
-<button class="btn-gold" onclick="openSearch('youtube')">بحث يوتيوب</button>
-<button class="btn-green" onclick="openSearch('manus')">بحث Manus</button>
-<button class="btn-dark" onclick="openSearch('mp3')">بحث MP3</button>
-<div id="gRes"></div>
-</div>
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+}
 
-<div class="box">
-<h2>▶️ يوتيوب جوه الموقع - تشغيل وترجمة</h2>
-<input id="ytInput" placeholder="الصق لينك يوتيوب أو اكتب اسم فيديو">
-<button class="btn-green" onclick="playYoutube()">▶️ تشغيل جوه الموقع</button>
-<button class="btn-gold" onclick="translateYT()">🌐 ترجمة الفيديو</button>
-<button class="btn-blue" onclick="openYTApp()">فتح في تطبيق يوتيوب</button>
-<div id="ytBox" style="margin-top:10px"></div>
-<div id="ytTrans"></div>
-</div>
+.input-row > input,
+.input-row > select {
+  flex: 1;
+  min-width: 160px;
+}
 
-<div class="box">
-<h2>📂 ملفات الهاتف - فيديو / صوت / صور / أغاني</h2>
-<input type="file" id="myFiles" accept="audio/*,video/*,image/*" multiple onchange="saveMyFiles(this)">
-<div id="myFilesList"></div>
-<p class="small">اختَر ملف صوت أو فيديو ثم اضغط «ارفع إلى Gemini واستخرج الترجمة». يرسل الملف من MyMusic إلى Gemini لمعالجته، ثم يحذف الخادم نسخة Gemini المؤقتة بعد اكتمال التحليل.</p>
-</div>
+.btn {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
 
-<div class="box" id="mediaTranslationTools">
-<h2>🎬 رفع الفيديو والصوت إلى Gemini وترجمتهما</h2>
-<p class="small">ارفع ملف MP3 أو MP4 من قسم ملفات الهاتف: يرفع MyMusic الملف إلى Gemini Files API لتحليل الصوت والصورة واستخراج الكلام بتوقيتات ترجمة SRT، ثم يترجم النص داخل الموقع. لا يضيف هذا تلقائياً دبلجة صوتية أو ترجمة مكتوبة فوق كل فيديو أثناء البث المباشر.</p>
-<button class="btn-green" onclick="openLiveTranslationPanel()">فتح لوحة الترجمة</button>
-<button class="btn-blue" onclick="translateCurrentMedia()">محاولة ترجمة الميديا الحالية</button>
-<button class="btn-gold" onclick="startTabAudioTranslation()">ترجمة صوت تبويب أو موقع</button>
-<button class="btn-dark" onclick="exportTranslationHistory()">تنزيل الترجمات المحفوظة</button>
-</div>
+.btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
+.btn-secondary {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
 
+.btn-small {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
 
-<div class="box">
-<h2>🎵 مشغل MP3 - بحث وتحميل وتشغيل</h2>
-<input id="search" placeholder="اكتب اسم أغنية...">
-<button class="btn-green" onclick="searchMusic()">بحث موسيقى مرخصة كاملة</button><button class="btn-blue" onclick="googleDiscover('music')">بحث جوجل عن الأغاني</button><button class="btn-gold" onclick="googleDiscover('video')">بحث جوجل عن الفيديوهات</button><button class="btn-dark" onclick="googleDiscover('site')">بحث جوجل عن المواقع</button>
-<button class="btn-gold" onclick="playTest()">▶️ أغنية تجريبية</button>
-<div id="results"></div>
-</div>
+/* Player Box */
+.player-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #05070d;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+}
 
-<div class="box">
-<h2>🌐 ترجمة شاملة - جوجل + Manus + داخل وخارج الكرة العائمة</h2>
-<input id="trText" placeholder="اكتب نص أو اسم فيديو أو أغنية للترجمة">
-<label class="small" for="textTarget">ترجم النص إلى:</label><select id="textTarget"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option></select>
-<button class="btn-green" onclick="doTranslate('inside')">🌐 ترجم داخل MyMusic</button>
-<button class="btn-white" onclick="window.open('https://translate.google.com/','_blank','noopener')">Google Translate</button>
-<button class="btn-white" onclick="window.open('https://www.deepl.com/translator','_blank','noopener')">DeepL</button>
-<button class="btn-white" onclick="window.open('https://www.bing.com/translator','_blank','noopener')">Bing</button>
-<div id="trRes" class="small"></div>
-<p class="small">الترجمة بتشتغل جوه الموقع من الزر العائم، وبره الموقع لما تفتح جوجل أو مانوس في تاب جديد، وانت بتسمع أو بتتفرج.</p>
-</div>
+.player-stage iframe,
+.player-stage video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
 
-<div class="box" id="hindiDictionaryBox">
-<h2>📖 قاموس هندي – عربي | हिन्दी ↔ العربية</h2>
-<p class="small">ابحث عن معنى كلمة أو عبارة بالهندية أو العربية، واعرض ترجمتها واستمع إلى نطقها. يعتمد البحث على خدمة ترجمة عبر الإنترنت وليس قاموسًا لغويًا تحريريًا مستقلًا.</p>
-<select id="dictionaryDirection" aria-label="اتجاه القاموس">
-<option value="hi|ar">هندي ← إلى العربية</option>
-<option value="ar|hi">عربي ← إلى الهندية</option>
-</select>
-<input id="dictionaryWord" placeholder="اكتب كلمة أو عبارة..." autocomplete="off">
-<button class="btn-green" onclick="lookupHindiDictionary()">🔎 ابحث في القاموس</button>
-<button class="btn-blue" onclick="speakDictionaryWord()">🔊 نطق الكلمة الأصلية</button>
-<button class="btn-gold" onclick="speakDictionaryResult()">🔊 نطق الترجمة</button>
-<div id="dictionaryResult" class="card" aria-live="polite">نتيجة القاموس ستظهر هنا.</div>
-</div>
+.player-stage audio {
+  width: 90%;
+}
 
-<div class="box" id="world-news-center">
-<h2>📰 مركز الأخبار المصرية والعربية والعالمية</h2>
-<p class="small">روابط مباشرة للمواقع الإخبارية من داخل MyMusic. افتح المصدر الأصلي لمتابعة الخبر وتفاصيله، وقارن بين أكثر من مصدر قبل مشاركة الأخبار.</p>
-<div class="ai-grid">
-<a class="ai-btn" href="https://www.youm7.com/" target="_blank" rel="noopener noreferrer">🇪🇬 اليوم السابع</a>
-<a class="ai-btn" href="https://www.almasryalyoum.com/" target="_blank" rel="noopener noreferrer">🇪🇬 المصري اليوم</a>
-<a class="ai-btn" href="https://www.ahram.org.eg/" target="_blank" rel="noopener noreferrer">🇪🇬 الأهرام</a>
-<a class="ai-btn" href="https://www.akhbarelyom.com/" target="_blank" rel="noopener noreferrer">🇪🇬 أخبار اليوم</a>
-<a class="ai-btn" href="https://www.shorouknews.com/" target="_blank" rel="noopener noreferrer">🇪🇬 الشروق</a>
-<a class="ai-btn" href="https://www.masrawy.com/" target="_blank" rel="noopener noreferrer">🇪🇬 مصراوي</a>
-<a class="ai-btn" href="https://www.elwatannews.com/" target="_blank" rel="noopener noreferrer">🇪🇬 الوطن</a>
-<a class="ai-btn" href="https://www.vetogate.com/" target="_blank" rel="noopener noreferrer">🇪🇬 فيتو</a>
-<a class="ai-btn" href="https://www.alwafd.news/" target="_blank" rel="noopener noreferrer">🇪🇬 الوفد</a>
-<a class="ai-btn" href="https://www.dostor.org/" target="_blank" rel="noopener noreferrer">🇪🇬 الدستور</a>
-<a class="ai-btn" href="https://www.cairo24.com/" target="_blank" rel="noopener noreferrer">🇪🇬 القاهرة 24</a>
-<a class="ai-btn" href="https://www.mena.org.eg/" target="_blank" rel="noopener noreferrer">🇪🇬 وكالة أنباء الشرق الأوسط</a>
-<a class="ai-btn" href="https://www.ahram.org.eg/World" target="_blank" rel="noopener noreferrer">🌍 الأهرام – العالم</a>
-<a class="ai-btn" href="https://www.aljazeera.net/" target="_blank" rel="noopener noreferrer">🌍 الجزيرة</a>
-<a class="ai-btn" href="https://www.bbc.com/arabic" target="_blank" rel="noopener noreferrer">🌍 BBC عربي</a>
-<a class="ai-btn" href="https://arabic.cnn.com/" target="_blank" rel="noopener noreferrer">🌍 CNN عربية</a>
-<a class="ai-btn" href="https://www.skynewsarabia.com/" target="_blank" rel="noopener noreferrer">🌍 سكاي نيوز عربية</a>
-<a class="ai-btn" href="https://www.alarabiya.net/" target="_blank" rel="noopener noreferrer">🌍 العربية</a>
-<a class="ai-btn" href="https://www.france24.com/ar/" target="_blank" rel="noopener noreferrer">🌍 فرانس 24 عربي</a>
-<a class="ai-btn" href="https://www.dw.com/ar/" target="_blank" rel="noopener noreferrer">🌍 DW عربية</a>
-<a class="ai-btn" href="https://www.reuters.com/world/middle-east/" target="_blank" rel="noopener noreferrer">🌐 Reuters – Middle East</a>
-<a class="ai-btn" href="https://apnews.com/" target="_blank" rel="noopener noreferrer">🌐 Associated Press</a>
-<a class="ai-btn" href="https://www.theguardian.com/world" target="_blank" rel="noopener noreferrer">🌐 The Guardian – World</a>
-<a class="ai-btn" href="https://www.al-monitor.com/" target="_blank" rel="noopener noreferrer">🌐 Al-Monitor</a>
-<a class="ai-btn" href="https://www.independentarabia.com/" target="_blank" rel="noopener noreferrer">🌍 اندبندنت عربية</a>
-<a class="ai-btn" href="https://asharq.com/" target="_blank" rel="noopener noreferrer">🌍 الشرق للأخبار</a>
-</div>
-<p class="small">تنبيه: هذه روابط للمواقع الناشرة وليست بثًا إخباريًا مدمجًا؛ قد تفتح بعض المواقع في نافذة أو تبويب جديد حسب إعدادات الهاتف.</p>
-</div>
+.player-placeholder {
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+}
 
-<div class="box" id="egypt-secondary-learning">
-<h2>🎓 مركز تعليم الثانوية العامة المصرية</h2>
-<p class="small">بوابة واحدة للوصول إلى الكتب الرسمية والدروس والمراجعات والبحث العلمي. اختر الصف والمادة ثم افتح مصدر التعلم المناسب.</p>
-<label class="small" for="studyGrade">الصف الدراسي</label>
-<select id="studyGrade" style="width:100%">
-<option value="الصف الأول الثانوي">الأول الثانوي</option>
-<option value="الصف الثاني الثانوي">الثاني الثانوي</option>
-<option value="الصف الثالث الثانوي">الثالث الثانوي</option>
-<option value="البكالوريا المصرية">البكالوريا المصرية</option>
-</select>
-<label class="small" for="studySubject">المادة</label>
-<select id="studySubject" style="width:100%">
-<option>اللغة العربية</option><option>اللغة الإنجليزية</option><option>اللغة الأجنبية الثانية</option>
-<option>الرياضيات</option><option>الفيزياء</option><option>الكيمياء</option><option>الأحياء</option>
-<option>التاريخ</option><option>الجغرافيا</option><option>الفلسفة والمنطق</option><option>علم النفس والاجتماع</option>
-<option>البرمجة والذكاء الاصطناعي</option><option>اللغة الفرنسية</option><option>اللغة الألمانية</option>
-</select>
-<button class="btn-green" onclick="searchStudyLessons()">🔎 ابحث عن شرح ومراجعة للمادة</button>
-<div class="ai-grid" style="margin-top:8px">
-<a class="ai-btn" href="https://studentbooks.moe.gov.eg/Books" target="_blank" rel="noopener noreferrer">📚 كتب الوزارة الرسمية</a>
-<a class="ai-btn" href="https://moe.gov.eg/elearningenterypage/e-learning/" target="_blank" rel="noopener noreferrer">🏫 بوابة التعليم الإلكتروني</a>
-<a class="ai-btn" href="https://madrasetnaplus.eg/home" target="_blank" rel="noopener noreferrer">📺 مدرستنا بلس</a>
-<a class="ai-btn" href="https://www.youtube.com/@madrasetna3rd.sec" target="_blank" rel="noopener noreferrer">🎥 مدرستنا الثانوية</a>
-<a class="ai-btn" href="https://www.khanacademy.org/" target="_blank" rel="noopener noreferrer">🧮 Khan Academy</a>
-<a class="ai-btn" href="https://scholar.google.com/" target="_blank" rel="noopener noreferrer">🔬 Google Scholar</a>
-</div>
-<p class="small">ملاحظة: الروابط تفتح المصادر الأصلية؛ توافر الدروس والمواد يتغير حسب ما تنشره الجهات التعليمية.</p>
-</div>
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
 
-<div class="box">
-<h2>🤖 أدوات الذكاء الاصطناعي والموارد</h2>
-<div class="ai-grid">
-<a class="ai-btn" style="background:#10a37f" href="https://chatgpt.com" target="_blank">💬 ChatGPT</a>
-<button class="ai-btn" style="background:#1a73e8;border:0;width:100%" onclick="openGeminiPanel()">✨ Gemini داخل MyMusic</button>
-<a class="ai-btn" style="background:#ff5c00" href="https://manus.im" target="_blank">🚀 Manus</a>
-<a class="ai-btn" style="background:#d97757" href="https://claude.ai" target="_blank">🧠 Claude</a>
-<a class="ai-btn" style="background:#20b8cd" href="https://www.perplexity.ai" target="_blank">🔍 Perplexity</a>
-<a class="ai-btn" style="background:#0078d4" href="https://copilot.microsoft.com" target="_blank">🪟 Copilot</a>
-<a class="ai-btn" style="background:#8b3dff" href="https://www.canva.com" target="_blank">🎨 Canva</a>
-<a class="ai-btn" style="background:#000;border:1px solid #fff" href="https://cursor.com" target="_blank">💻 Cursor</a>
-<a class="ai-btn" style="background:#ff2d55" href="https://suno.com" target="_blank">🎵 Suno</a>
-<a class="ai-btn" style="background:#00c2a8" href="https://elevenlabs.io" target="_blank">🎙️ ElevenLabs</a>
-<a class="ai-btn" style="background:#000;border:1px solid #fff" href="https://www.capcut.com" target="_blank">✂️ CapCut</a>
-<a class="ai-btn" style="background:#111;border:1px solid #fff" href="https://www.midjourney.com" target="_blank">🖼️ Midjourney</a>
-</div>
-</div>
+.tab-btn {
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
 
-<div class="box">
-<h2>📱 مواقع التواصل الاجتماعي</h2>
-<div class="ai-grid">
-<a class="ai-btn" style="background:#1877f2" href="https://facebook.com" target="_blank">📘 فيسبوك</a>
-<a class="ai-btn" style="background:#000" href="https://instagram.com" target="_blank">📸 انستجرام</a>
-<a class="ai-btn" style="background:#25d366" href="https://whatsapp.com" target="_blank">💬 واتساب</a>
-<a class="ai-btn" style="background:#000" href="https://tiktok.com" target="_blank">🎬 تيك توك</a>
-<a class="ai-btn" style="background:#ff0000" href="https://youtube.com" target="_blank">▶️ يوتيوب</a>
-<a class="ai-btn" style="background:#1da1f2" href="https://x.com" target="_blank">𝕏 تويتر</a>
-<a class="ai-btn" style="background:#0088cc" href="https://telegram.org" target="_blank">✈️ تليجرام</a>
-<a class="ai-btn" style="background:#0a66c2" href="https://linkedin.com" target="_blank">💼 لينكد إن</a>
-</div>
-</div>
+.tab-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+}
 
-<div class="box" id="loginBox">
-<h2>👤 تسجيل دخول / إنشاء حساب</h2>
-<div style="text-align:center">
-<button class="btn-blue" onclick="loginWith('Google')">🔍 دخول بـ Google</button><br>
-<button class="btn-blue" onclick="loginWith('Facebook')">📘 دخول بـ Facebook</button><br>
-<button style="background:#000;border:1px solid #fff" onclick="loginWith('Apple')">🍎 دخول بـ Apple</button><br>
-<button class="btn-green" onclick="showPhoneLogin()">📱 دخول برقم الهاتف</button><br>
-<button class="btn-dark" onclick="loginWith('X / تويتر')">𝕏 دخول بـ X</button><br>
-<button class="btn-dark" onclick="loginWith('GitHub')">💻 دخول بـ GitHub</button><br>
-<button class="btn-gold" onclick="loginWith('Microsoft')">🪟 دخول بـ Microsoft</button><br>
-<button class="btn-white" onclick="loginWith('البريد الإلكتروني')">✉️ دخول بالبريد</button>
-</div>
-<div id="phoneLogin" style="display:none;text-align:center;margin-top:12px;background:#222;padding:14px;border-radius:16px">
-<h3 style="margin:0">📱 دخول برقم الهاتف</h3>
-<p class="small">هنبعتلك كود تأكيد - تجريبي دلوقتي</p>
-<select id="countryCode" style="width:30%;display:inline-block">
-<option value="+20">🇪🇬 +20 مصر</option>
-<option value="+966">🇸🇦 +966 السعودية</option>
-<option value="+971">🇦🇪 +971 الإمارات</option>
-<option value="+962">🇯🇴 +962 الأردن</option>
-<option value="+1">🇺🇸 +1 أمريكا</option>
-</select>
-<input id="phoneNum" placeholder="اكتب رقم هاتفك" style="width:60%;display:inline-block" inputmode="numeric">
-<button class="btn-green" onclick="sendOTP()">📩 ابعت كود التأكيد</button>
-<div id="otpBox" style="display:none">
-<input id="otpCode" placeholder="اكتب الكود - جرب 1234" inputmode="numeric">
-<button class="btn-gold" onclick="verifyOTP()">✅ تأكيد الكود ودخول</button>
-<p class="small">الكود التجريبي: <b>1234</b></p>
-</div>
-</div>
-<div id="loginStatus" style="text-align:center;margin-top:10px">مش مسجل دخول</div>
-<button id="logoutBtn" class="btn-dark" style="display:none;width:100%" onclick="logout()">🚪 تسجيل خروج</button>
-<p class="small" style="text-align:center">⚠️ بياناتك مش بتتبعت لأي حد، ولا رقمك ولا بريدك بيظهر لأي حد.</p>
-</div>
+.tab-panel {
+  display: none;
+}
 
-<div class="box">
-<h2>💬 رسائل الموقع - رد آلي</h2>
-<input id="msgName" placeholder="اسمك">
-<input id="msgText" placeholder="اكتب رسالتك...">
-<button class="btn-green" onclick="sendMsg()">إرسال</button>
-<div id="msgReply"></div>
-</div>
+.tab-panel.active {
+  display: block;
+}
 
-<div class="box" style="text-align:center">
-<h2>📱 ثبّت التطبيق</h2>
-<button class="btn-green" onclick="installApp()">⬇️ تثبيت التطبيق</button>
-<p class="small">أو دوس 3 نقط ⋮ → إضافة إلى الشاشة الرئيسية</p>
-</div>
+/* Output Boxes */
+.result-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.94rem;
+}
 
-<button id="floatBtn" onclick="toggleFloatMenu()">🎧</button>
-<div id="floatMenu">
-<b>🎧 MyMusic AI</b><br>
-<button class="btn-blue" onclick="openGeminiPanel()">✨ اسأل مساعد MyMusic (Gemini)</button>
+.status-msg {
+  font-size: 0.88rem;
+  margin-top: 8px;
+  color: var(--accent);
+}
 
-<button onclick="togglePlay()">⏯️ تشغيل / إيقاف</button>
-<button onclick="nextSong()">⏭️ التالي</button>
-<button onclick="playYoutube()">▶️ تشغيل يوتيوب</button>
-<button onclick="doTranslate('google')">🌐 ترجمة جوجل</button>
-<button onclick="doTranslate('manus')">🚀 ترجمة Manus</button><button class="btn-green" onclick="openLiveTranslationPanel()">🎙️ افتح الترجمة المباشرة</button><button class="btn-blue" onclick="translateCurrentMedia()">▶️ ترجمة الميديا الحالية</button><button class="btn-gold" onclick="startTabAudioTranslation()">🌐 ترجم صوت الموقع/التبويب</button>
+.status-msg.error {
+  color: var(--danger);
+}
 
-<button onclick="openSearch('google')">🔍 بحث جوجل</button>
-<button onclick="toggleFloat()">👁️ إخفاء الزر</button>
-<button onclick="toggleFloatMenu()">❌ إغلاق</button>
+.status-msg.success {
+  color: var(--success);
+}
 
-<div id="mymusicLearningLinks" style="margin-top:8px;border-top:1px solid #555;padding-top:8px;max-height:48vh;overflow-y:auto">
-  <b>📰 الأخبار المصرية والعالمية</b>
-  <a class="floatLink" href="https://www.youm7.com/" target="_blank" rel="noopener noreferrer">🇪🇬 اليوم السابع</a>
-  <a class="floatLink" href="https://www.almasryalyoum.com/" target="_blank" rel="noopener noreferrer">🇪🇬 المصري اليوم</a>
-  <a class="floatLink" href="https://www.ahram.org.eg/" target="_blank" rel="noopener noreferrer">🇪🇬 الأهرام</a>
-  <a class="floatLink" href="https://www.akhbarelyom.com/" target="_blank" rel="noopener noreferrer">🇪🇬 أخبار اليوم</a>
-  <a class="floatLink" href="https://www.shorouknews.com/" target="_blank" rel="noopener noreferrer">🇪🇬 الشروق</a>
-  <a class="floatLink" href="https://www.masrawy.com/" target="_blank" rel="noopener noreferrer">🇪🇬 مصراوي</a>
-  <a class="floatLink" href="https://www.elwatannews.com/" target="_blank" rel="noopener noreferrer">🇪🇬 الوطن</a>
-  <a class="floatLink" href="https://www.vetogate.com/" target="_blank" rel="noopener noreferrer">🇪🇬 فيتو</a>
-  <a class="floatLink" href="https://www.aljazeera.net/" target="_blank" rel="noopener noreferrer">🌍 الجزيرة</a>
-  <a class="floatLink" href="https://www.bbc.com/arabic" target="_blank" rel="noopener noreferrer">🌍 BBC عربي</a>
-  <a class="floatLink" href="https://arabic.cnn.com/" target="_blank" rel="noopener noreferrer">🌍 CNN عربية</a>
-  <a class="floatLink" href="https://www.skynewsarabia.com/" target="_blank" rel="noopener noreferrer">🌍 سكاي نيوز عربية</a>
-  <a class="floatLink" href="https://www.alarabiya.net/" target="_blank" rel="noopener noreferrer">🌍 العربية</a>
-  <a class="floatLink" href="https://www.france24.com/ar/" target="_blank" rel="noopener noreferrer">🌍 فرانس 24 عربي</a>
-  <a class="floatLink" href="https://www.reuters.com/world/middle-east/" target="_blank" rel="noopener noreferrer">🌐 Reuters</a>
-  <a class="floatLink" href="https://apnews.com/" target="_blank" rel="noopener noreferrer">🌐 Associated Press</a>
-  <b>🎼 الموسيقى والكلمات</b>
-  <a class="floatLink" href="https://www.musixmatch.com/" target="_blank" rel="noopener noreferrer">🎵 Musixmatch – كلمات الأغاني وترجماتها</a>
-  <a class="floatLink" href="https://genius.com/" target="_blank" rel="noopener noreferrer">🎤 Genius – كلمات ومعلومات الأغاني</a>
-  <b>🌐 مواقع الترجمة</b>
-  <a class="floatLink" href="https://translate.google.com/" target="_blank" rel="noopener noreferrer">Google Translate – ترجمة النصوص والصور</a>
-  <a class="floatLink" href="https://www.deepl.com/translator" target="_blank" rel="noopener noreferrer">DeepL – ترجمة النصوص والملفات</a>
-  <a class="floatLink" href="https://www.bing.com/translator" target="_blank" rel="noopener noreferrer">Microsoft Translator</a>
-  <a class="floatLink" href="https://www.reverso.net/text-translation" target="_blank" rel="noopener noreferrer">Reverso – ترجمة وأمثلة لغوية</a>
-  <a class="floatLink" href="https://translate.yandex.com/" target="_blank" rel="noopener noreferrer">Yandex Translate</a>
-  <b>🔬 البحث العلمي والتجارب</b>
-  <a class="floatLink" href="https://scholar.google.com/" target="_blank" rel="noopener noreferrer">Google Scholar – الأبحاث العلمية</a>
-  <a class="floatLink" href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubMed – الأبحاث الطبية</a>
-  <a class="floatLink" href="https://arxiv.org/" target="_blank" rel="noopener noreferrer">arXiv – أبحاث الفيزياء والرياضيات والحوسبة</a>
-  <a class="floatLink" href="https://www.sciencedirect.com/" target="_blank" rel="noopener noreferrer">ScienceDirect – الدوريات العلمية</a>
-  <a class="floatLink" href="https://www.wolframalpha.com/" target="_blank" rel="noopener noreferrer">WolframAlpha – الحسابات والمسائل العلمية</a>
-  <a class="floatLink" href="https://phet.colorado.edu/" target="_blank" rel="noopener noreferrer">PhET – محاكاة وتجارب تفاعلية</a>
-  <a class="floatLink" href="https://www.geogebra.org/" target="_blank" rel="noopener noreferrer">GeoGebra – الرياضيات والهندسة</a>
-  <b>🎓 التعليم والمناهج للطلاب في مصر</b>
-  <a class="floatLink" href="https://moe.gov.eg/ar/" target="_blank" rel="noopener noreferrer">وزارة التربية والتعليم المصرية</a>
-  <a class="floatLink" href="https://elearning1.moe.gov.eg/" target="_blank" rel="noopener noreferrer">بوابة التعليم الإلكتروني والكتب</a>
-  <a class="floatLink" href="https://www.ekb.eg/" target="_blank" rel="noopener noreferrer">بنك المعرفة المصري</a>
-  <a class="floatLink" href="https://study.ekb.eg/" target="_blank" rel="noopener noreferrer">Study – المذاكرة الرقمية</a>
-  <a class="floatLink" href="https://madrasetnaplus.eg/home" target="_blank" rel="noopener noreferrer">مدرستنا بلس – دروس ومحتوى تعليمي</a>
-  <a class="floatLink" href="https://www.khanacademy.org/" target="_blank" rel="noopener noreferrer">Khan Academy – شرح وتدريب مجاني</a>
-  <a class="floatLink" href="https://www.nafham.com/" target="_blank" rel="noopener noreferrer">نفهم – شروحات تعليمية</a>
-  <a class="floatLink" href="https://www.edraak.org/" target="_blank" rel="noopener noreferrer">إدراك – دورات تعليمية عربية</a>
-</div>
-</div>
+/* Playlist */
+.playlist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
 
-<div id="liveTranslatePanel" role="region" aria-label="لوحة الترجمة المباشرة" style="display:none">
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>🎙️ الترجمة المباشرة</b><button class="btn-dark" type="button" onclick="closeLiveTranslationPanel()" aria-label="إغلاق لوحة الترجمة">✕ إغلاق</button></div>
-  <p class="small">يمكنك ترجمة ملف صوت أو فيديو من قسم ملفات الهاتف دون ميكروفون. الاستماع المباشر للوسائط الخارجية يعتمد على دعم المتصفح ومشاركة الصوت.</p>
-  <label class="small" for="speechSource">لغة الكلام</label>
-  <select id="speechSource">
-    <option value="auto" selected>تلقائي – اكتشاف لغة الصوت</option><option value="en-US">English</option><option value="ar-EG">العربية</option><option value="fr-FR">Français</option><option value="de-DE">Deutsch</option><option value="es-ES">Español</option><option value="tr-TR">Türkçe</option><option value="it-IT">Italiano</option><option value="ru-RU">Русский</option><option value="zh-CN">中文</option><option value="ja-JP">日本語</option><option value="ko-KR">한국어</option><option value="pt-BR">Português</option><option value="hi-IN">हिन्दी</option><option value="ur-PK">اردو</option><option value="fa-IR">فارسی</option><option value="bn-BD">বাংলা</option><option value="nl-NL">Nederlands</option><option value="el-GR">Ελληνικά</option><option value="he-IL">עברית</option><option value="id-ID">Bahasa Indonesia</option><option value="zh-CN">中文</option><option value="ja-JP">日本語</option><option value="ko-KR">한국어</option><option value="pt-BR">Português</option><option value="hi-IN">हिन्दी</option><option value="ur-PK">اردو</option><option value="fa-IR">فارسی</option><option value="bn-BD">বাংলা</option><option value="nl-NL">Nederlands</option><option value="el-GR">Ελληνικά</option><option value="he-IL">עברית</option><option value="id-ID">Bahasa Indonesia</option>
-  </select>
-  <label class="small" for="speechTarget">ترجمة إلى</label>
-  <select id="speechTarget">
-    <option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="tr">Türkçe</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="pt">Português</option><option value="hi">हिन्दी</option><option value="ur">اردو</option><option value="fa">فارسی</option><option value="bn">বাংলা</option><option value="nl">Nederlands</option><option value="el">Ελληνικά</option><option value="he">עברית</option><option value="id">Bahasa Indonesia</option><option value="zh">中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="pt">Português</option><option value="hi">हिन्दी</option><option value="ur">اردو</option><option value="fa">فارسی</option><option value="bn">বাংলা</option><option value="nl">Nederlands</option><option value="el">Ελληνικά</option><option value="he">עברית</option><option value="id">Bahasa Indonesia</option>
-  </select>
-  <button class="btn-green" id="startSpeechBtn" onclick="startLiveTranslation()">🎙️ ابدأ الاستماع والترجمة</button>
-  <button class="btn-dark" onclick="stopLiveTranslation()">⏹️ إيقاف الترجمة</button>
-  <button class="btn-blue" onclick="speakLiveTranslation()">🔊 انطق آخر ترجمة</button><button class="btn-gold" onclick="saveLiveTranslation()">💾 احفظ الترجمة</button><button class="btn-dark" onclick="exportTranslationHistory()">⬇️ تنزيل الترجمات TXT</button><button class="btn-white" onclick="showTranslationHistory()">📚 سجل الترجمات</button><div id="translationHistory" class="small"></div>
-  <label class="small"><input id="autoDub" type="checkbox" style="width:auto"> نطق الترجمة تلقائيًا بعد كل مقطع (اختياري؛ قد يخفض صوت الأغنية)</label>
-  <div id="ocrOutput" aria-live="polite">ترجمة النصوص الظاهرة في الصور وإطارات الفيديو المحلي ستظهر هنا.</div>
-  <p class="small">قراءة الإطارات متاحة للملفات المحلية المختارة هنا. استخدم سماعات لتجنب التقاط صوت النطق المترجم مرة أخرى بالميكروفون. لا يمكن للصفحة قراءة صورة أو صوت فيديو YouTube داخل إطار محمي أو موقع آخر.</p>
-  <span id="liveStatus" class="small" aria-live="polite">جاهز - لم يبدأ الاستماع</span>
-  <span id="liveOriginal"></span>
-  <span id="liveResult"></span>
-</div>
+.playlist-info strong {
+  display: block;
+  font-size: 0.95rem;
+}
 
-<div class="box" style="text-align:center">
-<h2>🌍 شارك MyMusic مع أصدقائك</h2>
-<p class="small">ساعدنا في نشر MyMusic حول العالم.</p>
-<button class="btn-green" onclick="shareMyMusic()">مشاركة الموقع</button>
-<div class="ai-grid">
-<a class="ai-btn" style="background:#1877f2" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmymusic-3k6.pages.dev%2F" target="_blank" rel="noopener">Facebook</a>
-<a class="ai-btn" style="background:#25d366" href="https://wa.me/?text=اكتشف%20MyMusic%20https%3A%2F%2Fmymusic-3k6.pages.dev%2F" target="_blank" rel="noopener">WhatsApp</a>
-<a class="ai-btn" style="background:#0088cc" href="https://t.me/share/url?url=https%3A%2F%2Fmymusic-3k6.pages.dev%2F&text=اكتشف%20MyMusic" target="_blank" rel="noopener">Telegram</a>
-<a class="ai-btn" style="background:#111" href="https://twitter.com/intent/tweet?text=اكتشف%20MyMusic&url=https%3A%2F%2Fmymusic-3k6.pages.dev%2F" target="_blank" rel="noopener">X</a>
-</div>
-<p class="small"><a href="/about.html" style="color:#f3d477">عن MyMusic</a> · <a href="/privacy.html" style="color:#f3d477">سياسة الخصوصية</a> · <a href="/terms.html" style="color:#f3d477">شروط الاستخدام</a> · <a href="/contact.html" style="color:#f3d477">اتصل بنا</a></p>
-</div>
-<div id="geminiPanel" role="dialog" aria-label="مساعد MyMusic Gemini"><b>✨ مساعد MyMusic الذكي</b><p class="small">اسأل عن الدراسة أو البحث أو الترجمة أو أي موضوع. لا ترسل بيانات شخصية أو أسرارًا.</p><textarea id="geminiPrompt" maxlength="5000" placeholder="اكتب سؤالك هنا..."></textarea><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn-green" id="geminiSend" onclick="sendGeminiPrompt()">إرسال السؤال</button><button class="btn-dark" onclick="closeGeminiPanel()">إغلاق</button></div><div id="geminiReply" aria-live="polite">جاهز لاستقبال سؤالك.</div></div>
-<div id="inAppBrowser" role="dialog" aria-label="متصفح MyMusic الداخلي">
- <div class="browserBar"><button class="btn-dark" onclick="closeInAppBrowser()">✕ رجوع إلى MyMusic</button><button class="btn-blue" onclick="reloadInAppBrowser()">↻</button><button class="btn-gold" onclick="openBrowserFallback()">فتح الموقع إذا منع العرض</button></div>
- <div class="browserHint" id="inAppBrowserHint">الموقع يفتح هنا داخل MyMusic. بعض المواقع تمنع العرض داخل إطار داخلي؛ عندها استخدم زر «فتح الموقع إذا منع العرض».</div>
- <iframe id="inAppBrowserFrame" title="متصفح MyMusic" referrerpolicy="strict-origin-when-cross-origin" allow="camera; microphone; autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
- </div>
-<div id="player">
-<b id="pTitle">MyMusic AI - اختار أغنية</b><br><small id="pArtist">جاهز للتشغيل</small>
-<div class="progress"><div id="progressBar"></div></div>
-<audio id="audio" controls></audio><br>
-<button onclick="prevSong()">⏮️</button>
-<button onclick="togglePlay()">⏯️ تشغيل / إيقاف</button>
-<button onclick="nextSong()">⏭️</button>
-<button class="btn-gold" onclick="downloadCurrent()">⬇️ تحميل MP3</button>
-</div>
+.playlist-info small {
+  color: var(--muted);
+}
 
-<script>
-let ALL=[], idx=0, audio=document.getElementById('audio'), currentUrl='', floatHidden=true;
-function toggleNight(){ document.body.classList.toggle('light-theme'); }
-function tick(){ let d=new Date(); document.getElementById('clock').innerText=d.toLocaleTimeString('ar-EG'); document.getElementById('date').innerText=d.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
-setInterval(tick,1000); tick();
-async function fetchWeather(lat,lon,name){
-  const desc=document.getElementById('weatherDesc');
-  try{
-    desc.innerText='جارٍ تحميل الطقس...';
-    const params=new URLSearchParams({latitude:String(lat),longitude:String(lon)});
-    const r=await fetch('/api/weather?'+params.toString(),{headers:{'Accept':'application/json'}});
-    if(!r.ok) throw new Error('Weather proxy returned '+r.status);
-    const j=await r.json();
-    if(!j.current || typeof j.current.temperature_2m!=='number') throw new Error('Invalid weather response');
-    document.getElementById('weatherTemp').innerText=Math.round(j.current.temperature_2m)+'°';
-    document.getElementById('weatherCity').innerText=name;
-    desc.innerText='الطقس شغال ✅';
-  }catch(e){
-    desc.innerText='تعذر تحميل الطقس حالياً';
-    console.warn('MyMusic weather:',e);
+/* Share bar */
+.share-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+/* Artist Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.info-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.info-box h4 {
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+/* Footer & Modal */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  margin-top: 30px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  display: none;
+  place-items: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.modal.open {
+  display: grid;
+}
+
+.modal-content {
+  width: min(680px, 100%);
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+@media (max-width: 960px) {
+  .main-grid {
+    grid-template-columns: 1fr;
   }
 }
-function getWeatherCairo(){ fetchWeather(30.0444,31.2357,'القاهرة'); }
-getWeatherCairo();
-function openSearch(type){ let q=document.getElementById('gSearch').value.trim()||document.getElementById('search').value.trim(); if(!q) return alert('اكتب كلمة بحث الأول'); if(type=='google') openInAppBrowser('https://www.google.com/search?q='+encodeURIComponent(q)); if(type=='youtube') openInAppBrowser('https://www.youtube.com/results?search_query='+encodeURIComponent(q)); if(type=='manus') openInAppBrowser('https://manus.im/?q='+encodeURIComponent(q)); if(type=='mp3'){ document.getElementById('search').value=q; searchMusic(); } document.getElementById('gRes').innerHTML='<div class="card">🔍 <b>'+q+'</b> - اتفتح في تاب جديد - <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/2991/2991148.png\'" style="width:28px;border-radius:50%"> الأيقونة الافتراضية</div>'; }
-function playYoutube(){ let v=document.getElementById('ytInput').value.trim()||document.getElementById('gSearch').value.trim(); if(!v) return alert('اكتب اسم فيديو أو الصق لينك يوتيوب'); let m=v.match(/(?:v=|youtu\.be\/|shorts\/)([A-Za-z0-9_-]{11})/); if(m){ document.getElementById('ytBox').innerHTML='<iframe src="https://www.youtube.com/embed/'+m[1]+'" allowfullscreen></iframe>'; } else { openInAppBrowser('https://www.youtube.com/results?search_query='+encodeURIComponent(v)); document.getElementById('ytBox').innerHTML='<div class="card">▶️ فتحنا بحث يوتيوب لـ <b>'+v+'</b> في تاب جديد</div>'; } }
-function openYTApp(){ let v=document.getElementById('ytInput').value.trim(); openInAppBrowser(v?('https://www.youtube.com/results?search_query='+encodeURIComponent(v)):'https://www.youtube.com'); }
-async function translateYT(){
- const input=document.getElementById('ytInput');
- const output=document.getElementById('ytTrans');
- const raw=input.value.trim();
- if(!raw)return alert('الصق رابط فيديو YouTube أولاً.');
- let parsed;
- try{parsed=new URL(raw);}catch(e){return alert('الرابط غير صالح.');}
- let host=parsed.hostname.toLowerCase();if(host.startsWith('www.'))host=host.slice(4);if(host.startsWith('m.'))host=host.slice(2);
- let videoId='';
- if(host==='youtu.be')videoId=parsed.pathname.split('/').filter(Boolean)[0]||'';
- else if(host==='youtube.com'||host==='youtube-nocookie.com'){
-  if(parsed.pathname==='/watch')videoId=parsed.searchParams.get('v')||'';
-  else{const parts=parsed.pathname.split('/').filter(Boolean);if(['shorts','embed','live'].includes(parts[0]))videoId=parts[1]||'';}
- }
- if(!/^[A-Za-z0-9_-]{11}$/.test(videoId))return alert('الرابط غير صالح. استخدم رابط YouTube لفيديو عام أو غير مدرج.');
- const videoUrl='https://www.youtube.com/watch?v='+videoId;
- const target=document.getElementById('mediaSpeechTarget')?.value||'ar';
- output.innerHTML='<div class="card" aria-live="polite">⏳ جارٍ إرسال رابط الفيديو إلى Gemini لتحليل الصوت واستخراج التوقيتات. قد تستغرق العملية بعض الوقت...</div>';
- if(!document.getElementById('ytBox').querySelector('iframe'))playYoutube();
- try{
-  const response=await fetch('/api/transcribe-youtube',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({url:videoUrl})});
-  const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(data.error||('تعذر تحليل الفيديو ('+response.status+')'));
-  const original=String(data.text||'').trim();
-  if(!original||original==='NO_SPEECH')throw new Error('لم يتم العثور على كلام أو كلمات أغنية مسموعة في الفيديو.');
-  output.innerHTML='<div class="card"><b>📝 النص الأصلي</b><pre id="ytOriginalText" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre><p>⏳ جارٍ ترجمة التوقيتات إلى اللغة المختارة...</p><pre id="ytTranslatedText" style="white-space:pre-wrap;overflow-wrap:anywhere;color:#86efac"></pre><div id="ytDownloadArea"></div></div>';
-  document.getElementById('ytOriginalText').textContent=original;
-  const translated=await translateTranscriptText(original,target,detectTranscriptLanguage(original));
-  document.getElementById('ytTranslatedText').textContent=translated;
-  const download=document.createElement('button');
-  download.className='btn-blue';download.textContent='⬇️ تنزيل الترجمة SRT';
-  download.onclick=()=>downloadSubtitleFile(translated,'MyMusic-YouTube-'+videoId+'.srt');
-  document.getElementById('ytDownloadArea').appendChild(download);
-  const note=document.createElement('p');note.className='small';
-  note.textContent='تم استخراج الترجمة مع التوقيتات. يمكنك عرضها هنا أو تنزيل ملف SRT وإضافته إلى الفيديو. لا تسمح قيود مشغل YouTube داخل الإطار بحقن مسار ترجمة مخصص فوق المشغل.';
-  document.getElementById('ytDownloadArea').appendChild(note);
- }catch(error){
-  output.innerHTML='<div class="card" style="color:#fca5a5" aria-live="polite"></div>';
-  output.querySelector('.card').textContent='⚠️ تعذرت ترجمة فيديو YouTube: '+error.message;
- }
-}
-async function doTranslate(where){
- const input=document.getElementById('trText'), output=document.getElementById('trRes');
- const t=input.value.trim();
- if(!t){output.innerText='اكتب النص الذي تريد ترجمته أولاً.';input.focus();return;}
- const target=document.getElementById('textTarget')?.value||'ar', source=detectTranscriptLanguage(t);
- output.innerText='⏳ جارٍ ترجمة النص داخل MyMusic...';
- try{
-  const translated=await translateTranscriptText(t,target,source);
-  output.innerText='🌐 الترجمة داخل MyMusic ('+source+' → '+target+'):\n'+translated;
-  lastLiveTranslation=translated;
-  document.getElementById('liveOriginal').innerText=t;
-  document.getElementById('liveResult').innerText=translated;
-  translationHistory.unshift({date:new Date().toLocaleString('ar-EG'),original:t,translated});
-  translationHistory=translationHistory.slice(0,100);
-  try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}
- }catch(error){output.innerText='تعذرت الترجمة داخل الموقع: '+error.message+'\nحاول مرة أخرى أو استخدم أحد مواقع الترجمة الخارجية.';}
-}
-let myLocalMedia=[];
-let autoTranscribeOnSelect=false;
-function chooseMediaForTranslation(){autoTranscribeOnSelect=true;document.getElementById('myFiles').click();}
-function getMediaMime(file){
-  if(file.type&&(file.type.startsWith('audio/')||file.type.startsWith('video/')))return file.type;
-  const ext=(file.name||'').split('.').pop().toLowerCase();
-  const types={mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',wav:'audio/wav',ogg:'audio/ogg',flac:'audio/flac',mp4:'video/mp4',m4v:'video/mp4',mov:'video/quicktime',webm:'video/webm','3gp':'video/3gpp',avi:'video/x-msvideo',wmv:'video/x-ms-wmv'};
-  return types[ext]||file.type||'';
-}
-function escapeHTML(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
-function saveMyFiles(inp){
-  myLocalMedia.forEach(item=>URL.revokeObjectURL(item.url));
-  myLocalMedia=Array.from(inp.files||[]).map(file=>({file,mime:getMediaMime(file),url:URL.createObjectURL(file)}));
-  let markup='';
-  myLocalMedia.forEach((item,i)=>{
-    const name=escapeHTML(item.file.name), url=item.url;
-    if(item.mime.startsWith('audio/')) markup+='<div class="card">🎵 '+name+'<br><audio controls src="'+url+'"></audio><br><button class="btn-green" onclick="transcribeLocalMedia('+i+')">✨ ارفع إلى Gemini واستخرج الترجمة</button><div id="transcriptOutput'+i+'" class="small" aria-live="polite"></div></div>';
-    else if(item.mime.startsWith('video/')) markup+='<div class="card">🎬 '+name+'<br><video id="localVideo'+i+'" controls playsinline src="'+url+'" style="width:100%"></video><br><button class="btn-green" onclick="transcribeLocalMedia('+i+')">✨ ارفع الفيديو إلى Gemini وترجمه</button><button class="btn-gold" onclick="ocrLocalVideo('+i+')">🔎 اقرأ وترجم الكلام الظاهر في إطار الفيديو</button><div id="transcriptOutput'+i+'" class="small" aria-live="polite"></div></div>';
-    else if(item.file.type.startsWith('image')) markup+='<div class="card">🖼️ '+name+'<br><img id="localImage'+i+'" src="'+url+'" style="width:100%;border-radius:12px"><br><button class="btn-gold" onclick="ocrLocalImage('+i+')">🔎 اقرأ وترجم النص داخل الصورة</button></div>';
-  });
-  document.getElementById('myFilesList').innerHTML=markup||'لم يتم اختيار ملفات مدعومة.';
-  if(autoTranscribeOnSelect){autoTranscribeOnSelect=false;const first=myLocalMedia.findIndex(item=>item.mime.startsWith('audio/')||item.mime.startsWith('video/'));if(first>=0){setTimeout(()=>transcribeLocalMedia(first),180);}else{document.getElementById('myFilesList').innerHTML='الملف المختار ليس صوتًا أو فيديو مدعومًا. اختر MP3 أو MP4 أو MOV أو WAV.';}}
-}
-
-function detectTranscriptLanguage(text){
-  if(/[\u0600-\u06FF]/.test(text))return 'ar';
-  if(/[\u0900-\u097F]/.test(text))return 'hi';
-  if(/[\u0400-\u04FF]/.test(text))return 'ru';
-  if(/[\u4E00-\u9FFF]/.test(text))return 'zh';
-  if(/[\u3040-\u30FF]/.test(text))return 'ja';
-  if(/[\uAC00-\uD7AF]/.test(text))return 'ko';
-  return 'en';
-}
-async function translateTranscriptText(text,target,source){
-  const sourceCode=source||detectTranscriptLanguage(text);
-  if(sourceCode===target)return text;
-  // Keep complete SRT cues together so chunking never separates a timestamp from its subtitle.
-  const raw=String(text||'').replace(/\r/g,'').trim();
-  const blocks=raw.includes('-->')?raw.split(/\n\s*\n/).filter(Boolean):raw.split(/(?<=[.!?؟。])\s+/).filter(Boolean);
-  const chunks=[];let current='';
-  for(const block of blocks){
-    const next=(current+'\n\n'+block).trim();
-    if(next.length>2800&&current){chunks.push(current);current=block;}
-    else current=next;
-  }
-  if(current)chunks.push(current);
-  const translated=[];
-  const names={ar:'Arabic',en:'English',fr:'French',de:'German',es:'Spanish',hi:'Hindi',tr:'Turkish',it:'Italian',ru:'Russian',zh:'Chinese',ja:'Japanese'};
-  for(let i=0;i<chunks.length;i++){
-    const prompt='Translate the following subtitle transcript from '+(sourceCode||'the detected source language')+' into '+(names[target]||target)+'. Preserve SRT cue numbers and timestamps exactly; translate only subtitle text. Preserve meaning, names, song lines and speaker labels. Return ONLY valid translated SRT text, with no explanation or introduction.\n\n'+chunks[i];
-    const response=await fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({prompt})});
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(data.error||'تعذرت ترجمة Gemini ('+response.status+')');
-    if(!data.text)throw new Error('لم تصل نتيجة الترجمة من Gemini');
-    translated.push(String(data.text).trim());
-  }
-  return translated.join('\n');
-}
-function cleanSubtitleText(text){
-  let value=String(text||'').trim();const fence=String.fromCharCode(96).repeat(3);
-  if(value.startsWith(fence))value=value.slice(3).replace(/^srt\s*/i,'').replace(new RegExp(fence+'$'),'').trim();
-  return value;
-}
-function downloadSubtitleFile(text, fileName){
-  const clean=cleanSubtitleText(text);
-  const blob=new Blob(['\uFEFF'+clean],{type:'text/plain;charset=utf-8'});
-  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fileName||'MyMusic-Subtitles.srt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
-}
-function showTranslatedSubtitles(index,text,target){
-  const video=document.getElementById('localVideo'+index);if(!video)return;
-  const previous=video.querySelector('track[data-mymusic-subtitles]');
-  if(previous){if(previous.dataset.objectUrl)URL.revokeObjectURL(previous.dataset.objectUrl);previous.remove();}
-  const vtt='WEBVTT\n\n'+cleanSubtitleText(text).replace(/,(\d{3})/g,'.$1');
-  const url=URL.createObjectURL(new Blob([vtt],{type:'text/vtt;charset=utf-8'}));
-  const track=document.createElement('track');track.kind='subtitles';track.label='MyMusic AI';track.srclang=target||'ar';track.default=true;track.dataset.mymusicSubtitles='1';track.dataset.objectUrl=url;track.src=url;
-  video.appendChild(track);
-  track.addEventListener('load',()=>{try{track.track.mode='showing';}catch(e){}});
-  try{for(const t of video.textTracks)t.mode='showing';}catch(e){}
-}
-function createSrtEditor(output, originalSrt, translatedSrt, fileName, videoIndex, target) {
-  output.innerHTML = '';
-  const heading = document.createElement('b');
-  heading.textContent = '📝 النص الأصلي بتوقيتاته';
-  const original = document.createElement('pre');
-  original.dir = 'auto';
-  original.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow:auto;background:#17243b;padding:10px;border-radius:10px';
-  original.textContent = originalSrt;
-  const translatedHeading = document.createElement('b');
-  translatedHeading.textContent = '🌐 الترجمة - محرر SRT';
-  translatedHeading.style.display = 'block';
-  translatedHeading.style.marginTop = '12px';
-  const editor = document.createElement('textarea');
-  editor.id = 'srtEditor' + videoIndex;
-  editor.dir = 'auto';
-  editor.lang = target || 'ar';
-  editor.setAttribute('aria-label', 'محرر ترجمة SRT');
-  editor.style.cssText = 'display:block;width:100%;min-height:220px;text-align:start;direction:auto;white-space:pre;overflow:auto;font-family:ui-monospace,monospace;line-height:1.7';
-  editor.value = translatedSrt;
-  const preview = document.createElement('div');
-  preview.id = 'srtPreview' + videoIndex;
-  preview.dir = 'auto';
-  preview.style.cssText = 'display:none;white-space:pre-wrap;overflow-wrap:anywhere;text-align:start;background:#17243b;padding:12px;border-radius:10px;margin-top:8px;max-height:260px;overflow:auto';
-  const status = document.createElement('p');
-  status.className = 'small';
-  status.setAttribute('aria-live', 'polite');
-  status.textContent = 'تم التحقق من صيغة SRT والتوقيتات. يمكنك تعديل النص مع الحفاظ على أرقام المقاطع وأوقاتها.';
-  const controls = document.createElement('div');
-  controls.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-top:8px';
-  const makeButton = (label, cls, handler) => {
-    const button = document.createElement('button');
-    button.type = 'button'; button.className = cls; button.textContent = label;
-    button.addEventListener('click', handler); controls.appendChild(button); return button;
-  };
-  const validateEditor = () => {
-    const parsed = validateAndNormalizeSrt(editor.value);
-    if (!parsed.ok) throw new Error(parsed.error);
-    editor.value = parsed.text;
-    return parsed.text;
-  };
-  makeButton('👁️ معاينة SRT', 'btn-gold', () => {
-    try {
-      const clean = validateEditor();
-      preview.textContent = clean;
-      preview.style.display = preview.style.display === 'none' ? 'block' : 'none';
-      status.textContent = '✅ تمت معاينة ملف SRT صالح.';
-    } catch (error) { status.textContent = '⚠️ ' + error.message; }
-  });
-  makeButton('⬇️ إنشاء وتنزيل SRT', 'btn-blue', () => {
-    try {
-      const clean = validateEditor();
-      downloadSubtitleFile(clean, fileName);
-      status.textContent = '✅ تم إنشاء ملف SRT وتنزيله.';
-    } catch (error) { status.textContent = '⚠️ لم يتم إنشاء الملف: ' + error.message; }
-  });
-  makeButton('📋 نسخ النص', 'btn-dark', async () => {
-    try {
-      const clean = validateEditor();
-      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(clean);
-      else {
-        editor.focus(); editor.select();
-        if (!document.execCommand('copy')) throw new Error('النسخ غير مدعوم في هذا المتصفح.');
-      }
-      status.textContent = '✅ تم نسخ نص SRT.';
-    } catch (error) { status.textContent = '⚠️ تعذر النسخ: ' + error.message; }
-  });
-  makeButton('🧹 تنسيق والتحقق', 'btn-green', () => {
-    try { validateEditor(); status.textContent = '✅ صيغة SRT سليمة والتوقيتات مرتبة.'; }
-    catch (error) { status.textContent = '⚠️ ' + error.message; }
-  });
-  output.append(heading, original, translatedHeading, editor, controls, preview, status);
-  if (videoIndex !== null && videoIndex !== undefined) showTranslatedSubtitles(videoIndex, translatedSrt, target);
-}
-function validateAndNormalizeSrt(value) {
-  const raw = cleanSubtitleText(value).replace(/\r/g, '').trim();
-  const blocks = raw.split(/\n\s*\n/).map(block => block.trim()).filter(Boolean);
-  const cues = [];
-  const toMs = stamp => {
-    const match = /^(\d{2,}):(\d{2}):(\d{2})[,\.](\d{3})$/.exec(stamp);
-    if (!match) return null;
-    const h=Number(match[1]), m=Number(match[2]), s=Number(match[3]), ms=Number(match[4]);
-    if (m>59 || s>59) return null;
-    return (((h*60)+m)*60+s)*1000+ms;
-  };
-  for (const block of blocks) {
-    const lines = block.split('\n');
-    const timeIndex = lines.findIndex(line => /\d{2,}:\d{2}:\d{2}[,\.]\d{3}\s*-->\s*\d{2,}:\d{2}:\d{2}[,\.]\d{3}/.test(line));
-    if (timeIndex < 0) continue;
-    const match = /^(\d{2,}:\d{2}:\d{2})[,\.](\d{3})\s*-->\s*(\d{2,}:\d{2}:\d{2})[,\.](\d{3})(?:\s+.*)?$/.exec(lines[timeIndex].trim());
-    if (!match) return {ok:false,error:'يوجد سطر توقيت غير صحيح في ملف SRT.'};
-    const start = match[1]+','+match[2], end = match[3]+','+match[4];
-    const startMs=toMs(start), endMs=toMs(end);
-    if (startMs===null || endMs===null || endMs<=startMs) return {ok:false,error:'توقيت أحد المقاطع غير صحيح أو وقت النهاية يسبق البداية.'};
-    const text = lines.slice(timeIndex+1).join('\n').trim();
-    if (!text) return {ok:false,error:'يوجد مقطع ترجمة فارغ.'};
-    cues.push({start,end,startMs,endMs,text});
-  }
-  if (!cues.length) return {ok:false,error:'لم يتم العثور على مقاطع SRT بتوقيتات صحيحة. لن يتم تنزيل نص غير مؤقت.'};
-  cues.sort((a,b)=>a.startMs-b.startMs);
-  for (let i=1;i<cues.length;i++) if(cues[i].startMs<cues[i-1].startMs) return {ok:false,error:'ترتيب التوقيتات غير صحيح.'};
-  return {ok:true,text:cues.map((cue,i)=>(i+1)+'\n'+cue.start+' --> '+cue.end+'\n'+cue.text).join('\n\n')};
-}
-async function transcribeLocalMedia(index){
-  const item=myLocalMedia[index];
-  const output=document.getElementById('transcriptOutput'+index);
-  if(!item||!output)return;
-  if(item.file.size>25*1024*1024){output.innerText='⚠️ حجم الملف '+(item.file.size/1024/1024).toFixed(1)+' ميجابايت، والحد الأقصى الحالي 25 ميجابايت.';return;}
-  const type=item.mime||getMediaMime(item.file)||'application/octet-stream';
-  if(!type.startsWith('audio/')&&!type.startsWith('video/')){output.innerText='اختر ملف صوت أو فيديو.';return;}
-  output.innerText='⏳ جارٍ رفع الملف إلى Gemini وتحليل الكلام والتوقيتات... لا تغلق الصفحة.';
-  try{
-    const form=new FormData();
-    const uploadFile=item.file.type===type?item.file:new File([item.file],item.file.name,{type});
-    form.append('audio',uploadFile,item.file.name);
-    const response=await fetch('/api/transcribe',{method:'POST',body:form});
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(data.error||('خطأ من الخادم '+response.status));
-    const originalResult=validateAndNormalizeSrt(String(data.text||''));
-    if(!originalResult.ok)throw new Error('لم يُرجع Gemini ترجمة SRT صالحة: '+originalResult.error);
-    const originalSrt=originalResult.text;
-    output.innerText='📝 تم استخراج '+originalSrt.split('\n\n').length+' مقطعًا. ⏳ جارٍ ترجمة النص مع تثبيت التوقيتات...';
-    const selectedLanguage=document.getElementById('mediaSpeechSource')?.value||'auto';
-    const target=document.getElementById('mediaSpeechTarget')?.value||'ar';
-    const sourceLanguage=selectedLanguage==='auto'?detectTranscriptLanguage(originalSrt):selectedLanguage.split('-')[0];
-    const translatedRaw=await translateTranscriptText(originalSrt,target,sourceLanguage);
-    const translatedResult=validateAndNormalizeSrt(translatedRaw);
-    if(!translatedResult.ok)throw new Error('نتيجة الترجمة لم تجتز فحص SRT: '+translatedResult.error);
-    createSrtEditor(output,originalSrt,translatedResult.text,'MyMusic-'+(item.file.name||'subtitles').replace(/[^a-z0-9._-]/gi,'_')+'.srt',type.startsWith('video/')?index:null,target);
-    lastLiveTranslation=translatedResult.text;
-    document.getElementById('liveOriginal').innerText=originalSrt;
-    document.getElementById('liveResult').innerText=translatedResult.text;
-    translationHistory.unshift({date:new Date().toLocaleString('ar-EG'),original:originalSrt,translated:translatedResult.text});
-    translationHistory=translationHistory.slice(0,100);
-    try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}
-  }catch(error){
-    output.innerText='⚠️ تعذرت معالجة الملف عبر Gemini: '+error.message+'\nلم يتم إنشاء ملف SRT غير صالح. تحقق من GEMINI_API_KEY في Cloudflare Pages Secrets.';
-  }
-}
-function playByIndex(i){ if(!ALL.length) return; idx=i; let s=ALL[i]; currentUrl=s.audio; document.getElementById('pTitle').innerText=s.name; document.getElementById('pArtist').innerText=s.artist_name; audio.src=s.audio; audio.play().catch(()=>{}); }
-function togglePlay(){ if(audio.paused) audio.play(); else audio.pause(); }
-function nextSong(){ if(!ALL.length) return; playByIndex((idx+1)%ALL.length); }
-function prevSong(){ if(!ALL.length) return; playByIndex((idx-1+ALL.length)%ALL.length); }
-function downloadCurrent(){ if(!currentUrl) return alert('شغل أغنية الأول'); let a=document.createElement('a'); a.href=currentUrl; a.download='MyMusic.mp3'; a.click(); }
-function playTest(){ ALL=[{name:'أغنية تجريبية',artist_name:'Test',audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'}]; playByIndex(0); }
-async function searchMusic(){
- const q=document.getElementById('search').value.trim();
- if(!q)return alert('اكتب اسم أغنية أو فنان الأول');
- const box=document.getElementById('results');box.innerHTML='⏳ جاري البحث عن تسجيلات مرخصة...';
- try{
-  const query='mediatype:audio AND licenseurl:http* AND '+q;
-  const api='https://archive.org/advancedsearch.php?'+new URLSearchParams({q:query,'fl[]':'identifier,title,creator,licenseurl',rows:'15',page:'1',output:'json'});
-  const response=await fetch(api);if(!response.ok)throw new Error('تعذر الوصول لأرشيف الموسيقى');
-  const data=await response.json();const docs=(data.response&&data.response.docs)||[];const found=[];
-  for(const item of docs.slice(0,12)){
-   try{const mr=await fetch('https://archive.org/metadata/'+encodeURIComponent(item.identifier));if(!mr.ok)continue;const meta=await mr.json();
-    const files=(meta.files||[]).filter(x=>/^(mp3|ogg|oga|flac|wav)$/i.test(x.format||''));
-    const file=files.find(x=>/\.mp3$/i.test(x.name))||files[0];if(!file||!item.licenseurl)continue;
-    const audioUrl='https://archive.org/download/'+encodeURIComponent(item.identifier)+'/'+file.name.split('/').map(encodeURIComponent).join('/');
-    found.push({name:item.title||item.identifier,artist_name:item.creator||'فنان غير محدد',audio:audioUrl,license:item.licenseurl,itemUrl:'https://archive.org/details/'+encodeURIComponent(item.identifier)});
-   }catch(e){}
-  }
-  ALL=found;idx=0;
-  if(!found.length){box.innerText='لم نعثر على تسجيلات صوتية ببيانات ترخيص لهذا البحث. جرّب بحث جوجل أو اختر ملفًا من هاتفك. لا تتوفر كل الأغاني التجارية للتنزيل المجاني.';return;}
-  box.innerHTML=found.map((x,i)=>'<div class="card"><b>'+escapeHTML(x.name)+'</b><br><small>'+escapeHTML(x.artist_name)+'</small><br><button onclick="playByIndex('+i+')">▶️ تشغيل الملف كاملًا</button> <a href="'+x.audio+'" download style="color:#fff">⬇️ تنزيل الملف</a> · <a href="'+x.itemUrl+'" target="_blank" rel="noopener" style="color:#9cf">المصدر والترخيص</a><p class="small">تحقق من شروط الترخيص قبل إعادة النشر أو الاستخدام التجاري.</p></div>').join('');
- }catch(e){box.innerText='تعذر البحث الآن. استخدم بحث جوجل أو حاول مرة أخرى.';}
-}
-function showPhoneLogin(){ document.getElementById('phoneLogin').style.display='block'; document.getElementById('phoneLogin').scrollIntoView({behavior:'smooth'}); }
-function sendOTP(){ let code=document.getElementById('countryCode').value; let num=document.getElementById('phoneNum').value.trim(); if(num.length<9) return alert('اكتب رقم هاتفك صح'); document.getElementById('otpBox').style.display='block'; alert('📩 اتبعت كود التأكيد لرقم: '+code+num+'\nالكود التجريبي: 1234'); }
-function verifyOTP(){ let c=document.getElementById('otpCode').value.trim(); if(c=='1234'){ let num=document.getElementById('phoneNum').value; loginSuccess('رقم الهاتف 📱 ('+num.slice(0,3)+'***'+num.slice(-2)+') - رقمك مخفي'); } else alert('الكود غلط - جرب 1234'); }
-function loginWith(t){ loginSuccess(t); }
-function loginSuccess(type){ document.getElementById('loginStatus').innerHTML='✅ أهلاً بيك!<br>تم الدخول بـ <b>'+type+'</b><br>في MyMusic AI 🎧'; document.getElementById('logoutBtn').style.display='block'; try{ localStorage.setItem('mymusic_user',type); }catch(e){} alert('✅ تم تسجيل الدخول بـ '+type); }
-function logout(){ document.getElementById('loginStatus').innerText='مش مسجل دخول'; document.getElementById('logoutBtn').style.display='none'; document.getElementById('phoneLogin').style.display='none'; try{ localStorage.removeItem('mymusic_user'); }catch(e){} alert('تم تسجيل الخروج 👋'); }
-function sendMsg(){ let n=document.getElementById('msgName').value||'صديقنا'; document.getElementById('msgReply').innerHTML='<div class="card">🤖 <b>MyMusic AI</b><br>أهلاً بيك يا '+n+'، شكراً لرسالتك ❤️<br>سنتواصل معك في أقرب فرصة.<br><small>- فريق MyMusic AI</small></div>'; }
-function toggleFloat(){ floatHidden=!floatHidden; document.getElementById('floatBtn').style.display=floatHidden?'none':'block'; document.getElementById('floatMenu').style.display='none'; }
-function toggleFloatMenu(){ let m=document.getElementById('floatMenu'); m.style.display=(m.style.display=='block')?'none':'block'; }
-
-let currentInAppUrl='';
-function openInAppBrowser(url){try{const parsed=new URL(url,location.href);if(!/^https?:$/.test(parsed.protocol))return alert('الرابط غير مدعوم');currentInAppUrl=parsed.href;document.getElementById('inAppBrowserFrame').src=currentInAppUrl;document.getElementById('inAppBrowser').style.display='flex';document.getElementById('floatMenu').style.display='none';document.body.style.overflow='hidden';}catch(e){alert('الرابط غير صالح');}}
-function closeInAppBrowser(){document.getElementById('inAppBrowserFrame').src='about:blank';document.getElementById('inAppBrowser').style.display='none';document.body.style.overflow='';}
-function reloadInAppBrowser(){if(currentInAppUrl)document.getElementById('inAppBrowserFrame').src=currentInAppUrl;}
-function openBrowserFallback(){if(currentInAppUrl)location.href=currentInAppUrl;}
-document.addEventListener('click',function(event){const link=event.target.closest('a[href]');if(!link)return;const url=link.href;if(!url||url.startsWith('javascript:'))return;let parsed;try{parsed=new URL(url,location.href);}catch(e){return;}if(parsed.origin===location.origin)return;if(link.target==='_blank'||link.hasAttribute('data-inapp')){event.preventDefault();openInAppBrowser(parsed.href);}});
-function openGeminiPanel(){document.getElementById('floatMenu').style.display='none';document.getElementById('geminiPanel').style.display='block';document.getElementById('geminiPrompt').focus();}
-function closeGeminiPanel(){document.getElementById('geminiPanel').style.display='none';}
-async function sendGeminiPrompt(){
- const input=document.getElementById('geminiPrompt'),reply=document.getElementById('geminiReply'),button=document.getElementById('geminiSend');
- const prompt=input.value.trim();if(!prompt)return alert('اكتب سؤالك أولاً.');if(prompt.length>5000)return alert('السؤال طويل جدًا؛ اختصره إلى 5000 حرف.');
- button.disabled=true;reply.textContent='⏳ جاري إرسال السؤال إلى Gemini...';
- try{const response=await fetch('/api/gemini',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({prompt})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||('تعذر الاتصال ('+response.status+')'));if(!data.text)throw new Error('لم يصل رد من المساعد. حاول مرة أخرى.');reply.textContent=data.text;}
- catch(error){reply.textContent='تعذر تشغيل مساعد Gemini: '+error.message+'\nتحقق من إعداد GEMINI_API_KEY كـ Secret مشفّر في Cloudflare ثم أعد النشر.';}
- finally{button.disabled=false;}
-}
-
-function searchStudyLessons(){
- const grade=document.getElementById('studyGrade').value;
- const subject=document.getElementById('studySubject').value;
- const q=grade+' '+subject+' شرح مراجعة حل أسئلة مصر';
- window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(q),'_blank','noopener');
-}
-function googleDiscover(kind){const q=document.getElementById('search').value.trim()||document.getElementById('gSearch').value.trim();if(!q)return alert('اكتب كلمة البحث أولاً');const term=kind==='music'?'أغنية كاملة '+q:kind==='video'?'فيديو '+q:q;window.open('https://www.google.com/search?q='+encodeURIComponent(term),'_blank','noopener');}
-function openLiveTranslationPanel(){document.getElementById('floatMenu').style.display='none';document.getElementById('liveTranslatePanel').style.display='block';}
-let liveCaptureStream=null,liveInputTrack=null,translationHistory=[];try{translationHistory=JSON.parse(localStorage.getItem('mymusic_translation_history')||'[]');}catch(e){translationHistory=[];}
-function translateCurrentMedia(){
-  // Local phone files use blob: URLs. Capturing their audio track avoids
-  // opening the microphone, which may steal audio focus and pause playback.
-  if(liveCaptureStream){liveCaptureStream.getTracks().forEach(t=>t.stop());liveCaptureStream=null;}
-  liveInputTrack=null;
-  const media=Array.from(document.querySelectorAll('audio,video')).find(x=>!x.paused&&x.currentSrc);
-  if(media){
-    const source=media.currentSrc||media.src||'';
-    let sameOrigin=false;
-    try{sameOrigin=new URL(source,location.href).origin===location.origin;}catch(e){}
-    const isLocalOrSameOrigin=source.startsWith('blob:')||source.startsWith('data:')||sameOrigin;
-    if(isLocalOrSameOrigin){
-      const capture=media.captureStream||media.mozCaptureStream;
-      if(capture){
-        try{
-          const stream=capture.call(media);
-          const track=stream.getAudioTracks()[0];
-          if(track&&track.readyState==='live'){
-            liveCaptureStream=stream;
-            liveInputTrack=track;
-            openLiveTranslationPanel();
-            const status=document.getElementById('liveStatus');
-            if(status) status.innerText='🎵 تم توصيل صوت الملف المحلي مباشرة للترجمة دون تشغيل الميكروفون.';
-            startLiveTranslation();
-            return;
-          }
-          stream.getTracks().forEach(t=>t.stop());
-        }catch(error){console.warn('Local audio capture unavailable; microphone fallback.',error);}
-      }
-    }
-  }
-  openLiveTranslationPanel();
-  const status=document.getElementById('liveStatus');
-  if(status) status.innerText='🎙️ هذا المصدر لا يسمح بالتقاط الصوت مباشرة؛ ستُستخدم الميكروفون. شغّل صوت الجهاز بمستوى مسموع.';
-  startLiveTranslation();
-}
-async function startTabAudioTranslation(){
-  const canShareTabAudio=!!(navigator.mediaDevices&&typeof navigator.mediaDevices.getDisplayMedia==='function');
-  if(!canShareTabAudio){
-    openLiveTranslationPanel();
-    const status=document.getElementById('liveStatus');
-    if(status) status.innerText='📱 هاتفك لا يدعم مشاركة صوت التبويب. سنستخدم ميكروفون الهاتف كحل بديل: ارفع صوت الفيديو أو الأغنية واسمح للمتصفح باستخدام الميكروفون.';
-    liveInputTrack=null;
-    startLiveTranslation();
-    return;
-  }
-  try{
-    const stream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
-    const track=stream.getAudioTracks()[0];
-    if(!track){
-      stream.getTracks().forEach(t=>t.stop());
-      openLiveTranslationPanel();
-      const status=document.getElementById('liveStatus');
-      if(status) status.innerText='لم يرسل المتصفح مسارًا صوتيًا. سنحاول الاستماع عبر ميكروفون الهاتف؛ ارفع صوت الفيديو واسمح بالميكروفون.';
-      liveInputTrack=null;
-      startLiveTranslation();
-      return;
-    }
-    liveCaptureStream=stream;
-    liveInputTrack=track;
-    openLiveTranslationPanel();
-    startLiveTranslation();
-  }catch(e){
-    openLiveTranslationPanel();
-    const status=document.getElementById('liveStatus');
-    if(status) status.innerText='تعذرت مشاركة التبويب: '+e.message+'. يمكنك استخدام زر الاستماع والترجمة بالميكروفون بعد السماح به.';
-  }
-}
-function saveLiveTranslation(){const original=document.getElementById('liveOriginal').innerText;const translated=document.getElementById('liveResult').innerText;if(!translated)return alert('لا توجد ترجمة لحفظها');translationHistory.unshift({date:new Date().toLocaleString('ar-EG'),original:original,translated:translated});translationHistory=translationHistory.slice(0,100);try{localStorage.setItem('mymusic_translation_history',JSON.stringify(translationHistory));}catch(e){}showTranslationHistory();}
-function showTranslationHistory(){const box=document.getElementById('translationHistory');if(!box)return;box.innerHTML=translationHistory.slice(0,10).map(x=>'<div class="card">'+escapeHTML(x.date)+'<br>'+escapeHTML(x.original)+'<br>'+escapeHTML(x.translated)+'</div>').join('')||'لا توجد ترجمات محفوظة';}
-function exportTranslationHistory(){if(!translationHistory.length)return alert('لا يوجد سجل محفوظ');const txt=translationHistory.map((x,i)=>(i+1)+'. '+x.date+'\n'+x.original+'\n'+x.translated).join('\n\n');const blob=new Blob(['\uFEFF'+txt],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='MyMusic-Translations.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-// Live speech translation: microphone-based (not direct tab/system-audio capture).
-let liveRecognition=null, liveListening=false, lastLiveTranslation='', liveRestartAllowed=false;
-function speechLanguageCode(tag){ return (tag||'en-US').split('-')[0].toLowerCase(); }
-async function translateLiveSpeech(text){
-  const source=speechLanguageCode(document.getElementById('speechSource').value);
-  const target=document.getElementById('speechTarget').value;
-  if(source===target) return text;
-  const endpoint='https://api.mymemory.translated.net/get?'+new URLSearchParams({q:text.slice(0,500),langpair:source+'|'+target});
-  const response=await fetch(endpoint,{headers:{'Accept':'application/json'}});
-  if(!response.ok) throw new Error('Translation service unavailable');
-  const data=await response.json();
-  const translated=data && data.responseData && data.responseData.translatedText;
-  if(!translated) throw new Error('No translated text returned');
-  return translated;
-}
-
-let lastDictionarySource='',lastDictionaryTarget='',lastDictionaryOriginal='',lastDictionaryTranslation='';
-async function lookupHindiDictionary(){
-  const input=document.getElementById('dictionaryWord');
-  const output=document.getElementById('dictionaryResult');
-  const word=input.value.trim();
-  if(!word){output.innerText='اكتب كلمة أو عبارة أولاً.';return;}
-  const pair=document.getElementById('dictionaryDirection').value.split('|');
-  const source=pair[0],target=pair[1];
-  output.innerText='⏳ جارٍ البحث عن المعنى...';
-  try{
-    const endpoint='https://api.mymemory.translated.net/get?'+new URLSearchParams({q:word.slice(0,500),langpair:source+'|'+target});
-    const response=await fetch(endpoint,{headers:{'Accept':'application/json'}});
-    if(!response.ok) throw new Error('خدمة القاموس غير متاحة الآن');
-    const data=await response.json();
-    const translated=data&&data.responseData&&data.responseData.translatedText;
-    if(!translated) throw new Error('لم يتم العثور على معنى مناسب');
-    lastDictionaryOriginal=word;lastDictionaryTranslation=translated;
-    lastDictionarySource=source;lastDictionaryTarget=target;
-    output.innerHTML='<b>الكلمة:</b> '+escapeHTML(word)+'<br><b>المعنى:</b> '+escapeHTML(translated)+'<br><span class="small">اتجاه الترجمة: '+(source==='hi'?'الهندية':'العربية')+' → '+(target==='hi'?'الهندية':'العربية')+'</span>';
-  }catch(error){output.innerText='تعذر جلب المعنى: '+error.message+' — تحقق من الإنترنت وحاول مجددًا.';}
-}
-function speakDictionaryText(text,lang){
-  if(!text)return alert('ابحث عن كلمة أولاً.');
-  if(!('speechSynthesis' in window))return alert('النطق الصوتي غير مدعوم في هذا المتصفح.');
-  const utterance=new SpeechSynthesisUtterance(text);
-  utterance.lang=lang==='hi'?'hi-IN':'ar';
-  window.speechSynthesis.cancel();window.speechSynthesis.speak(utterance);
-}
-function speakDictionaryWord(){speakDictionaryText(lastDictionaryOriginal,lastDictionarySource);}
-function speakDictionaryResult(){speakDictionaryText(lastDictionaryTranslation,lastDictionaryTarget);}
-function closeLiveTranslationPanel(){stopLiveTranslation();document.getElementById('liveTranslatePanel').style.display='none';}
-
-function startLiveTranslation(){
-  document.getElementById('floatMenu').style.display='none';
-  document.getElementById('liveTranslatePanel').style.display='block';
-  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SpeechRecognition){
-    document.getElementById('liveStatus').innerText='المتصفح لا يدعم التعرف على الكلام. جرّب Chrome المحدّث.';
-    return;
-  }
-  if(liveListening) return;
-  liveRestartAllowed=true;
-  liveRecognition=new SpeechRecognition();
-  liveRecognition.lang=document.getElementById('speechSource').value;
-  liveRecognition.continuous=true;
-  liveRecognition.interimResults=false;
-  liveRecognition.maxAlternatives=1;
-  liveRecognition.onstart=()=>{liveListening=true;document.getElementById('liveStatus').innerText='🎙️ يستمع الآن... شغّل الفيديو وارفع صوت السماعة.';};
-  liveRecognition.onresult=async(event)=>{
-    for(let i=event.resultIndex;i<event.results.length;i++){
-      if(!event.results[i].isFinal) continue;
-      const heard=event.results[i][0].transcript.trim();
-      if(!heard) continue;
-      document.getElementById('liveOriginal').innerText='النص المسموع: '+heard;
-      document.getElementById('liveStatus').innerText='⏳ جارٍ ترجمة الكلام...';
-      try{
-        const translated=await translateLiveSpeech(heard);
-        lastLiveTranslation=translated;
-        document.getElementById('liveResult').innerText='الترجمة: '+translated;
-        document.getElementById('liveStatus').innerText='✅ تمت ترجمة المقطع الصوتي';
-        if(document.getElementById('autoDub').checked && 'speechSynthesis' in window){
-          const voice=new SpeechSynthesisUtterance(translated);
-          voice.lang=document.getElementById('speechTarget').value;
-          window.speechSynthesis.cancel();window.speechSynthesis.speak(voice);
-        }
-      }catch(error){
-        document.getElementById('liveResult').innerText='تعذرت الترجمة الآن. تحقق من الاتصال وحاول مرة أخرى.';
-        document.getElementById('liveStatus').innerText='⚠️ خدمة الترجمة غير متاحة مؤقتًا';
-      }
-    }
-  };
-  liveRecognition.onerror=(event)=>{
-    document.getElementById('liveStatus').innerText=event.error==='not-allowed'?'اسمح باستخدام الميكروفون من إعدادات المتصفح.':'حدث خطأ في الاستماع: '+event.error;
-    if(event.error==='not-allowed'||event.error==='service-not-allowed') liveRestartAllowed=false;
-  };
-  liveRecognition.onend=()=>{
-    liveListening=false;
-    if(liveRestartAllowed){
-      document.getElementById('liveStatus').innerText='إعادة الاتصال بالميكروفون...';
-      setTimeout(()=>{if(liveRestartAllowed&&liveRecognition){try{if(liveInputTrack&&liveInputTrack.readyState==='live')liveRecognition.start(liveInputTrack);else liveRecognition.start();}catch(e){}}},500);
-    }else{
-      document.getElementById('liveStatus').innerText='تم إيقاف الاستماع.';
-    }
-  };
-  try{if(liveInputTrack&&liveInputTrack.readyState==='live'){try{liveRecognition.start(liveInputTrack);}catch(trackError){liveRestartAllowed=false;document.getElementById('liveStatus').innerText='المتصفح لا يدعم ترجمة مسار الملف مباشرة. لم نشغّل الميكروفون حتى لا يتوقف صوت الأغنية؛ جرّب Chrome محدّثًا.';}}else{liveRecognition.start();}}catch(error){liveRestartAllowed=false;document.getElementById('liveStatus').innerText='تعذر بدء الاستماع. لم يتم إيقاف ملف الصوت؛ تحقق من دعم المتصفح.';}
-}
-function stopLiveTranslation(){
-  liveRestartAllowed=false;
-  if(liveRecognition){try{liveRecognition.stop();}catch(e){}}
-  liveListening=false;
-  if('speechSynthesis' in window) window.speechSynthesis.cancel();
-  if(liveCaptureStream){liveCaptureStream.getTracks().forEach(t=>t.stop());liveCaptureStream=null;}liveInputTrack=null;
-  document.getElementById('liveStatus').innerText='⏹️ تم إيقاف الاستماع.';
-}
-function speakLiveTranslation(){
-  if(!lastLiveTranslation) return alert('لا توجد ترجمة صوتية بعد. ابدأ الاستماع أولاً.');
-  if(!('speechSynthesis' in window)) return alert('النطق الصوتي غير مدعوم في هذا المتصفح.');
-  const utterance=new SpeechSynthesisUtterance(lastLiveTranslation);
-  utterance.lang=document.getElementById('speechTarget').value;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utterance);
-}
-let ocrWorkerPromise=null;
-async function getOcrWorker(){
-  if(!window.Tesseract){
-    await new Promise((resolve,reject)=>{
-      const script=document.createElement('script');
-      script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-      script.onload=resolve; script.onerror=()=>reject(new Error('تعذر تحميل محرك قراءة النصوص'));
-      document.head.appendChild(script);
-    });
-  }
-  if(!ocrWorkerPromise) ocrWorkerPromise=window.Tesseract.createWorker('eng+ara+hin');
-  return ocrWorkerPromise;
-}
-async function ocrCanvasAndTranslate(canvas){
-  const output=document.getElementById('ocrOutput');
-  output.innerText='⏳ جاري قراءة النص من الصورة...';
-  try{
-    const worker=await getOcrWorker();
-    const result=await worker.recognize(canvas);
-    const recognized=(result.data.text||'').trim();
-    if(!recognized){output.innerText='لم يتم العثور على نص واضح في هذه الصورة أو اللقطة.';return;}
-    output.innerText='النص الأصلي: '+recognized+'\\n⏳ جارٍ الترجمة...';
-    const target=document.getElementById('speechTarget').value;
-    const source=/[\\u0600-\\u06FF]/.test(recognized)?'ar':(/[\\u0900-\\u097F]/.test(recognized)?'hi':'en');
-    const response=await fetch('https://api.mymemory.translated.net/get?'+new URLSearchParams({q:recognized.slice(0,500),langpair:source+'|'+target}),{headers:{'Accept':'application/json'}});
-    if(!response.ok) throw new Error('Translation service unavailable');
-    const data=await response.json();
-    const translated=data&&data.responseData&&data.responseData.translatedText;
-    output.innerText='النص الأصلي: '+recognized+'\\nالترجمة: '+(translated||'لم تتوفر ترجمة للنص.');
-  }catch(error){output.innerText='تعذرت قراءة/ترجمة النص: '+error.message;}
-}
-function ocrLocalImage(index){
-  const image=document.getElementById('localImage'+index);
-  if(!image||!image.complete) return alert('انتظر حتى تكتمل الصورة ثم حاول.');
-  const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
-  canvas.getContext('2d').drawImage(image,0,0);ocrCanvasAndTranslate(canvas);
-}
-function ocrLocalVideo(index){
-  const video=document.getElementById('localVideo'+index);
-  if(!video||!video.videoWidth) return alert('شغّل الفيديو أو أوقفه عند الإطار المطلوب أولاً.');
-  const canvas=document.createElement('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;
-  canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);ocrCanvasAndTranslate(canvas);
-}
-
-async function shareMyMusic(){ const data={title:'MyMusic AI',text:'اكتشف MyMusic للبحث عن الأغاني والفنانين والاستماع إلى المعاينات الموسيقية.',url:'https://mymusic-3k6.pages.dev/'}; try{ if(navigator.share){await navigator.share(data);} else if(navigator.clipboard){await navigator.clipboard.writeText(data.url);alert('تم نسخ رابط MyMusic للمشاركة');} else {window.prompt('انسخ رابط MyMusic',data.url);} }catch(e){} }
-let myMusicInstallPrompt = null;
-window.addEventListener('beforeinstallprompt', event => {
-  event.preventDefault();
-  myMusicInstallPrompt = event;
-});
-window.addEventListener('appinstalled', () => {
-  myMusicInstallPrompt = null;
-  alert('تم تثبيت MyMusic على جهازك بنجاح 🎧');
-});
-async function installApp(){
-  if(myMusicInstallPrompt){
-    myMusicInstallPrompt.prompt();
-    const choice = await myMusicInstallPrompt.userChoice;
-    myMusicInstallPrompt = null;
-    if(choice && choice.outcome === 'accepted') return;
-  }
-  if(window.matchMedia('(display-mode: standalone)').matches){
-    alert('MyMusic مثبت بالفعل على جهازك 🎧');
-    return;
-  }
-  alert('لتثبيت MyMusic: افتح قائمة المتصفح ⋮ ثم اختر «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق» إذا ظهر الخيار.');
-}
-audio.addEventListener('timeupdate',()=>{ if(audio.duration) document.getElementById('progressBar').style.width=(audio.currentTime/audio.duration*100)+'%'; });
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
-
-/* VEVO in-page discovery, playback and AI translation. No external-window navigation. */
-let myMusicVevoCurrentId = "";
-let myMusicVevoCurrentTitle = "";
-let myMusicVevoCurrentChannel = "";
-let myMusicVevoChatHistory = [];
-let myMusicVevoOriginalSrt = "";
-let myMusicVevoTranslatedSrt = "";
-function vevoSetStatus(message){const el=document.getElementById("vevoStatus");if(el)el.textContent=message;}
-async function searchVevoVideos(){
-  const input=document.getElementById("vevoSearchInput");
-  const query=(input?.value||"").trim();
-  const results=document.getElementById("vevoResults");
-  if(!query){vevoSetStatus("اكتب اسم الفنان أو الأغنية أولاً.");input?.focus();return;}
-  results.innerHTML="";
-  const mode=document.getElementById("vevoSearchMode")?.value||"all";
-  vevoSetStatus("⏳ جارٍ البحث في "+(mode==="vevo"?"قنوات VEVO":"YouTube")+"...");
-  try{
-    const response=await fetch("/api/vevo-search?q="+encodeURIComponent(query)+"&mode="+encodeURIComponent(mode),{headers:{"Accept":"application/json"}});
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(data.error||"تعذر البحث الآن.");
-    if(!Array.isArray(data.items)||!data.items.length){vevoSetStatus(data.message||"لم نعثر على فيديوهات من قنوات تحمل اسم VEVO. جرّب اسم فنان أو أغنية آخر.");return;}
-    vevoSetStatus("✅ عُثر على "+data.items.length+" فيديو. اختر فيديو لتشغيله داخل MyMusic AI.");
-    results.innerHTML=data.items.map(item=>{
-      const id=String(item.id||"");
-      if(!/^[A-Za-z0-9_-]{11}$/.test(id))return "";
-      const title=escapeHTML(item.title||"VEVO video");
-      const channel=escapeHTML(item.channel||"VEVO");
-      const thumb=/^https:\/\//.test(item.thumbnail||"")?item.thumbnail:"";
-      return '<article class="vevo-result"><img loading="lazy" src="'+escapeHTML(thumb)+'" alt=""><div style="min-width:0;flex:1"><b>'+title+'</b><small>'+channel+'</small><br><button class="btn-gold" type="button" onclick="playVevoVideo(\''+id+'\',\''+title.replace(/&#39;/g,"")+'\',\''+channel+'\')">▶ تشغيل داخل الموقع</button></div></article>';
-    }).join("");
-  }catch(error){vevoSetStatus("⚠️ "+error.message);}
-}
-function playVevoVideo(id,title,channel){
-  if(!/^[A-Za-z0-9_-]{11}$/.test(id))return;
-  myMusicVevoCurrentId=id;myMusicVevoCurrentTitle=title||"VEVO";myMusicVevoCurrentChannel=channel||"YouTube";myMusicVevoChatHistory=[];renderVevoAiChatWelcome();
-  myMusicVevoOriginalSrt="";myMusicVevoTranslatedSrt="";
-  document.getElementById("vevoDownloadBtn").disabled=true;
-  document.getElementById("vevoNowPlaying").textContent="يتم التشغيل داخل MyMusic AI: "+myMusicVevoCurrentTitle+" — "+(channel||"VEVO");
-  document.getElementById("vevoPlayer").innerHTML='<iframe title="VEVO music video" src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0&playsinline=1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
-  document.getElementById("vevoOriginalOutput").textContent="لم يتم استخراج النص بعد.";
-  document.getElementById("vevoTranslatedOutput").textContent="ارفع ملفًا تملكه من أداة ترجمة الفيديو والصوت، أو الصق الكلمات أعلاه للترجمة.";
-  vevoSetStatus("▶️ تم تحميل مشغل الفيديو داخل الصفحة. إذا منع صاحب الفيديو التضمين فلن يعمل المشغل لهذا الفيديو.");
-}
-
-function toggleVevoAiChat(force){
-  const panel=document.getElementById("vevoAiChat"),button=document.getElementById("vevoAiChatToggle");
-  if(!panel||!button)return;
-  const open=typeof force==="boolean"?force:!panel.classList.contains("open");
-  panel.classList.toggle("open",open);button.setAttribute("aria-expanded",String(open));
-  if(open)document.getElementById("vevoAiChatInput")?.focus({preventScroll:true});
-}
-function addVevoAiChatMessage(text,role){
-  const list=document.getElementById("vevoAiChatMessages");if(!list)return;
-  const item=document.createElement("div");item.className="vevo-chat-msg "+(role==="user"?"vevo-chat-user":"vevo-chat-ai");
-  item.textContent=text;list.appendChild(item);list.scrollTop=list.scrollHeight;
-}
-function renderVevoAiChatWelcome(){
-  const list=document.getElementById("vevoAiChatMessages");if(!list)return;list.innerHTML="";
-  addVevoAiChatMessage("أهلًا بك! اسألني عن هذا الفيديو أو الفنان: "+(myMusicVevoCurrentTitle||"اختر فيديو أولاً")+".","ai");
-}
-function clearVevoAiChat(){myMusicVevoChatHistory=[];renderVevoAiChatWelcome();}
-async function sendVevoAiQuestion(){
-  const input=document.getElementById("vevoAiChatInput"),button=document.getElementById("vevoAiChatSend");
-  const question=(input?.value||"").trim();if(!question){input?.focus();return;}
-  if(question.length>1000){addVevoAiChatMessage("اختصر السؤال إلى 1000 حرف من فضلك.","ai");return;}
-  if(!myMusicVevoCurrentId){addVevoAiChatMessage("اختَر فيديو من نتائج VEVO أو YouTube أولاً حتى أربط السؤال بالمحتوى الصحيح.","ai");return;}
-  input.value="";addVevoAiChatMessage(question,"user");button.disabled=true;
-  const list=document.getElementById("vevoAiChatMessages"),wait=document.createElement("div");
-  wait.className="vevo-chat-msg vevo-chat-ai";wait.textContent="⏳ أفكر في إجابتك...";list.appendChild(wait);list.scrollTop=list.scrollHeight;
-  const transcript=(myMusicVevoOriginalSrt||"").slice(0,1300);
-  const history=myMusicVevoChatHistory.slice(-4).map(x=>(x.role==="user"?"المستخدم: ":"المساعد: ")+x.text).join("\n").slice(-800);
-  const prompt=[
-    "أنت مساعد محادثة ذكي داخل منصة MyMusic AI، متخصص في الموسيقى والفيديو والفنانين. أجب بالعربية الواضحة وبأسلوب مفيد وممتاز، ويمكنك الإجابة عن الأسئلة العامة أيضًا. لا تختلق حقائق أو كلمات أغنية أو تفاصيل مشهد لا تعرفها؛ وضح عندما تكون المعلومة غير مؤكدة. استخدم سياق الفيديو والنص المستخرج إن وجد. لا تدّع أنك تشاهد أو تسمع البث الحي مباشرة.",
-    "بيانات الفيديو الحالي:",
-    "العنوان: "+myMusicVevoCurrentTitle,
-    "القناة/الفنان الظاهر في نتيجة البحث: "+myMusicVevoCurrentChannel,
-    "رابط الفيديو: https://www.youtube.com/watch?v="+myMusicVevoCurrentId,
-    "النص المستخرج من الفيديو إن توفر:\n"+(transcript||"لم يتم استخراج نص من هذا الفيديو حتى الآن."),
-    "سياق المحادثة السابقة:\n"+(history||"لا توجد أسئلة سابقة."),
-    "سؤال المستخدم الحالي: "+question,
-    "أجب مباشرة، واذكر إن كانت إجابتك مبنية على بيانات الفيديو المتاحة أو على معرفة عامة."
-  ].join("\n\n");
-  try{
-    const response=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({prompt,enableSearch:true})});
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(data.error||"تعذر الاتصال بمساعد الذكاء الاصطناعي.");
-    const answer=String(data.text||"").trim();if(!answer)throw new Error("لم يصل رد من Gemini.");
-    wait.remove();addVevoAiChatMessage(answer,"ai");
-    myMusicVevoChatHistory.push({role:"user",text:question},{role:"model",text:answer});myMusicVevoChatHistory=myMusicVevoChatHistory.slice(-12);
-  }catch(error){wait.remove();addVevoAiChatMessage("تعذر الحصول على الإجابة: "+error.message+" تأكد من ضبط GEMINI_API_KEY في Cloudflare Pages ثم أعد النشر.","ai");}
-  finally{button.disabled=false;input?.focus({preventScroll:true});}
-}
-document.addEventListener("DOMContentLoaded",()=>{
-  const chatInput=document.getElementById("vevoAiChatInput");
-  if(chatInput)chatInput.addEventListener("keydown",event=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();sendVevoAiQuestion();}});
-});
-
-async function transcribeVevoVideo(){
-  if(!myMusicVevoCurrentId){vevoSetStatus("اختر فيديو من نتائج البحث أولاً.");return;}
-  vevoSetStatus("⏳ يحاول Gemini تحليل الفيديو العام واستخراج الكلام والكلمات مع التوقيتات...");
-  try{
-    const response=await fetch("/api/transcribe-youtube",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:"https://www.youtube.com/watch?v="+myMusicVevoCurrentId})});
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(data.error||"تعذر تحليل هذا الفيديو. قد لا يكون متاحًا لـ Gemini.");
-    const srt=String(data.text||"").replace(/\r/g,"").trim();
-    if(!srt||srt==="NO_SPEECH")throw new Error("لم يتم العثور على كلام أو كلمات مسموعة في الفيديو.");
-    myMusicVevoOriginalSrt=srt;
-    document.getElementById("vevoOriginalOutput").textContent=srt;
-    vevoSetStatus("✅ تم استخراج النص. جارٍ ترجمته إلى اللغة المختارة...");
-    await translateVevoSrt(srt);
-  }catch(error){
-    vevoSetStatus("⚠️ "+error.message+" يمكنك لصق النص يدويًا أو رفع ملف تملكه من أداة ترجمة الفيديو والصوت.");
-  }
-}
-async function translateVevoSrt(sourceText){
-  const target=document.getElementById("vevoTargetLanguage").value;
-  const prompt="Translate the following song/video subtitles into language code "+target+". Preserve every SRT cue number and timestamp exactly, preserve line breaks and return only valid SRT. Do not add commentary.\n\n"+sourceText.slice(0,4300);
-  const response=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
-  const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(data.error||"تعذرت ترجمة النص بواسطة Gemini.");
-  myMusicVevoTranslatedSrt=String(data.text||"").trim();
-  if(!myMusicVevoTranslatedSrt)throw new Error("لم يُرجع Gemini ترجمة.");
-  document.getElementById("vevoTranslatedOutput").textContent=myMusicVevoTranslatedSrt;
-  document.getElementById("vevoDownloadBtn").disabled=false;
-  vevoSetStatus("✅ اكتملت ترجمة الفيديو داخل MyMusic AI. يمكنك تنزيل ملف SRT.");
-}
-async function translateVevoLyrics(){
-  const text=(document.getElementById("vevoLyricsInput").value||"").trim();
-  if(!text){vevoSetStatus("الصق كلمات الأغنية أو النص أولاً.");return;}
-  vevoSetStatus("⏳ جارٍ ترجمة الكلمات باستخدام Gemini...");
-  try{
-    const target=document.getElementById("vevoTargetLanguage").value;
-    const response=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:"Translate the following song lyrics into language code "+target+". Preserve stanza and line breaks. Return only the translation, without commentary.\n\n"+text.slice(0,4300)})});
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(data.error||"تعذرت الترجمة.");
-    document.getElementById("vevoOriginalOutput").textContent=text;
-    document.getElementById("vevoTranslatedOutput").textContent=data.text||"لم تصل ترجمة.";
-    myMusicVevoTranslatedSrt="";
-    document.getElementById("vevoDownloadBtn").disabled=true;
-    vevoSetStatus("✅ تمت ترجمة الكلمات داخل الموقع.");
-  }catch(error){vevoSetStatus("⚠️ "+error.message);}
-}
-function downloadVevoSrt(){
-  if(!myMusicVevoTranslatedSrt)return;
-  const blob=new Blob(["\uFEFF"+myMusicVevoTranslatedSrt],{type:"application/x-subrip;charset=utf-8"});
-  const url=URL.createObjectURL(blob);const a=document.createElement("a");
-  a.href=url;a.download="MyMusic-AI-VEVO-translation.srt";a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-document.addEventListener("DOMContentLoaded",()=>{
- const input=document.getElementById("vevoSearchInput");
- if(input)input.addEventListener("keydown",event=>{if(event.key==="Enter")searchVevoVideos();});
-});
-
-</script>
-</body>
-  </html>
