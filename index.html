@@ -522,6 +522,52 @@
 @media(max-width:700px){#myToolsFab{left:10px;bottom:12px;padding:10px 13px}#myToolsPanel{inset:1vh 1vw;border-radius:12px}#myToolsPanel .tools-layout{grid-template-columns:1fr;grid-template-rows:minmax(145px,35%) 1fr}#myToolsPanel .tool-items{grid-template-columns:repeat(2,minmax(0,1fr))}#myToolsPanel .tool-view iframe{min-height:250px}#myLearningLab{padding:12px}}
 @media(min-width:1100px){#myToolsPanel{inset:3vh 5vw}}
 </style>
+
+<style id="mymusic-global-dark-refresh">
+:root{--bg:#080909;--surface:#111311;--surface-2:#191c19;--border:rgba(184,151,89,.42);--border-soft:rgba(255,255,255,.11);--text:#f3f0e8;--muted:#b7b1a4;--primary:#8b7040;--primary-dark:#594629;--accent:#c7a96b;--success:#a6ad91;--danger:#c77d70}
+body{background:#080909!important;background-image:radial-gradient(ellipse at 50% -20%,rgba(139,112,64,.14),transparent 55%)!important;color:#f3f0e8}
+.topbar,.footer{background:rgba(8,9,9,.97)!important;border-color:rgba(184,151,89,.35)!important}
+.card,.modal-content,.social-world-card,#myToolsPanel{background:linear-gradient(145deg,#141613,#0d0f0d)!important;border-color:rgba(184,151,89,.35)!important}
+.workshop-hero,.workshop-tile,.vevo-search,.vevo-result,.result-box,.info-box,.playlist-item,.social-panel,.social-subtitle-settings,.url-import-panel{background:#171a16!important;border-color:rgba(184,151,89,.3)!important;color:#f3f0e8}
+.workshop-hero p,.workshop-tile small,.playlist-info small,.social-note{color:#b7b1a4!important}
+a,.info-box h4,.workshop-tile strong,.workshop-chip,.status-msg{color:#c7a96b!important}
+.btn,.btn:hover,.tab-btn.active,.brand-badge{background:linear-gradient(135deg,#8b7040,#594629)!important;border-color:#c7a96b!important;color:#fff!important}
+.btn-secondary,.nav-btn,.tab-btn{background:#191c19!important;border-color:rgba(184,151,89,.35)!important;color:#eee9dd!important}
+input,select,textarea{background:#141713!important;color:#f3f0e8!important;border-color:rgba(184,151,89,.32)!important}
+input::placeholder,textarea::placeholder{color:#a9a293!important}
+.ad-slot{background:#111311!important;border-color:rgba(184,151,89,.45)!important;color:#b7b1a4!important}
+.workshop-chip{background:#211d14!important;border-color:rgba(184,151,89,.38)!important}
+.subtitle-overlay{background:rgba(8,9,9,.9)!important}
+#myToolsFab{background:#8b7040!important;border-color:#c7a96b!important;color:#fff!important}
+#myToolsPanel .tools-head{background:#080909!important;border-color:rgba(184,151,89,.35)!important}
+.social-platforms button{background:#111311!important;border-color:rgba(184,151,89,.35)!important;color:#f3f0e8!important}
+.social-platforms button.active{background:#594629!important}
+#memberCenter *{box-sizing:border-box}
+#memberMenuButton{position:fixed;left:16px;top:16px;z-index:10020;width:46px;height:46px;border-radius:13px;border:1px solid #b99a5b;background:#111311;color:#e4c98e;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 28px #0009}
+#memberMenuButton span{font-size:25px;line-height:1}
+#memberCenter{position:fixed;inset:0;z-index:10030;display:none;color:#f3f0e8;font-family:Cairo, sans-serif}
+#memberCenter.open{display:block}
+#memberCenter .mc-backdrop{position:absolute;inset:0;background:#000b;backdrop-filter:blur(4px)}
+#memberCenter .mc-drawer{position:absolute;left:0;top:0;height:100%;width:min(430px,92vw);overflow:auto;background:linear-gradient(160deg,#171914,#090a09 75%);border-right:1px solid #8b7040;box-shadow:20px 0 70px #0009;padding:20px}
+#memberCenter .mc-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #51452f;padding-bottom:14px;margin-bottom:16px}
+#memberCenter h2,#memberCenter h3{margin:0;color:#e4c98e}
+#memberCenter .mc-close{border:1px solid #655332;background:#22231e;color:#eee;border-radius:9px;padding:6px 11px;font:inherit;cursor:pointer}
+#memberCenter .mc-profile{display:flex;gap:12px;align-items:center;padding:14px;background:#202119;border:1px solid #57492e;border-radius:15px;margin-bottom:16px}
+#memberCenter .mc-avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#594629;color:#fff;font-size:22px}
+#memberCenter .mc-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 18px}
+#memberCenter .mc-nav button{padding:10px 8px;background:#171a16;color:#eee;border:1px solid #51452f;border-radius:10px;font:inherit;cursor:pointer}
+#memberCenter .mc-nav button.active{background:#594629;border-color:#c7a96b}
+#memberCenter .mc-section{display:none;background:#121410;border:1px solid #3f392a;border-radius:14px;padding:15px;margin:12px 0}
+#memberCenter .mc-section.active{display:block}
+#memberCenter .mc-section label{display:block;color:#c8bd9f;font-size:.9rem;margin:10px 0 5px}
+#memberCenter .mc-section input,#memberCenter .mc-section select{width:100%;padding:10px;border-radius:9px;background:#1b1e18;color:#fff;border:1px solid #655332;font:inherit}
+#memberCenter .mc-action{width:100%;padding:10px;margin-top:10px;border-radius:10px;border:1px solid #b99a5b;background:#594629;color:#fff;font:inherit;cursor:pointer}
+#memberCenter .mc-muted{color:#b7b1a4;font-size:.86rem}
+#memberCenter .mc-row{padding:10px 0;border-bottom:1px solid #333126;overflow-wrap:anywhere}
+#memberCenter .mc-plan{border:1px solid #8b7040;background:linear-gradient(140deg,#292316,#151610);padding:14px;border-radius:13px;margin:10px 0}
+#memberCenter .mc-provider{background:#202119!important;border:1px solid #665638!important;color:#eee!important}
+@media(max-width:600px){#memberMenuButton{top:10px;left:10px;width:42px;height:42px}#memberCenter .mc-drawer{padding:15px}}
+</style>
 </head>
 <body>
   <header class="topbar">
