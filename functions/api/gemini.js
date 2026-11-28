@@ -123,11 +123,22 @@ export async function onRequest(context) {
       headers: JSON_HEADERS
     });
   } catch (error) {
-    const status = error?.status === 429 ? 429 : 502;
-    const message = error?.status === 503 || /high demand|overload|temporarily unavailable/i.test(error?.message || "")
-      ? "خدمة Gemini مزدحمة حاليًا. جرّب مرة أخرى بعد قليل؛ حاول MyMusic تلقائيًا استخدام نموذج بديل."
-      : String(error?.message || "تعذر الاتصال بخدمة Gemini. حاول مرة أخرى.").slice(0, 500);
-    return new Response(JSON.stringify({ error: message }), {
+    const upstreamStatus = Number(error?.status || 0);
+    const rawMessage = String(error?.message || "");
+    const permissionDenied = upstreamStatus === 403 ||
+      /permission denied on the service|permission_denied|access denied|api_key_service_blocked/i.test(rawMessage);
+
+    // A 403 from Google is an access/entitlement problem, not a browser or player error.
+    // Keep the diagnostic actionable without exposing the API key or raw provider payload.
+    const status = upstreamStatus === 429 ? 429 : permissionDenied ? 503 : 502;
+    const message = permissionDenied
+      ? "رفضت Google صلاحية استخدام Gemini (403 PERMISSION_DENIED). الخادم يقرأ GEMINI_API_KEY، لكن Google لا تسمح لهذا المفتاح أو المشروع بتنفيذ الطلب. افتح Google AI Studio > Get API key، وتأكد أن المفتاح من مشروع Gemini الصحيح وأن المفتاح/المشروع غير محظور. إذا كان المفتاح من نوع Standard فتأكد من قيود API أنها تسمح بـ Gemini API؛ أما مفاتيح Auth الجديدة فاستخدم إعداداتها كما أنشأها AI Studio. بعد التصحيح استبدل Secret GEMINI_API_KEY في Cloudflare Pages > Settings > Variables and Secrets ضمن Production ثم أعد النشر. لا تضع المفتاح داخل ملفات الموقع أو ترسله في المحادثة."
+      : upstreamStatus === 429
+        ? "وصل الطلب إلى Gemini، لكن تم تجاوز حد الاستخدام أو معدل الطلبات (429). انتظر قليلًا ثم أعد المحاولة أو راجع الحصة المتاحة للمشروع."
+        : upstreamStatus === 503 || /high demand|overload|temporarily unavailable/i.test(rawMessage)
+          ? "خدمة Gemini مزدحمة حاليًا. جرّب مرة أخرى بعد قليل؛ حاول MyMusic تلقائيًا استخدام نموذج بديل."
+          : rawMessage.slice(0, 500) || "تعذر الاتصال بخدمة Gemini. حاول مرة أخرى.";
+    return new Response(JSON.stringify({ error: message, code: permissionDenied ? "GEMINI_ACCESS_DENIED" : undefined }), {
       status,
       headers: JSON_HEADERS
     });
