@@ -1341,16 +1341,29 @@
       }
       downloadDubBtn.addEventListener("click",async function(){
         if(!dubSegments.length)return;
-        var duration=Math.max.apply(null,dubSegments.map(function(s){return s.startMs/1000+s.buffer.duration;}));
-        if(duration>1200){setStatus(dubStatus,"مدة الفيلم أطول من 20 دقيقة؛ استخدم الدبلجة المتزامنة داخل المشغل لتجنب استهلاك ذاكرة الهاتف عند إنشاء WAV كامل.","error");return;}
-        downloadDubBtn.disabled=true; setStatus(dubStatus,"جاري تجميع المقاطع في ملف صوتي واحد...","");
+        var duration=Math.max.apply(null,dubSegments.map(function(seg){return Math.max(seg.endMs/1000,seg.startMs/1000+seg.buffer.duration);}));
+        var chunkSeconds=600, partCount=Math.ceil(duration/chunkSeconds);
+        downloadDubBtn.disabled=true;
         try{
-          var rate=24000, offline=new OfflineAudioContext(1,Math.ceil(duration*rate),rate);
-          dubSegments.forEach(function(seg){var src=offline.createBufferSource();src.buffer=seg.buffer;src.connect(offline.destination);src.start(seg.startMs/1000);});
-          var rendered=await offline.startRendering(), blob=encodeWav(rendered), url=URL.createObjectURL(blob), a=document.createElement("a");
-          a.href=url;a.download="MyMusic-Dubbed-"+document.getElementById("aiTargetLang").value+".wav";a.click();
-          setStatus(dubStatus,"تم تجهيز ملف الدبلجة WAV للتنزيل.","success");setTimeout(function(){URL.revokeObjectURL(url);},60000);
-        }catch(e){setStatus(dubStatus,"تعذر تجميع ملف WAV: "+e.message,"error");}
+          var rate=24000, lang=document.getElementById("aiTargetLang").value;
+          for(var part=0;part<partCount;part++){
+            var chunkStart=part*chunkSeconds,chunkEnd=Math.min(duration,chunkStart+chunkSeconds);
+            var offline=new OfflineAudioContext(1,Math.ceil((chunkEnd-chunkStart)*rate),rate);
+            dubSegments.forEach(function(seg){
+              var segStart=seg.startMs/1000,segEnd=segStart+seg.buffer.duration;
+              var clipStart=Math.max(segStart,chunkStart),clipEnd=Math.min(segEnd,chunkEnd);
+              if(clipEnd<=clipStart)return;
+              var src=offline.createBufferSource();src.buffer=seg.buffer;src.connect(offline.destination);
+              src.start(clipStart-chunkStart,clipStart-segStart,clipEnd-clipStart);
+            });
+            updateDubProgress((part+1)/partCount*100,"تجهيز ملف الدبلجة "+(part+1)+" من "+partCount+" ("+Math.floor(chunkStart/60)+"–"+Math.ceil(chunkEnd/60)+" دقيقة)");
+            var rendered=await offline.startRendering(),blob=encodeWav(rendered),url=URL.createObjectURL(blob),a=document.createElement("a");
+            a.href=url;a.download="MyMusic-Dubbed-"+lang+"-part-"+String(part+1).padStart(2,"0")+"-of-"+String(partCount).padStart(2,"0")+".wav";
+            document.body.appendChild(a);a.click();a.remove();setTimeout(function(u){URL.revokeObjectURL(u);},300000,url);
+            if(part+1<partCount)await new Promise(function(resolve){setTimeout(resolve,500);});
+          }
+          setStatus(dubStatus,"اكتمل تجهيز الدبلجة إلى "+partCount+" ملف WAV متتابع، مدة كل ملف حتى 10 دقائق. اسم كل ملف يوضح ترتيبه؛ اسمح بالتنزيلات المتعددة من المتصفح عند ظهور الطلب.","success");
+        }catch(e){setStatus(dubStatus,"تعذر تجميع ملفات الدبلجة WAV: "+e.message,"error");}
         finally{downloadDubBtn.disabled=false;}
       });
 
