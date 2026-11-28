@@ -470,6 +470,12 @@
     .progress-fill { width:0%; height:100%; background:#65172b; transition:width .18s ease; }
     .progress-meta { display:flex; justify-content:space-between; gap:8px; color:#fff; font-size:.85rem; }
     .url-import-panel { background:#10213d; border:1px solid #65172b; border-radius:12px; padding:12px; margin:10px 0; }
+    .workshop-chip { background:#10213d; border-color:#65172b; }
+    .subtitle-overlay { background:rgba(11,24,48,.92); }
+    #dubStudio { border-color:#65172b !important; }
+    .workshop-hero { background:linear-gradient(120deg,#0b1830,#10213d); }
+    .workshop-tile { background:#10213d; }
+    .vevo-result:hover { border-color:#fff; }
     @media (max-width: 960px) {
       .main-grid {
         grid-template-columns: 1fr;
@@ -623,6 +629,7 @@
                 <button type="button" class="btn" id="importMediaUrlBtn">جلب الملف وبدء الترجمة</button>
               </div>
               <small>يجب أن يسمح خادم الفيديو بالوصول من المتصفح (CORS). روابط YouTube وVEVO ليست روابط تنزيل مباشرة.</small>
+              <a id="downloadImportedVideoLink" class="btn btn-secondary btn-small" hidden style="display:none;margin-top:8px;" download>تنزيل نسخة الفيديو/الصوت الأصلية</a>
               <div class="progress-track" role="progressbar" aria-label="تقدم جلب الملف" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="mediaProgressFill"></div></div>
               <div class="progress-meta"><span id="mediaProgressStatus">جاهز لاستيراد رابط</span><strong id="mediaProgressPercent">0%</strong></div>
             </div>
@@ -1335,6 +1342,8 @@
             if(received>90*1024*1024){reader.cancel();throw new Error("تجاوز الملف حد 90 ميجابايت.");}
           }
           var blob=new Blob(chunks,{type:type});
+          var originalUrl=URL.createObjectURL(blob), originalDownload=document.getElementById("downloadImportedVideoLink");
+          originalDownload.href=originalUrl; originalDownload.download="MyMusic-original-media"; originalDownload.hidden=false; originalDownload.style.display="inline-block";
           var filename=decodeURIComponent(parsed.pathname.split("/").pop()||"mymusic-media").replace(/[^\w. -]/g,"_");
           var ext=type.startsWith("video/")?(type.includes("webm")?"webm":"mp4"):(type.includes("mpeg")||type.includes("mp3")?"mp3":type.includes("wav")?"wav":"m4a");
           if(!/\.(mp4|webm|mov|mp3|wav|m4a|ogg)$/i.test(filename)) filename="MyMusic-import."+ext;
