@@ -5,73 +5,90 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const LANGUAGE_CODES = {
   "العربية":"ar-EG", "English":"en-US", "Français":"fr-FR", "Español":"es-ES",
   "Deutsch":"de-DE", "Türkçe":"tr-TR", "Italiano":"it-IT", "Português":"pt-BR",
-  "Русский":"ru-RU", "日本語":"ja-JP", "한국어":"ko-KR", "中文":"cmn-CN",
+  "Русский":"ru-RU", "日本語":"ja-JP", "한국어":"ko-KR", "中文":"zh-CN",
   "हिन्दी":"hi-IN", "فارسی":"fa-IR"
 };
 const VOICES = new Set(["Kore","Puck","Charon","Fenrir","Aoede","Leda","Orus","Zephyr"]);
 
-async function synthesize(apiKey, text, language, voice, durationMs) {
-  const models = ["gemini-2.5-flash-preview-tts", "gemini-2.5-pro-preview-tts"];
-  let lastMessage = "لم يُرجع نموذج الصوت ملفاً صوتياً.";
-  for (const model of models) {
+async function synthesize(apiKey, cue, languageCode, voiceName) {
+  let lastError = null;
+  for (const model of ["gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts"]) {
     for (let attempt = 0; attempt < 2; attempt++) {
-      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + encodeURIComponent(apiKey), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: "Speak the following translated movie dialogue naturally and clearly in " + language + ". Use a consistent dubbing voice, natural conversational pacing, and expressive delivery appropriate to the scene. Aim to fit the dialogue into approximately " + Math.max(500, Math.round(durationMs || 2500)) + " milliseconds when natural speech allows; do not omit words or speak unnaturally fast. Speak only the supplied dialogue, without adding explanations or introductions:\n" + text }] }],
-          generationConfig: {
-            responseModalities: ["AUDIO"],
-            speechConfig: {
-              languageCode: LANGUAGE_CODES[language] || "ar-EG",
-              voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } }
+      let response, data = {};
+      try {
+        response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+          body: JSON.stringify({
+            contents: [{
+              role: "user",
+              parts: [{
+                text: cue.text,
+                speechMetadata: { style: "Natural, clear, expressive dubbed dialogue. Speak the supplied words verbatim; use conversational pacing and emotion appropriate to a movie scene." }
+              }]
+            }],
+            generationConfig: {
+              responseModalities: ["AUDIO"],
+              speechConfig: {
+                languageCode,
+                voiceConfig: { prebuiltVoiceConfig: { voiceName } }
+              }
             }
-          }
-        })
-      });
-      const data = await response.json().catch(() => ({}));
-      const audio = (data.candidates?.[0]?.content?.parts || []).find(part => part.inlineData?.data);
-      if (response.ok && audio?.inlineData?.data) {
-        return { data: audio.inlineData.data, mimeType: audio.inlineData.mimeType || "audio/wav" };
+          })
+        });
+        data = await response.json().catch(() => ({}));
+      } catch (error) {
+        lastError = error;
+        if (attempt === 0) { await sleep(700); continue; }
+        break;
       }
-      lastMessage = data.error?.message || "فشل توليد الصوت من Gemini (" + response.status + ").";
-      if ([429,500,502,503,504].includes(response.status) && attempt === 0) {
-        await sleep(900);
-        continue;
+      if (response.ok) {
+        const parts = data?.candidates?.[0]?.content?.parts || [];
+        const audio = parts.find(part => part?.inlineData?.data);
+        if (audio) return { audioBase64: audio.inlineData.data, mimeType: audio.inlineData.mimeType || "audio/wav" };
+        lastError = new Error("أعاد نموذج الصوت نتيجة بلا ملف صوتي.");
+        break;
       }
-      if ([400,404].includes(response.status)) break;
-      if (![429,500,502,503,504].includes(response.status)) throw new Error(lastMessage);
+      lastError = Object.assign(new Error(data?.error?.message || "تعذر إنشاء الصوت بالدبلجة."), { status: response.status });
+      if ([400, 404].includes(response.status)) break;
+      if (![429, 500, 502, 503, 504].includes(response.status)) throw lastError;
+      if (attempt === 0) await sleep(900);
     }
   }
-  throw new Error(lastMessage);
+  throw lastError || new Error("نموذج الدبلجة غير متاح لهذا المشروع.");
 }
 
 export async function onRequest({ request, env }) {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: { ...HEADERS, "Allow": "POST, OPTIONS" } });
   if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
   const apiKey = env.GEMINI_API_KEY;
-  if (!apiKey) return json({ error: "مفتاح Gemini غير مضبوط كـ Secret في Cloudflare." }, 503);
+  if (!apiKey) return json({ error: "مفتاح GEMINI_API_KEY غير مضبوط كـ Secret في Cloudflare Pages Production." }, 503);
   let body;
-  try { body = await request.json(); } catch { return json({ error: "صيغة الطلب غير صحيحة." }, 400); }
+  try { body = await request.json(); } catch { return json({ error: "بيانات طلب الدبلجة غير صحيحة." }, 400); }
   const cues = Array.isArray(body?.cues) ? body.cues : [];
   const language = String(body?.targetLanguage || "العربية").slice(0, 40);
-  const voice = VOICES.has(body?.voiceName) ? body.voiceName : "Kore";
-  if (!cues.length || cues.length > 4) return json({ error: "أرسل من مقطع إلى 4 مقاطع ترجمة في كل دفعة." }, 400);
-  if (!LANGUAGE_CODES[language]) return json({ error: "اللغة المطلوبة غير مدعومة حالياً للدبلجة." }, 400);
+  const voiceName = String(body?.voiceName || "Kore");
+  const languageCode = LANGUAGE_CODES[language];
+  if (!cues.length || cues.length > 4) return json({ error: "أرسل من مقطع إلى أربعة مقاطع ترجمة في كل دفعة." }, 400);
+  if (!languageCode) return json({ error: "اللغة المطلوبة غير مدعومة حالياً للدبلجة." }, 400);
+  if (!VOICES.has(voiceName)) return json({ error: "الصوت المختار غير صالح." }, 400);
+  const clean = [];
   for (const cue of cues) {
-    if (!Number.isFinite(cue?.startMs) || !Number.isFinite(cue?.endMs) || cue.startMs < 0 || cue.endMs <= cue.startMs ||
-        typeof cue?.text !== "string" || !cue.text.trim() || cue.text.length > 900) {
-      return json({ error: "بيانات أحد مقاطع الترجمة غير صحيحة أو طويلة جداً." }, 400);
+    const text = String(cue?.text || "").trim();
+    const startMs = Number(cue?.startMs), endMs = Number(cue?.endMs);
+    if (!text || text.length > 900 || !Number.isFinite(startMs) || !Number.isFinite(endMs) || startMs < 0 || endMs <= startMs) {
+      return json({ error: "يوجد مقطع ترجمة فارغ أو بتوقيت غير صالح أو طويل جداً." }, 400);
     }
+    clean.push({ text, startMs: Math.round(startMs), endMs: Math.round(endMs) });
   }
   try {
     const audio = [];
-    for (const cue of cues) {
-      const result = await synthesize(apiKey, cue.text.trim(), language, voice, cue.endMs - cue.startMs);
-      audio.push({ startMs: cue.startMs, endMs: cue.endMs, text: cue.text, mimeType: result.mimeType, audioBase64: result.data });
+    for (const cue of clean) {
+      const result = await synthesize(apiKey, cue, languageCode, voiceName);
+      audio.push({ startMs: cue.startMs, endMs: cue.endMs, audioBase64: result.audioBase64, mimeType: result.mimeType });
     }
-    return json({ audio, voice, targetLanguage: language, provider: "Gemini TTS" });
+    return json({ audio, provider: "Google Gemini TTS", voiceName, languageCode });
   } catch (error) {
-    return json({ error: String(error?.message || "تعذر إنشاء الدبلجة الصوتية.").slice(0, 600) }, 502);
+    return json({ error: String(error?.message || "تعذرت معالجة الدبلجة الصوتية.").slice(0, 600) }, error?.status === 429 ? 429 : 502);
   }
 }
