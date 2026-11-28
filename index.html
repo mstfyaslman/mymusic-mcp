@@ -565,6 +565,16 @@
           <button type="button" class="btn" id="socialLoadBtn">عرض داخل MyMusic</button>
           <div id="socialPublicStatus" class="status-msg" role="status">يدعم المنشورات والريلز العامة. قصص Instagram والحسابات الخاصة لا يدعمها التضمين العام.</div>
           <div id="socialEmbedStage" class="social-embed-stage"><span class="social-small">سيظهر المحتوى هنا داخل الموقع بعد إدخال رابطه.</span></div>
+          <div class="social-subtitle-settings" id="socialLiveAudioPanel" style="margin-top:12px">
+            <strong>🎧 مساعد الاستماع والترجمة المباشرة — Google Gemini</strong>
+            <p class="social-note">اضغط استقبال الصوت، ثم اختر تبويب Facebook نفسه وفعّل مشاركة صوت التبويب من نافذة المتصفح. سيستقبل المساعد مقاطع صوت قصيرة، ويتعرف على الكلام ويترجمه إلى اللغة المختارة ويعرضه فوق مساحة الفيديو. لا يبدأ التسجيل إلا بموافقتك ويمكنك إيقافه في أي وقت.</p>
+            <div class="social-sync-row">
+              <button type="button" class="btn" id="socialLiveAudioStart">🎙 استقبال صوت الفيديو وترجمته</button>
+              <button type="button" class="btn btn-secondary" id="socialLiveAudioStop" disabled>إيقاف الاستقبال</button>
+            </div>
+            <div id="socialLiveAudioStatus" class="status-msg" role="status">جاهز. يتطلب Chrome حديثاً وموافقتك على مشاركة صوت تبويب Facebook.</div>
+            <label class="social-small" style="display:block;margin-top:8px"><input type="checkbox" id="socialLiveShowOriginal" checked> إظهار النص الأصلي مع الترجمة</label>
+          </div>
           <div class="social-subtitle-settings">
             <strong>ترجمة مرئية ومتزامنة على الشاشة</strong>
             <p class="social-note">ارفع ملف ترجمة SRT أو الصق نصه. ستظهر الأسطر فوق مساحة العرض حسب التوقيت. مع مشغلات Meta المضمّنة لا تسمح Meta بقراءة وقت الفيديو تلقائياً؛ استخدم ساعة المزامنة أدناه واضبطها مع بداية المقطع.</p>
