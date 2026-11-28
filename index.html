@@ -594,6 +594,8 @@ input::placeholder,textarea::placeholder{color:#a9a293!important}
         <label><input id="mcTrack" type="checkbox" checked style="width:auto"> حفظ سجل النشاط محلياً</label>
         <button class="mc-action" id="mcSaveSettings" type="button">حفظ الإعدادات</button>
         <p class="mc-muted">اختيار اللغة يُحفظ كتفضيل؛ لا يترجم تلقائياً كل نصوص الموقع.</p>
+        <button class="mc-action" id="mcCheckServices" type="button">فحص خدمات الموقع</button>
+        <div id="mcServicesStatus" class="mc-muted" role="status" aria-live="polite">يمكنك فحص إعدادات Gemini وVEVO وMeta دون عرض أي مفاتيح سرية.</div>
       </section>
       <section class="mc-section" data-mc-section="plan"><h3>خطة الاشتراك</h3>
         <div class="mc-plan"><strong>Free — مجانية</strong><p class="mc-muted">الخطة الحالية. استخدم الميزات المتاحة وفق حدود الموقع.</p></div>
@@ -2281,6 +2283,27 @@ document.getElementById('myLearningCopy').addEventListener('click',async()=>{try
   document.getElementById('mcSaveProfile').addEventListener('click',function(){profile={name:document.getElementById('mcName').value.trim(),phone:document.getElementById('mcPhone').value.trim(),email:document.getElementById('mcEmail').value.trim()};if(write(keys.profile,profile)){renderProfile();alert('تم حفظ الملف الشخصي على هذا الجهاز.')}else alert('تعذر الحفظ؛ مساحة التخزين قد تكون ممتلئة.')});
   document.getElementById('mcLanguage').value=settings.language||'ar';document.getElementById('mcTrack').checked=settings.track!==false;
   document.getElementById('mcSaveSettings').addEventListener('click',function(){settings={language:document.getElementById('mcLanguage').value,track:document.getElementById('mcTrack').checked};write(keys.settings,settings);document.documentElement.lang=settings.language;document.documentElement.dir=settings.language==='ar'?'rtl':'ltr';alert('تم حفظ تفضيلاتك. تغيير اللغة لا يترجم كل نصوص الموقع تلقائياً.')});
+  var checkServices=document.getElementById('mcCheckServices');
+  if(checkServices)checkServices.addEventListener('click',async function(){
+    var box=document.getElementById('mcServicesStatus');
+    checkServices.disabled=true;box.textContent='جارٍ فحص إعدادات الخادم...';
+    try{
+      var response=await fetch('/api/health',{method:'GET',cache:'no-store',credentials:'same-origin'});
+      var data=await response.json();
+      if(!response.ok)throw new Error(data.error||'تعذر فحص الخدمات.');
+      var rows=[
+        ['مساعد Gemini والترجمة والدبلجة',data.gemini?'مهيأ':'يحتاج GEMINI_API_KEY'],
+        ['بحث VEVO',data.youtube?'مهيأ':'يحتاج YOUTUBE_API_KEY'],
+        ['ربط حسابات Meta',data.meta?'مهيأ':'يحتاج مفاتيح Meta وربط SOCIAL_KV'],
+        ['ملف العضوية',data.memberProfile==='local'?'حفظ محلي فقط':'غير متاح'],
+        ['تسجيل الدخول الحقيقي',data.authentication?'مهيأ':'غير مربوط'],
+        ['الاشتراكات والدفع',data.payments?'مهيأة':'بوابة الدفع غير مربوطة']
+      ];
+      box.textContent=rows.map(function(row){return row[0]+': '+row[1]}).join('\\n');
+      box.style.whiteSpace='pre-line';
+    }catch(error){box.textContent='تعذر الفحص: '+error.message;}
+    finally{checkServices.disabled=false;}
+  });
   function activity(){return read(keys.activity,[])}
   function renderActivity(){var box=document.getElementById('mcActivityList'),items=activity();box.innerHTML=items.length?items.slice(0,40).map(function(x){return '<div class="mc-row"><strong>'+esc(x.title)+'</strong><div class="mc-muted">'+esc(x.time)+'</div></div>'}).join(''):'لا يوجد نشاط محفوظ بعد.'}
   function renderSaved(){var box=document.getElementById('mcSavedList'),items=read(keys.saved,[]);box.innerHTML=items.length?items.map(function(x,i){return '<div class="mc-row"><a href="'+esc(x.url)+'">'+esc(x.title)+'</a> <button type="button" data-remove-saved="'+i+'" style="float:right">حذف</button></div>'}).join(''):'لا توجد صفحات محفوظة.';box.querySelectorAll('[data-remove-saved]').forEach(function(b){b.addEventListener('click',function(){var a=read(keys.saved,[]);a.splice(Number(b.dataset.removeSaved),1);write(keys.saved,a);renderSaved()})})}
