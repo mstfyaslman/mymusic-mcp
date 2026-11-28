@@ -453,6 +453,23 @@
     .subtitle-overlay { position:absolute; z-index:5; left:4%; right:4%; bottom:7%; text-align:center; pointer-events:none; color:white; font-weight:800; font-size:clamp(16px,2.2vw,25px); text-shadow:0 2px 4px #000,0 0 8px #000; background:rgba(15,8,22,.58); border-radius:8px; padding:6px 10px; display:none; }
     @media(max-width:760px){ .workshop-grid{grid-template-columns:repeat(2,minmax(0,1fr));} .workshop-hero{padding:16px;} }
 
+    /* Strict four-color MyMusic theme */
+    :root { --bg:#050608; --surface:#0b1830; --surface-2:#10213d; --border:rgba(101,23,43,.8); --border-soft:rgba(255,255,255,.16); --text:#fff; --muted:#fff; --primary:#65172b; --primary-dark:#42101e; --accent:#fff; --success:#fff; --danger:#fff; }
+    body { background:#050608; background-image:radial-gradient(circle at top right,#10213d 0%,#050608 72%); color:#fff; }
+    a,.status-msg,.info-box h4,.workshop-tile strong,.workshop-chip { color:#fff; }
+    .topbar,.footer { background:#050608; border-color:#65172b; }
+    .card,.modal-content { background:#0b1830; border-color:#65172b; }
+    .workshop-hero,.vevo-search,.result-box,.info-box,.playlist-item,.workshop-tile,.vevo-result { background:#10213d; border-color:#65172b; color:#fff; }
+    .workshop-hero p,.workshop-tile small,.status-msg,.playlist-info small { color:#fff; }
+    .btn,.btn:hover,.tab-btn.active,.brand-badge { background:#65172b; border-color:#fff; color:#fff; }
+    .btn-secondary,.nav-btn,.tab-btn { background:#10213d; border-color:#65172b; color:#fff; }
+    input,select,textarea { background:#10213d; color:#fff; border-color:#65172b; }
+    input::placeholder,textarea::placeholder { color:#fff; opacity:.72; }
+    .ad-slot { background:#0b1830; border-color:#65172b; color:#fff; }
+    .progress-track { height:14px; width:100%; background:#10213d; border:1px solid #65172b; border-radius:999px; overflow:hidden; margin:10px 0 6px; }
+    .progress-fill { width:0%; height:100%; background:#65172b; transition:width .18s ease; }
+    .progress-meta { display:flex; justify-content:space-between; gap:8px; color:#fff; font-size:.85rem; }
+    .url-import-panel { background:#10213d; border:1px solid #65172b; border-radius:12px; padding:12px; margin:10px 0; }
     @media (max-width: 960px) {
       .main-grid {
         grid-template-columns: 1fr;
@@ -599,6 +616,16 @@
             <p style="font-size:0.88rem;color:var(--muted);margin-bottom:10px;">
               ارفع ملف صوت أو فيديو حتى 90 ميجابايت. يمكن معالجة التسجيلات الصوتية الطويلة (3 ساعات وأكثر) على أجزاء متتابعة مع حفظ التوقيتات. للفيديو الأطول من ساعة استخرج الصوت أولاً.
             </p>
+            <div class="url-import-panel">
+              <strong>استيراد فيديو أو صوت من رابط مباشر</strong>
+              <div class="input-row" style="margin-top:8px;">
+                <input type="url" id="aiMediaUrl" placeholder="الصق رابط MP4 / WebM / MP3 / WAV مباشر..." />
+                <button type="button" class="btn" id="importMediaUrlBtn">جلب الملف وبدء الترجمة</button>
+              </div>
+              <small>يجب أن يسمح خادم الفيديو بالوصول من المتصفح (CORS). روابط YouTube وVEVO ليست روابط تنزيل مباشرة.</small>
+              <div class="progress-track" role="progressbar" aria-label="تقدم جلب الملف" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="mediaProgressFill"></div></div>
+              <div class="progress-meta"><span id="mediaProgressStatus">جاهز لاستيراد رابط</span><strong id="mediaProgressPercent">0%</strong></div>
+            </div>
             <div class="input-row">
               <input type="file" id="aiMediaFile" accept="audio/*,video/*" />
             </div>
@@ -1066,10 +1093,10 @@
         return out.join("\n\n");
       }
       function parseSrtCues(srt) {
-        return String(srt || "").replace(/\\r/g,"").split(/\\n\\s*\\n/).map(function(block) {
-          var lines=block.split("\\n"), ti=lines.findIndex(function(line){return /\\d{2}:\\d{2}:\\d{2}[,.]\\d{3}\\s*-->/.test(line);});
+        return String(srt || "").replace(/\r/g,"").split(/\n\s*\n/).map(function(block) {
+          var lines=block.split("\n"), ti=lines.findIndex(function(line){return /\d{2,}:\d{2}:\d{2}[,.]\d{3}\s*-->/.test(line);});
           if(ti<0) return null;
-          var m=/(\\d{2}):(\\d{2}):(\\d{2})[,.](\\d{3})\\s*-->\\s*(\\d{2}):(\\d{2}):(\\d{2})[,.](\\d{3})/.exec(lines[ti]);
+          var m=/(\d{2,}):(\d{2}):(\d{2})[,.](\d{3})\s*-->\s*(\d{2,}):(\d{2}):(\d{2})[,.](\d{3})/.exec(lines[ti]);
           if(!m) return null;
           var ms=function(a,b,c,d){return ((+a*3600)+(+b*60)+(+c))*1000+(+d);};
           return {start:ms(m[1],m[2],m[3],m[4]),end:ms(m[5],m[6],m[7],m[8]),text:lines.slice(ti+1).join(" ")};
@@ -1104,7 +1131,19 @@
             cues:batch,targetLanguage:document.getElementById("aiTargetLang").value,voiceName:document.getElementById("dubVoice").value
           })});
           for(var j=0;j<result.audio.length;j++) {
-            var item=result.audio[j], buffer=await dubAudioContext.decodeAudioData(base64ToArrayBuffer(item.audioBase64));
+            var item=result.audio[j], raw=base64ToArrayBuffer(item.audioBase64), mime=String(item.mimeType||"");
+            // Gemini TTS sends raw PCM; decodeAudioData requires a WAV container.
+            if(/audio\/L16|pcm/i.test(mime)) {
+              var pcm=new Uint8Array(raw), wav=new ArrayBuffer(44+pcm.byteLength), view=new DataView(wav);
+              function putText(pos,value){for(var k=0;k<value.length;k++)view.setUint8(pos+k,value.charCodeAt(k));}
+              var rate=24000, channels=1;
+              putText(0,"RIFF"); view.setUint32(4,36+pcm.byteLength,true); putText(8,"WAVE"); putText(12,"fmt ");
+              view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,channels,true);
+              view.setUint32(24,rate,true); view.setUint32(28,rate*channels*2,true); view.setUint16(32,channels*2,true);
+              view.setUint16(34,16,true); putText(36,"data"); view.setUint32(40,pcm.byteLength,true);
+              new Uint8Array(wav,44).set(pcm); raw=wav;
+            }
+            var buffer=await dubAudioContext.decodeAudioData(raw);
             made.push({startMs:item.startMs,endMs:item.endMs,buffer:buffer});
           }
           dubSegments=made.slice();
@@ -1252,6 +1291,52 @@
         subtitleCues=parseSrtCues(translated); attachLocalSubtitleTrack(translated);
         setStatus(aiMediaStatus,"اكتملت ترجمة الملف بالكامل ("+Math.floor(duration/3600)+" ساعة و"+Math.floor((duration%3600)/60)+" دقيقة). عدد المقاطع: "+subtitleCues.length+". يمكنك الآن إنشاء الدبلجة الصوتية.","success");
       }
+      // Import a CORS-enabled direct media URL with byte progress, then translate it.
+      var mediaProgressFill=document.getElementById("mediaProgressFill");
+      var mediaProgressPercent=document.getElementById("mediaProgressPercent");
+      var mediaProgressStatus=document.getElementById("mediaProgressStatus");
+      function updateMediaProgress(percent,label){
+        var value=Math.max(0,Math.min(100,Math.round(percent||0)));
+        mediaProgressFill.style.width=value+"%"; mediaProgressPercent.textContent=value+"%";
+        mediaProgressStatus.textContent=label||"";
+        mediaProgressFill.parentElement.setAttribute("aria-valuenow",String(value));
+      }
+      document.getElementById("importMediaUrlBtn").addEventListener("click",async function(){
+        var btn=this, raw=document.getElementById("aiMediaUrl").value.trim();
+        if(!raw){setStatus(aiMediaStatus,"الصق رابط ملف فيديو أو صوت مباشر أولاً.","error");return;}
+        var parsed; try{parsed=new URL(raw);}catch(e){setStatus(aiMediaStatus,"الرابط غير صحيح.","error");return;}
+        if(parsed.protocol!=="https:" && parsed.protocol!=="http:"){setStatus(aiMediaStatus,"استخدم رابط HTTPS أو HTTP مباشر.","error");return;}
+        btn.disabled=true; updateMediaProgress(0,"جاري الاتصال بمصدر الملف...");
+        try{
+          var response=await fetch(parsed.href,{method:"GET"});
+          if(!response.ok) throw new Error("رفض مصدر الفيديو التنزيل (HTTP "+response.status+").");
+          var type=(response.headers.get("content-type")||"").split(";")[0].trim().toLowerCase();
+          if(!/^(video\/(mp4|webm|quicktime)|audio\/(mpeg|mp3|wav|x-wav|ogg|mp4|webm|aac|x-m4a))$/.test(type))
+            throw new Error("الرابط لا يعرض ملف فيديو/صوت مباشر بصيغة مدعومة.");
+          var total=Number(response.headers.get("content-length")||0);
+          if(total>90*1024*1024) throw new Error("حجم الملف يتجاوز الحد الحالي 90 ميجابايت.");
+          if(!response.body||!response.body.getReader) throw new Error("المتصفح لا يدعم قراءة الملف مع إظهار تقدم التحميل.");
+          var reader=response.body.getReader(), chunks=[], received=0, part;
+          while(!(part=await reader.read()).done){
+            chunks.push(part.value); received+=part.value.byteLength;
+            updateMediaProgress(total?received/total*100:0,total?("تم جلب "+(received/1048576).toFixed(1)+" من "+(total/1048576).toFixed(1)+" ميجابايت"):"تم جلب "+(received/1048576).toFixed(1)+" ميجابايت");
+            if(received>90*1024*1024){reader.cancel();throw new Error("تجاوز الملف حد 90 ميجابايت.");}
+          }
+          var blob=new Blob(chunks,{type:type});
+          var filename=decodeURIComponent(parsed.pathname.split("/").pop()||"mymusic-media").replace(/[^\w. -]/g,"_");
+          var ext=type.startsWith("video/")?(type.includes("webm")?"webm":"mp4"):(type.includes("mpeg")||type.includes("mp3")?"mp3":type.includes("wav")?"wav":"m4a");
+          if(!/\.(mp4|webm|mov|mp3|wav|m4a|ogg)$/i.test(filename)) filename="MyMusic-import."+ext;
+          activeLocalFile=new File([blob],filename,{type:type});
+          aiMediaFileInput.value="";
+          updateMediaProgress(100,"اكتمل جلب الملف؛ جاري بدء التفريغ والترجمة...");
+          await transcribeAndTranslateFile(activeLocalFile);
+          setStatus(aiMediaStatus,"اكتمل جلب الملف وترجمته. يمكنك الآن إنشاء الدبلجة الصوتية.","success");
+        }catch(error){
+          updateMediaProgress(0,"تعذر جلب الرابط");
+          var message=/Failed to fetch|CORS|NetworkError/i.test(error.message)?"المصدر يمنع الوصول المباشر من المتصفح (CORS) أو يتطلب تسجيل دخول. نزّل الملف المصرح لك به وارفعه من جهازك.":error.message;
+          setStatus(aiMediaStatus,message,"error");
+        }finally{btn.disabled=false;}
+      });
       aiMediaBtn.addEventListener("click",async function(){
         var file=(aiMediaFileInput.files&&aiMediaFileInput.files[0])||activeLocalFile;
         this.disabled=true;
