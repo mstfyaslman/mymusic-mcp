@@ -1262,29 +1262,26 @@
         var btn=this, file=(aiMediaFileInput.files&&aiMediaFileInput.files[0])||activeLocalFile;
         if(!file){setStatus(aiMediaStatus,"اختر فيديو أو صوتاً أولاً.","error");return;}
         btn.disabled=true;
-        var video=null, objectUrl=null, recorder=null;
+        var video=null, objectUrl=null, recorder=null, audioContext=null;
         try{
           if(!file.type.startsWith("video/")) {
             setStatus(aiMediaStatus,"الملف صوتي بالفعل؛ جاري تقسيمه إلى أجزاء للترجمة الطويلة...","");
             await transcribeAndTranslateFile(file); return;
           }
-          if(typeof MediaRecorder==="undefined") throw new Error("متصفحك لا يدعم استخراج الصوت. استخدم Chrome حديثاً أو ارفع ملف MP3/M4A.");
-          video=document.createElement("video"); video.preload="auto"; video.muted=true; video.playsInline=true;
+          if(typeof MediaRecorder==="undefined" || !(window.AudioContext||window.webkitAudioContext)) throw new Error("متصفحك لا يدعم استخراج الصوت. استخدم Chrome حديثاً أو ارفع ملف MP3/M4A.");
+          video=document.createElement("video"); video.preload="auto"; video.playsInline=true;
           objectUrl=URL.createObjectURL(file); video.src=objectUrl;
+          audioContext=new (window.AudioContext||window.webkitAudioContext)();
+          await audioContext.resume();
           await new Promise(function(resolve,reject){
             video.onloadedmetadata=resolve; video.onerror=function(){reject(new Error("تعذر فتح ملف الفيديو لاستخراج الصوت."));};
           });
           var duration=video.duration;
           if(!Number.isFinite(duration)||duration<=0) throw new Error("تعذر قراءة مدة الفيديو.");
-          var capture=video.captureStream||video.mozCaptureStream;
-          if(!capture) {
-            if(duration>3600) throw new Error("استخراج الصوت من فيديو أطول من ساعة يحتاج متصفحاً يدعم captureStream. افتح MyMusic في Chrome حديث أو ارفع ملفاً صوتياً.");
-            await transcribeAndTranslateFile(file); return;
-          }
-          var stream=capture.call(video), audioTracks=stream.getAudioTracks();
-          if(!audioTracks.length) throw new Error("لم يتم العثور على مسار صوت داخل الفيديو.");
-          var audioStream=new MediaStream(audioTracks), mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":"audio/webm";
-          recorder=new MediaRecorder(audioStream,{mimeType:mimeType,audioBitsPerSecond:48000});
+          var source=audioContext.createMediaElementSource(video), destination=audioContext.createMediaStreamDestination();
+          source.connect(destination);
+          var mimeType=MediaRecorder.isTypeSupported("audio/webm;codecs=opus")?"audio/webm;codecs=opus":"audio/webm";
+          recorder=new MediaRecorder(destination.stream,{mimeType:mimeType,audioBitsPerSecond:48000});
           var chunks=[];
           setStatus(aiMediaStatus,"جاري استخراج الصوت من الفيديو بسرعة التشغيل الفعلية ("+Math.floor(duration/3600)+" ساعة و"+Math.floor((duration%3600)/60)+" دقيقة). اترك الصفحة مفتوحة حتى ينتهي...","");
           var extractedBlob=await new Promise(function(resolve,reject){
@@ -1308,6 +1305,7 @@
           if(recorder&&recorder.state!=="inactive"){try{recorder.stop();}catch(e){}}
           if(video){try{video.pause();video.removeAttribute("src");video.load();}catch(e){}}
           if(objectUrl)URL.revokeObjectURL(objectUrl);
+          if(audioContext){try{await audioContext.close();}catch(e){}}
           btn.disabled=false;
         }
       });
