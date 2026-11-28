@@ -1903,7 +1903,7 @@
         document.getElementById("socialTranslationMode").addEventListener("change",function(){socialTranslationRevision++;socialLastTranslationKey="";if(this.value==="auto")scheduleSocialAutoTranslation();else{clearTimeout(socialTranslateTimer);socialTranslationPending=false;document.getElementById("socialTranslationResult").textContent="الوضع اليدوي: اضغط «ترجمة الآن» لبدء الترجمة.";}});
         document.getElementById("socialTranslateBtn").addEventListener("click",function(){socialTranslationRevision++;socialLastTranslationKey="";clearTimeout(socialTranslateTimer);translateSocialText();});
         // Live Facebook tab-audio capture: user-authorized browser sharing only.
-        var socialLiveActive=false,socialDisplayStream=null,socialAudioStream=null,socialLiveRecorder=null,socialLiveStartedAt=0,socialLiveSegmentStart=0;
+        var socialLiveActive=false,socialDisplayStream=null,socialAudioStream=null,socialLiveRecorder=null,socialLiveStartedAt=0,socialLiveQueue=Promise.resolve(),socialLivePending=0;
         var socialLiveStartBtn=document.getElementById("socialLiveAudioStart"),socialLiveStopBtn=document.getElementById("socialLiveAudioStop"),socialLiveStatus=document.getElementById("socialLiveAudioStatus");
         function socialLiveStatusText(message,isError){socialLiveStatus.textContent=message;socialLiveStatus.classList.toggle("error",!!isError);}
         function socialSrtTimestamp(ms){ms=Math.max(0,Math.round(ms));var h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000),v=ms%1000;return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")+","+String(v).padStart(3,"0");}
@@ -1916,13 +1916,15 @@
           if(!response.ok)throw new Error(data.error||"تعذر تحليل صوت Facebook.");
           var raw=String(data.text||"").replace(/```(?:srt)?/gi,"").trim();
           if(!raw||raw==="NO_SPEECH")return;
-          var parsed=parseSocialSrt(raw),base=Number(data.offsetMs)||offsetMs;
-          if(!parsed.length){socialLiveStatusText("وصل الصوت، لكن لم تصل ترجمة بتوقيتات صالحة لهذا المقطع.",true);return;}
-          parsed.forEach(function(cue){cue.start+=base;cue.end+=base;subtitleCues.push(cue);});
+          var parsed=parseSocialSrt(raw);
+          if(!parsed.length){socialLiveStatusText("وصل الصوت، لكن لم تصل ترجمة بتوقيتات صالحة لهذا المقطع.");return;}
+          // Results arrive after cloud inference; schedule this segment from the moment it becomes available.
+          var anchor=Math.max(subtitleClock*1000,performance.now()-socialLiveStartedAt),firstStart=parsed[0].start;
+          parsed.forEach(function(cue){cue.start=anchor+(cue.start-firstStart);cue.end=anchor+(cue.end-firstStart);subtitleCues.push(cue);});
           subtitleCues.sort(function(a,b){return a.start-b.start;});
           subtitleClock=Math.max(subtitleClock,(performance.now()-socialLiveStartedAt)/1000);
           paintSubtitle();
-          socialLiveStatusText("المساعد يعمل — تمت إضافة "+parsed.length+" مقطع مترجم. قد يظهر تأخير بسيط بسبب معالجة الذكاء الاصطناعي.");
+          socialLiveStatusText("المساعد يعمل — تمت إضافة "+parsed.length+" ترجمة صوتية. قد يوجد تأخير قصير بسبب المعالجة السحابية.");
         }
         async function socialLiveCaptureLoop(){
           var audioTracks=socialDisplayStream.getAudioTracks();
@@ -1943,10 +1945,17 @@
             socialLiveRecorder=null;
             if(chunks.length){
               var blob=new Blob(chunks,{type:recorder.mimeType||"audio/webm"});
-              try{await socialProcessAudioChunk(blob,segmentStart);}
-              catch(error){socialLiveStatusText(error.message||"حدث خطأ أثناء ترجمة الصوت.",true);if(!socialLiveActive)break;await new Promise(function(resolve){setTimeout(resolve,1200);});}
+              if(socialLivePending<4){
+                socialLivePending++;
+                socialLiveQueue=socialLiveQueue.then(function(){return socialProcessAudioChunk(blob,segmentStart);}).catch(function(error){socialLiveStatusText(error.message||"حدث خطأ أثناء ترجمة الصوت.",true);}).finally(function(){socialLivePending=Math.max(0,socialLivePending-1);});
+              }else{
+                socialLiveStatusText("المساعد يتأخر في المعالجة؛ تم تجاوز مقطع مؤقت للحفاظ على استمرار الاستقبال.",true);
+              }
             }
           }
+          await socialLiveQueue;
+          subtitleRunning=false;if(subtitleTimer)cancelAnimationFrame(subtitleTimer);
+          if(!socialLiveActive)socialLiveStatusText("تم إيقاف استقبال الصوت. يمكنك بدء جلسة جديدة متى شئت.");
         }
         async function startSocialLiveAudio(){
           if(socialLiveActive)return;
@@ -1972,9 +1981,8 @@
           if(socialLiveRecorder&&socialLiveRecorder.state!=="inactive"){try{socialLiveRecorder.stop();}catch(e){}}
           if(socialDisplayStream){socialDisplayStream.getTracks().forEach(function(track){track.stop();});socialDisplayStream=null;}
           if(socialAudioStream){socialAudioStream.getTracks().forEach(function(track){track.stop();});socialAudioStream=null;}
-          subtitleRunning=false;if(subtitleTimer)cancelAnimationFrame(subtitleTimer);
-          socialLiveStartBtn.disabled=false;socialLiveStopBtn.disabled=true;
-          socialLiveStatusText("تم إيقاف استقبال الصوت. يمكنك بدء جلسة جديدة متى شئت.");
+          socialLiveStopBtn.disabled=true;
+          socialLiveStatusText("تم إيقاف الالتقاط. جارٍ إنهاء ترجمة المقاطع التي وصلت بالفعل...");
         }
         socialLiveStartBtn.addEventListener("click",startSocialLiveAudio);
         socialLiveStopBtn.addEventListener("click",stopSocialLiveAudio);
